@@ -188,7 +188,7 @@ data "amazon-ami" "ubuntu_server_noble_x86_64" {
   }
   most_recent = true
   owners      = ["099720109477"]
-  region      = var.build_region
+  region      = var.aws_build_region
 }
 
 
