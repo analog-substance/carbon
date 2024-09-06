@@ -1,0 +1,9 @@
+---
+- name: 'Provision Desktop Image'
+  hosts: all
+
+  roles:
+    - base-ubuntu
+    - user-home-skel
+    - user-gui
+    - desktop

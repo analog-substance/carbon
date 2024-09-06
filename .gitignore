@@ -1,0 +1,6 @@
+# Ignore packer output directories
+output-*
+
+# Ignore 
+carbon-vm-*-2*
+private.auto.pkrvars.hcl

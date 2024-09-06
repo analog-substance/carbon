@@ -1,0 +1,30 @@
+#cloud-config
+autoinstall:
+  version: 1
+  locale: en_US
+  keyboard:
+    layout: us
+  ssh:
+    install-server: true
+    allow-pw: true
+  packages:
+    - zsh
+  updates: all
+  late-commands:
+    - |
+      if [ -d /sys/firmware/efi ]; then
+        apt-get install -y efibootmgr
+        efibootmgr -o $(efibootmgr | perl -n -e '/Boot(.+)\* Ubuntu/ && print $1')
+      fi
+  user-data:
+    preserve_hostname: false
+    hostname: carbon
+    package_upgrade: true
+    timezone: UTC
+    users:
+      - name: isotope
+        passwd: $6$hu4TwZI9NL3Oz9fT$.M1v/59Fs2FjupQyWvPsNC3rX42hPG8AELzS1WJg.lzntXsR7ACaDHLd/d3xNufpc59XRNBt8UQL9aHvSx8.t1
+        groups: [adm, cdrom, dip, plugdev, lxd, sudo]
+        lock-passwd: false
+        sudo: ALL=(ALL) NOPASSWD:ALL
+        shell: /bin/zsh

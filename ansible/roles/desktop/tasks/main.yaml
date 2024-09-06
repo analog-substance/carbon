@@ -1,0 +1,50 @@
+---
+
+- name: TigerVNC Download
+  get_url:
+    url: https://master.dl.sourceforge.net/project/tigervnc/beta/1.12beta/tigervnc-1.11.90.x86_64.tar.gz?viasf=1
+    dest: /tmp/tigervnc.tgz
+    force: no
+
+- name: Install Desktop Packages
+  become: true
+  apt:
+    pkg:
+      - autocutsel
+      - firefox
+      - fonts-font-awesome
+      - imagemagick
+      - net-tools
+      - sxhkd
+      # - wireshark-qt
+      - xclip
+      - xdotool
+      - xubuntu-desktop-minimal
+    state: latest
+
+- name: TigerVNC Install
+  become: true
+  shell: cd /tmp && tar -xzf tigervnc.tgz && cp -r tigervnc-1*/* / && rm -rf tigervnc*
+
+- name: TigerVNC Default Config
+  become: true
+  copy:
+    src: tigervnc.conf
+    dest: /etc/tigervnc/vncserver-config-mandatory
+    mode: 0644
+
+- name: Flameshot Get Latest Package URL
+  shell: curl -s https://api.github.com/repos/flameshot-org/flameshot/releases | jq -r '.[0].assets[] | select((.name | ascii_downcase | (contains("amd64")) and contains("ubuntu-20")) and (.content_type == "application/vnd.debian.binary-package")) | .browser_download_url'
+  register: flameshot_release
+
+- name: Flameshot
+  apt:
+    deb: "{{ flameshot_release.stdout }}"
+    state: present
+  become: true
+
+- name: VS Code
+  become: true
+  apt:
+    deb: https://code.visualstudio.com/sha/download?build=stable&os=linux-deb-x64
+

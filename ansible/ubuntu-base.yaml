@@ -1,0 +1,6 @@
+---
+- name: 'Provision Base Image'
+  hosts: all
+
+  roles:
+    - base-ubuntu

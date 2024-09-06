@@ -1,0 +1,7 @@
+---
+  - name: Copy files
+    copy:
+      src: home/
+      dest: /etc/skel
+      mode: preserve
+    become: true
