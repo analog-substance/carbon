@@ -1,3 +1,5 @@
+// vsphere configs
+
 vsphere_username  = "REPLACE"
 vsphere_password  = "REPLACE"
 vsphere_endpoint  = "REPLACE"

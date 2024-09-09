@@ -101,20 +101,53 @@ variable "aws_build_region" {
   type        = string
 }
 
+variable "aws_tags" {
+  default = {
+    Architecture = "x86_64"
+    OS_Version   = "Ubuntu Noble Numbat"
+  }
 
-// variable "vm_name" {
-//   type        = string
-//   description = "Name for VM"
-// }
+  type = map(string)
+}
+
+variable "aws_run_tags" {
+  default = {
+    Environment = "testing"
+    Type        = "builder"
+  }
+
+  type = map(string)
+}
+
+variable "aws_vpc_filters" {
+  default = {
+    "Name" : "AMI Builds"
+  }
+
+  type = map(string)
+}
+
+variable "aws_subnet_filters" {
+  default = {
+    "Name" : "AMI Builds"
+  }
+
+  type = map(string)
+}
+
+locals {
+  timestamp = formatdate("YYYYMMDDhhmmss", timestamp())
+}
 
 source "virtualbox-iso" "carbon-vm-ubuntu" {
   guest_os_type    = "Ubuntu_64"
+  vm_name = "carbon-ubuntu-vm-${local.timestamp}"
   iso_url          = var.iso_url
   iso_checksum     = var.iso_checksum
   ssh_username     = var.ssh_username
   ssh_password     = var.ssh_password
   ssh_timeout      = "10m"
-  shutdown_command = "echo 'carbon' | sudo -S shutdown -P now"
+  shutdown_command = "echo '${var.ssh_password}' | sudo -S shutdown -P now"
   headless         = false
   firmware         = "efi"
   http_directory   = "./http/24.04/"
@@ -175,66 +208,55 @@ source "vsphere-iso" "carbon-vm-ubuntu" {
   boot_command   = [var.boot_command]
   boot_wait      = "5s"
 
-  vm_name = "carbon-ububuntu-vm"
+  vm_name = "carbon-ubuntu-vm-${local.timestamp}"
 
 }
-
-data "amazon-ami" "ubuntu_server_noble_x86_64" {
-  filters = {
-    architecture        = "x86_64"
-    name                = "ubuntu/images/hvm-ssd-gp3/ubuntu-noble-24.04-amd64-server*"
-    root-device-type    = "ebs"
-    virtualization-type = "hvm"
-  }
-  most_recent = true
-  owners      = ["099720109477"]
-  region      = var.aws_build_region
-}
-
-
-locals { timestamp = regex_replace(timestamp(), "[- TZ:]", "") }
 
 source "amazon-ebs" "carbon-vm-ubuntu" {
-  profile = var.aws_profile
-  region  = var.aws_build_region
-  source_ami                  = data.amazon-ami.ubuntu_server_noble_x86_64.id
+  profile    = var.aws_profile
+  region     = var.aws_build_region
 
   ami_name                    = "carbon-vm-ami-${local.timestamp}"
-  instance_type               = "t3.small"
+  instance_type               = "t3.medium"
   ssh_username                = "ubuntu"
+  ssh_interface               = "public_ip"
+  ssh_timeout                 = "10m"
   encrypt_boot                = true
   associate_public_ip_address = true
+  user_data_file = "./http/24.04/user-data"
 
   temporary_key_pair_type = "ed25519"
-  // kms_key_id                  = var.build_region_kms
-  // region_kms_key_ids = var.region_kms_keys
-  // skip_create_ami    = var.skip_create_ami
-  
+
   launch_block_device_mappings {
     delete_on_termination = true
-    device_name           = "/dev/xvda"
+    device_name = "/dev/sda1"
     encrypted             = true
     volume_size           = 80
     volume_type           = "gp3"
   }
-  
-  subnet_filter {
+
+  tags     = var.aws_tags
+  run_tags = var.aws_run_tags
+
+  source_ami_filter {
     filters = {
-      "tag:Name" = "AMI Build"
+      architecture        = "x86_64"
+      name                = "ubuntu/images/hvm-ssd-gp3/ubuntu-noble-24.04-amd64-server*"
+      root-device-type    = "ebs"
+      virtualization-type = "hvm"
     }
+    most_recent = true
+    owners      = ["099720109477"]
   }
 
-  tags = {
-    Application        = "Carbon VM"
-    Architecture       = "x86_64"
-    Base_AMI_Name      = data.amazon-ami.ubuntu_server_noble_x86_64.name
-    OS_Version         = "Ubuntu Noble Numbat"
+  subnet_filter {
+    filters = var.aws_subnet_filters
+    most_free = true
+    random    = false
   }
 
   vpc_filter {
-    filters = {
-      "tag:Name" = "AMI Build"
-    }
+    filters = var.aws_vpc_filters
   }
 }
 
@@ -243,6 +265,7 @@ build {
   sources = [
     "sources.vsphere-iso.carbon-vm-ubuntu",
     "sources.virtualbox-iso.carbon-vm-ubuntu",
+    "sources.amazon-ebs.carbon-vm-ubuntu",
   ]
 
   provisioner "ansible" {
@@ -251,7 +274,7 @@ build {
 
   provisioner "shell" {
     inline = [
-      "find /home/${var.ssh_username} -maxdepth 1 -type d -name '~*' -exec rm -rf {} \\;",
+      "find /home/ -maxdepth 2 -type d -name '~*' -exec rm -rf {} \\;",
     ]
   }
 }
