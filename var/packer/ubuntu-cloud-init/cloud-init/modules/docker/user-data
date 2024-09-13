@@ -1,0 +1,12 @@
+#cloud-config
+autoinstall:
+  version: 1
+  updates: all
+  apt:
+    primary:
+      - arches: [default]
+        uri: http://us.archive.ubuntu.com/ubuntu/
+  packages:
+    - docker-ce
+    - docker-ce-cli
+  updates: all

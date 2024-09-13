@@ -1,0 +1,28 @@
+---
+  - name: copy skel to home
+    shell: 'rsync -av  /etc/skel/ ~/.  --exclude .vnc'
+
+  - name: Combine all ssh keys to single string
+    set_fact:
+      all_ssh_keys: "{{ '\n'.join(users | selectattr('ssh_key') | map(attribute='ssh_key') | list) }}"
+
+  - name: Add ssh keys to shared user
+    authorized_key:
+      key: "{{ all_ssh_keys }}"
+      user: "{{ ansible_user_id }}"
+      exclusive: true
+
+  - name: Create users
+    when: multiple_user_support == true and users is defined and (users|length>0)
+    user:
+      name: "{{ item.name }}"
+      append: yes
+      groups:
+        - "sudo"
+        - "docker"
+      state: present
+      shell: /usr/bin/zsh
+    loop: "{{ users }}"
+    become: true
+    loop_control:
+      label: "{{ item.name }}"

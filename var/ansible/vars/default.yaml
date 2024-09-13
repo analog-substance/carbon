@@ -1,0 +1,8 @@
+---
+# should user accounts be created for each user?
+multiple_user_support: false
+
+# users:
+#   - name: user01
+#     ssh_key: sdasdas
+users: []

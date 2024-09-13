@@ -1,0 +1,13 @@
+---
+- name: 'Provision Desktop Image'
+  hosts: all
+  vars_files:
+    - ./vars/default.yaml
+    - ./vars/overrides.yaml
+
+  roles:
+    - base-ubuntu
+    - base-users
+    - desktop
+    - desktop-users
+    - users

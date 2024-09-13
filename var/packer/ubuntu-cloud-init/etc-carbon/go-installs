@@ -1,0 +1,14 @@
+github.com/analog-substance/nex@latest
+github.com/analog-substance/as-gold@latest
+github.com/analog-substance/copper/cmd/copper@latest
+github.com/defektive/fast-resolv@latest
+github.com/OJ/gobuster/v3@latest
+github.com/ffuf/ffuf@latest
+github.com/hakluke/hakrawler@latest
+github.com/hakluke/hakcheckurl@latest
+github.com/projectdiscovery/nuclei/v3/cmd/nuclei@latest
+github.com/projectdiscovery/httpx/cmd/httpx@latest
+github.com/projectdiscovery/dnsx/cmd/dnsx@latest
+github.com/projectdiscovery/katana/cmd/katana@latest
+github.com/projectdiscovery/subfinder/v2/cmd/subfinder@latest
+github.com/sensepost/gowitness@latest
