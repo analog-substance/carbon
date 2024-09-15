@@ -21,14 +21,18 @@ func (e environment) Platform() types.Platform {
 func (e environment) VMs() []types.VM {
 	var vms []types.VM
 	for _, mpVM := range api.ListVMs() {
+		publicIPs := []string{}
+		privateIPs := []string{}
+
+		publicIPs = append(publicIPs, mpVM.Ipv4...)
 
 		vms = append(vms, types.Machine{
 			InstanceName:       mpVM.Name,
 			CurrentState:       stateFromVboxInfo(mpVM.State),
 			InstanceID:         mpVM.Name,
 			Env:                e,
-			PublicIPAddresses:  mpVM.Ipv4[0:1],
-			PrivateIPAddresses: mpVM.Ipv4[1:2],
+			PublicIPAddresses:  publicIPs,
+			PrivateIPAddresses: privateIPs,
 		})
 	}
 	return vms

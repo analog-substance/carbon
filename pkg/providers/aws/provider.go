@@ -4,6 +4,7 @@ import (
 	"github.com/analog-substance/carbon/pkg/providers/types"
 	"github.com/aws/aws-sdk-go-v2/config"
 	"gopkg.in/ini.v1"
+	"log"
 	"slices"
 	"strings"
 )
@@ -27,11 +28,16 @@ func (p *provider) Profiles() []string {
 	}
 
 	for _, s := range sections.SectionStrings() {
-		if s == "DEFAULT" {
+		sec, err := sections.GetSection(s)
+		if err != nil {
+			log.Println("error getting config section:", s)
 			continue
 		}
-		name, _ := strings.CutPrefix(s, "profile ")
-		p.profiles = append(p.profiles, name)
+
+		if len(sec.Keys()) > 1 {
+			name, _ := strings.CutPrefix(s, "profile ")
+			p.profiles = append(p.profiles, name)
+		}
 	}
 
 	return p.profiles
