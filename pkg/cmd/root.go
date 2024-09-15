@@ -40,8 +40,8 @@ var environments []string
 var jsonOutput bool
 var carbonObj *carbon.Carbon
 
-// rootCmd represents the base command when called without any subcommands
-var rootCmd = &cobra.Command{
+// RootCmd represents the base command when called without any subcommands
+var RootCmd = &cobra.Command{
 	Use:   "carbon",
 	Short: "Infrastructure ops simplified",
 	Long:  `Manage and use infrastructure with a consistent interface, regardless of where it lives.`,
@@ -65,7 +65,7 @@ var rootCmd = &cobra.Command{
 // Execute adds all child commands to the root command and sets flags appropriately.
 // This is called by main.main(). It only needs to happen once to the rootCmd.
 func Execute() {
-	err := rootCmd.Execute()
+	err := RootCmd.Execute()
 	if err != nil {
 		os.Exit(1)
 	}
@@ -77,21 +77,21 @@ func init() {
 	// Cobra supports persistent flags, which, if defined here,
 	// will be global for your application.
 
-	rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is $HOME/.carbon.yaml)")
-	rootCmd.PersistentFlags().StringSliceP("provider", "P", []string{}, "Provider to use vbox, aws")
-	rootCmd.PersistentFlags().StringSliceVarP(&platforms, "platform", "p", []string{}, "Platform to use. Like an instance of a provider. Used to specify aws profiles")
-	rootCmd.PersistentFlags().StringSliceVarP(&environments, "environment", "e", []string{}, "Environment to use. Some platforms support many environments.")
-	rootCmd.PersistentFlags().BoolVarP(&jsonOutput, "json", "j", false, "Output in JSON")
+	RootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is $HOME/.carbon.yaml)")
+	RootCmd.PersistentFlags().StringSliceP("provider", "P", []string{}, "Provider to use vbox, aws")
+	RootCmd.PersistentFlags().StringSliceVarP(&platforms, "platform", "p", []string{}, "Platform to use. Like an instance of a provider. Used to specify aws profiles")
+	RootCmd.PersistentFlags().StringSliceVarP(&environments, "environment", "e", []string{}, "Environment to use. Some platforms support many environments.")
+	RootCmd.PersistentFlags().BoolVarP(&jsonOutput, "json", "j", false, "Output in JSON")
 
-	err := viper.BindPFlag("providers", rootCmd.PersistentFlags().Lookup("provider"))
+	err := viper.BindPFlag("providers", RootCmd.PersistentFlags().Lookup("provider"))
 	if err != nil {
 		log.Fatal(err)
 	}
-	err = viper.BindPFlag("platforms", rootCmd.PersistentFlags().Lookup("platform"))
+	err = viper.BindPFlag("platforms", RootCmd.PersistentFlags().Lookup("platform"))
 	if err != nil {
 		log.Fatal(err)
 	}
-	err = viper.BindPFlag("environments", rootCmd.PersistentFlags().Lookup("environment"))
+	err = viper.BindPFlag("environments", RootCmd.PersistentFlags().Lookup("environment"))
 	if err != nil {
 		log.Fatal(err)
 	}

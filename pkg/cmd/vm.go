@@ -39,7 +39,7 @@ So you type less and be more productive!`,
 }
 
 func init() {
-	rootCmd.AddCommand(vmCmd)
+	RootCmd.AddCommand(vmCmd)
 
 	// Here you will define your flags and configuration settings.
 
