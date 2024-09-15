@@ -4,6 +4,7 @@ go 1.23.1
 
 require (
 	github.com/NoF0rte/cmd-builder v0.0.0-20220305223538-e35bfeabbbff
+	github.com/analog-substance/util v0.1.0
 	github.com/aws/aws-sdk-go-v2 v1.30.5
 	github.com/aws/aws-sdk-go-v2/config v1.27.33
 	github.com/aws/aws-sdk-go-v2/service/ec2 v1.177.3
@@ -17,7 +18,6 @@ require (
 )
 
 require (
-	github.com/analog-substance/util v0.1.0 // indirect
 	github.com/aws/aws-sdk-go-v2/credentials v1.17.32 // indirect
 	github.com/aws/aws-sdk-go-v2/feature/ec2/imds v1.16.13 // indirect
 	github.com/aws/aws-sdk-go-v2/internal/configsources v1.3.17 // indirect
