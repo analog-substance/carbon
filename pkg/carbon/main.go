@@ -2,6 +2,7 @@ package carbon
 
 import (
 	"github.com/analog-substance/carbon/pkg/providers/aws"
+	"github.com/analog-substance/carbon/pkg/providers/libvirt"
 	"github.com/analog-substance/carbon/pkg/providers/multipass"
 	"github.com/analog-substance/carbon/pkg/providers/types"
 	"github.com/analog-substance/carbon/pkg/providers/virtualbox"
@@ -86,6 +87,7 @@ func AvailableProviders() []types.Provider {
 	if len(availableProviders) == 0 {
 		allProviders := []types.Provider{
 			aws.New(),
+			libvirt.New(),
 			virtualbox.New(),
 			multipass.New(),
 		}

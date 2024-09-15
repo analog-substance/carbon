@@ -8,14 +8,6 @@ import (
 	"path/filepath"
 )
 
-type VBoxVM struct {
-	Name    string
-	ID      string
-	State   string
-	GuestOS string
-
-	vmInfo map[string]string
-}
 type MultipassVM struct {
 	Ipv4    []string `json:"ipv4"`
 	Name    string   `json:"name"`
