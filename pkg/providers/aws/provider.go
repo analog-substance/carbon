@@ -28,15 +28,18 @@ func (p *provider) Profiles() []string {
 	}
 
 	for _, s := range sections.SectionStrings() {
-		sec, err := sections.GetSection(s)
-		if err != nil {
-			log.Println("error getting config section:", s)
-			continue
-		}
+		sl := strings.ToLower(s)
+		if sl == "default" || strings.HasPrefix(sl, "profile") {
+			sec, err := sections.GetSection(s)
+			if err != nil {
+				log.Println("error getting config section:", s)
+				continue
+			}
 
-		if len(sec.Keys()) > 1 {
-			name, _ := strings.CutPrefix(s, "profile ")
-			p.profiles = append(p.profiles, name)
+			if len(sec.Keys()) > 1 {
+				name, _ := strings.CutPrefix(s, "profile ")
+				p.profiles = append(p.profiles, name)
+			}
 		}
 	}
 
