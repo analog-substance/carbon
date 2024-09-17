@@ -2,8 +2,8 @@
 timezone: UTC
 
 ssh_deletekeys: false
-ssh_authorized_keys:
-  - ssh-rsa replace
+#ssh_authorized_keys:
+#  - ssh-rsa replace
 
 apt:
   sources:

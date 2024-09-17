@@ -8,3 +8,6 @@ private.auto.pkrvars.hcl
 dist/
 overrides.yaml
 test/
+
+/packer/
+/terraform/

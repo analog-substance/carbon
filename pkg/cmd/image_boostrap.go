@@ -33,7 +33,9 @@ var imageBootstrapCmd = &cobra.Command{
 	Long:  `create image build configs`,
 	Run: func(cmd *cobra.Command, args []string) {
 		name, _ := cmd.Flags().GetString("name")
-		err := carbonObj.CreateImageBuild(name)
+		osDir, _ := cmd.Flags().GetString("os")
+		serviceProvider, _ := cmd.Flags().GetString("service")
+		err := carbonObj.CreateImageBuild(name, osDir, serviceProvider)
 		if err != nil {
 			log.Fatal(err)
 		}
@@ -42,14 +44,7 @@ var imageBootstrapCmd = &cobra.Command{
 
 func init() {
 	imageCmd.AddCommand(imageBootstrapCmd)
-
-	// Here you will define your flags and configuration settings.
-
-	// Cobra supports Persistent Flags which will work for this command
-	// and all subcommands, e.g.:
-	// imageCmd.PersistentFlags().String("foo", "", "A help for foo")
-
-	// Cobra supports local flags which will only run when this command
-	// is called directly, e.g.:
 	imageBootstrapCmd.Flags().StringP("name", "n", "", "Name of image build")
+	imageBootstrapCmd.Flags().StringP("os", "o", "ubuntu-24.04", "Name of image build")
+	imageBootstrapCmd.Flags().StringP("service", "s", "", "Service provider (aws, virtualbox, qemu, multipass)")
 }

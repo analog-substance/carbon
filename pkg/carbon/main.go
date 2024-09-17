@@ -1,11 +1,14 @@
 package carbon
 
 import (
+	"github.com/analog-substance/carbon/files"
+	"github.com/analog-substance/carbon/pkg/cloud_init"
 	"github.com/analog-substance/carbon/pkg/providers/aws"
 	"github.com/analog-substance/carbon/pkg/providers/multipass"
 	"github.com/analog-substance/carbon/pkg/providers/types"
 	"github.com/analog-substance/carbon/pkg/providers/virtualbox"
-	"io/fs"
+	"gopkg.in/yaml.v3"
+	"log"
 	"os"
 	"path"
 	"strings"
@@ -94,12 +97,71 @@ func (c *Carbon) FindVMByName(name string) types.VM {
 	return nil
 }
 
-const PackerCloudInitDir = "cloud-init"
+const embeddedRootDir = "var"
+const CloudInitDir = "cloud-init"
+const PackerDir = "packer"
 
-func (c *Carbon) CreateImageBuild(name string) error {
-	err := os.MkdirAll(path.Join("packer", name, PackerCloudInitDir), fs.ModeDir)
+func (c *Carbon) CreateImageBuild(name, osDir, service string) error {
+	bootstrappedDir := path.Join("packer", name)
+	cloudInitDir := path.Join(bootstrappedDir, CloudInitDir)
+	err := os.MkdirAll(cloudInitDir, 0755)
 	if err != nil {
 		return err
+	}
+	embeddedFS := files.Files
+	baseCloudInitDir := path.Join(embeddedRootDir, CloudInitDir, osDir)
+	basePackerDir := path.Join(embeddedRootDir, PackerDir, osDir, CloudInitDir, service)
+	cloudInitListing, err := embeddedFS.ReadDir(baseCloudInitDir)
+	if err != nil {
+		return err
+	}
+	packerListing, err := embeddedFS.ReadDir(basePackerDir)
+	if err != nil {
+		return err
+	}
+
+	tpls := map[string]*cloud_init.CloudConfig{}
+	endResult := &cloud_init.CloudConfig{}
+	for _, d := range cloudInitListing {
+		if strings.HasSuffix(d.Name(), ".yaml") {
+			filebytes, err := embeddedFS.ReadFile(path.Join(baseCloudInitDir, d.Name()))
+			if err != nil {
+				log.Fatal(err)
+			}
+
+			tpls[d.Name()] = &cloud_init.CloudConfig{}
+
+			err = yaml.Unmarshal(filebytes, tpls[d.Name()])
+			if err != nil {
+				return err
+			}
+
+			endResult.MergeWith(tpls[d.Name()])
+		}
+	}
+	d, err := yaml.Marshal(&endResult)
+	if err != nil {
+		return err
+	}
+
+	err = os.WriteFile(path.Join(cloudInitDir, "meta-data"), []byte{}, 0644)
+	if err != nil {
+		return err
+	}
+	err = os.WriteFile(path.Join(cloudInitDir, "user-data"), d, 0644)
+	if err != nil {
+		return err
+	}
+
+	for _, d := range packerListing {
+		filebytes, err := embeddedFS.ReadFile(path.Join(basePackerDir, d.Name()))
+		if err != nil {
+			return err
+		}
+		err = os.WriteFile(path.Join(bootstrappedDir, d.Name()), filebytes, 0644)
+		if err != nil {
+			return err
+		}
 	}
 
 	return nil
