@@ -22,7 +22,6 @@ THE SOFTWARE.
 package cmd
 
 import (
-	"github.com/analog-substance/carbon/pkg/providers/types"
 	"github.com/spf13/cobra"
 	"log"
 )
@@ -33,15 +32,8 @@ var vmSSH = &cobra.Command{
 	Short: "ssh to a vm",
 	Long:  `ssh to a vm`,
 	Run: func(cmd *cobra.Command, args []string) {
-		id, _ := cmd.Flags().GetString("id")
-		name, _ := cmd.Flags().GetString("name")
 		user, _ := cmd.Flags().GetString("user")
-		var vm types.VM
-		if name != "" {
-			vm = carbonObj.FindVMByName(name)
-		} else if id != "" {
-			vm = carbonObj.FindVMByID(id)
-		}
+		vm := getVMFromArgs(cmd, args)
 		if vm != nil {
 			err := vm.ExecSSH(user)
 			if err != nil {
@@ -55,7 +47,4 @@ var vmSSH = &cobra.Command{
 
 func init() {
 	vmCmd.AddCommand(vmSSH)
-	vmSSH.Flags().StringP("name", "name", "", "Name of the VM")
-	vmSSH.Flags().StringP("id", "i", "", "ID of machine to start")
-	vmSSH.Flags().StringP("user", "u", "ubuntu", "SSH Username")
 }

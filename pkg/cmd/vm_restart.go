@@ -32,8 +32,7 @@ var vmRestart = &cobra.Command{
 	Short: "Stop a vm",
 	Long:  `Stop a vm`,
 	Run: func(cmd *cobra.Command, args []string) {
-		id, _ := cmd.Flags().GetString("id")
-		vm := carbonObj.FindVMByID(id)
+		vm := getVMFromArgs(cmd, args)
 		if vm != nil {
 			err := vm.Stop()
 			if err != nil {
@@ -47,5 +46,4 @@ var vmRestart = &cobra.Command{
 
 func init() {
 	vmCmd.AddCommand(vmRestart)
-	vmStop.Flags().StringP("id", "i", "", "ID of machine to start")
 }
