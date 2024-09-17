@@ -29,7 +29,7 @@ type VM interface {
 	Stop() error
 	Restart() error
 	Environment() Environment
-	ExecSSH() error
+	ExecSSH(string) error
 }
 
 type Machine struct {
@@ -77,7 +77,7 @@ func (m Machine) Restart() error {
 	return m.Env.RestartVM(m.InstanceID)
 }
 
-func (m Machine) ExecSSH() error {
+func (m Machine) ExecSSH(user string) error {
 	path, _ := exec.LookPath("ssh")
 	ip := m.IPAddress()
 
@@ -89,7 +89,7 @@ func (m Machine) ExecSSH() error {
 		"UserKnownHostsFile=/dev/null",
 		//"-p",
 		//strconv.Itoa(m.SSHPort),
-		fmt.Sprintf("%s@%s", "ubuntu", ip),
+		fmt.Sprintf("%s@%s", user, ip),
 	}
 
 	//args = append(args, additionalArgs...)

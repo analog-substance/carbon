@@ -80,6 +80,17 @@ func (c *Carbon) FindVMByID(id string) types.VM {
 	return nil
 }
 
+func (c *Carbon) FindVMByName(name string) types.VM {
+	for _, vm := range c.GetVMs() {
+		lowerName := strings.ToLower(vm.Name())
+		name = strings.ToLower(name)
+		if strings.Contains(lowerName, name) {
+			return vm
+		}
+	}
+	return nil
+}
+
 var availableProviders []types.Provider
 
 func AvailableProviders() []types.Provider {
