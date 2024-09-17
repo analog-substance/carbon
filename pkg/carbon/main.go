@@ -5,6 +5,9 @@ import (
 	"github.com/analog-substance/carbon/pkg/providers/multipass"
 	"github.com/analog-substance/carbon/pkg/providers/types"
 	"github.com/analog-substance/carbon/pkg/providers/virtualbox"
+	"io/fs"
+	"os"
+	"path"
 	"strings"
 )
 
@@ -88,6 +91,17 @@ func (c *Carbon) FindVMByName(name string) types.VM {
 			return vm
 		}
 	}
+	return nil
+}
+
+const PackerCloudInitDir = "cloud-init"
+
+func (c *Carbon) CreateImageBuild(name string) error {
+	err := os.MkdirAll(path.Join("packer", name, PackerCloudInitDir), fs.ModeDir)
+	if err != nil {
+		return err
+	}
+
 	return nil
 }
 

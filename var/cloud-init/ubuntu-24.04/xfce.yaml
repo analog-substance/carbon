@@ -1,0 +1,16 @@
+#cloud-config
+apt:
+  sources:
+    microsoft.list:
+      source: deb [arch=amd64,arm64,armhf signed-by=$KEY_FILE] https://packages.microsoft.com/repos/code stable main
+      keyid: BC528686B50D79E339D3721CEB3E94ADBE1229CF
+packages:
+  - autocutsel
+  - code
+  - firefox
+  - flameshot
+  - fonts-font-awesome
+  - fonts-noto-color-emoji
+  - imagemagick
+  - tigervnc-standalone-server
+  - xubuntu-desktop-minimal

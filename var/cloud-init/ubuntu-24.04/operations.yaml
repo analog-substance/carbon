@@ -1,0 +1,18 @@
+#cloud-config
+packages:
+  - curl
+  - dnsutils
+  - gdb
+  - hydra
+  - ipcalc
+  - masscan
+  - ncat
+  - net-tools
+  - nmap
+  - openjdk-11-jre
+  - openvpn
+  - prips
+  - swaks
+  - wfuzz
+  - whois
+  # - wireshark-qt

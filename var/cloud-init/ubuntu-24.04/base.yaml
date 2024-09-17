@@ -1,0 +1,40 @@
+#cloud-config
+
+packages:
+  - apt-transport-https
+  - autoconf
+  - automake
+  - build-essential
+  - ca-certificates
+  - checkinstall
+  - curl
+  - figlet
+  - fortune-mod
+  - git
+  - gnupg-agent
+  - jq
+  - libffi-dev
+  - libjpeg8-dev
+  - libplist-utils
+  - libssl-dev
+  - libunbound-dev
+  - libxml2-dev
+  - libxml2-utils
+  - libxslt1-dev
+  - make
+  - openjdk-11-jre
+  - openvpn
+  - python-is-python3
+  - python3-pip
+  - python3-shodan
+  - python3-venv
+  - rsync
+  - silversearcher-ag
+  - tmux
+  - tree
+  - unzip
+  - vim
+  - yq
+  - zlib1g-dev
+  - zsh
+  # - wireshark-qt

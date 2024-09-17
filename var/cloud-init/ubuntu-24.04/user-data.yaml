@@ -1,18 +1,9 @@
 #cloud-config
-timezone: UTC
-
-ssh_deletekeys: false
-ssh_authorized_keys:
-  - ssh-rsa replace
-
 apt:
   sources:
     docker.list:
       source: deb [arch=amd64] https://download.docker.com/linux/ubuntu $RELEASE stable
       keyid: 9DC858229FC7DD38854AE2D88D81803C0EBFCD88
-    microsoft.list:
-      source: deb [arch=amd64,arm64,armhf signed-by=$KEY_FILE] https://packages.microsoft.com/repos/code stable main
-      keyid: BC528686B50D79E339D3721CEB3E94ADBE1229CF
 
 write_files:
 - path: /etc/carbon/git-repos
