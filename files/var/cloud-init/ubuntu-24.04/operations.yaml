@@ -12,6 +12,7 @@ packages:
   - openjdk-11-jre
   - openvpn
   - prips
+  - python3-shodan
   - swaks
   - wfuzz
   - whois

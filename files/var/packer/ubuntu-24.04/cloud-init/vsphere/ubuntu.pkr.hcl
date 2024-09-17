@@ -1,18 +1,6 @@
 packer {
   required_version = ">= 1.7.0"
   required_plugins {
-    amazon = {
-      version = ">= 1.2.8"
-      source  = "github.com/hashicorp/amazon"
-    }
-    ansible = {
-      version = ">= 1.1.1"
-      source  = "github.com/hashicorp/ansible"
-    }
-    virtualbox = {
-      version = "~> 1"
-      source  = "github.com/hashicorp/virtualbox"
-    }
     vsphere = {
       version = "~> 1"
       source  = "github.com/hashicorp/vsphere"
@@ -87,91 +75,8 @@ variable "vsphere_datastore" {
 
 }
 
-variable "aws_profile" {
-  default     = "default"
-  description = "The aws credentials profile to use."
-  type        = string
-}
-
-variable "aws_build_region" {
-  default     = "us-east-1"
-  description = "The region in which to retrieve the base AMI from and build the new AMI."
-  type        = string
-}
-
-variable "aws_tags" {
-  default = {
-    Architecture = "x86_64"
-    OS_Version   = "Ubuntu Noble Numbat"
-  }
-
-  type = map(string)
-}
-
-variable "aws_run_tags" {
-  default = {
-    Environment = "testing"
-    Type        = "builder"
-  }
-
-  type = map(string)
-}
-
-variable "aws_vpc_filters" {
-  default = {
-    "Name" : "AMI Builds"
-  }
-
-  type = map(string)
-}
-
-variable "aws_subnet_filters" {
-  default = {
-    "Name" : "AMI Builds"
-  }
-
-  type = map(string)
-}
-
 locals {
   timestamp = formatdate("YYYYMMDDhhmmss", timestamp())
-}
-
-source "virtualbox-iso" "carbon-vm-ubuntu" {
-  guest_os_type    = "Ubuntu_64"
-  vm_name          = "carbon-ubuntu-vm-${local.timestamp}"
-  iso_url          = var.iso_url
-  iso_checksum     = var.iso_checksum
-  ssh_username     = var.ssh_username
-  ssh_password     = var.ssh_password
-  disk_size        = 80000
-  ssh_timeout      = "15m"
-  shutdown_command = "echo '${var.ssh_password}' | sudo -S shutdown -P now"
-  headless         = false
-  firmware         = "efi"
-  http_directory   = "./http/24.04/"
-  boot_command     = [var.boot_command]
-  boot_wait        = "5s"
-  vboxmanage = [
-    [
-      "modifyvm",
-      "{{.Name}}",
-      "--memory",
-      "4096"
-    ],
-    [
-      "modifyvm",
-      "{{.Name}}",
-      "--cpus",
-      "4"
-    ],
-    [
-      "modifyvm",
-      "{{.Name}}",
-      "--nat-localhostreachable1",
-      "on"
-    ]
-  ]
 }
 
 source "vsphere-iso" "carbon-vm-ubuntu" {
@@ -211,69 +116,15 @@ source "vsphere-iso" "carbon-vm-ubuntu" {
 
 }
 
-source "amazon-ebs" "carbon-vm-ubuntu" {
-  profile = var.aws_profile
-  region  = var.aws_build_region
-
-  ami_name                    = "carbon-vm-ami-${local.timestamp}"
-  instance_type               = "t3.medium"
-  ssh_username                = "ubuntu"
-  ssh_interface               = "public_ip"
-  ssh_timeout                 = "10m"
-  encrypt_boot                = true
-  associate_public_ip_address = true
-  user_data_file              = "./http/24.04/user-data"
-
-  temporary_key_pair_type = "ed25519"
-
-  launch_block_device_mappings {
-    delete_on_termination = true
-    device_name           = "/dev/sda1"
-    encrypted             = true
-    volume_size           = 80
-    volume_type           = "gp3"
-  }
-
-  tags     = var.aws_tags
-  run_tags = var.aws_run_tags
-
-  source_ami_filter {
-    filters = {
-      architecture        = "x86_64"
-      name                = "ubuntu/images/hvm-ssd-gp3/ubuntu-noble-24.04-amd64-server*"
-      root-device-type    = "ebs"
-      virtualization-type = "hvm"
-    }
-    most_recent = true
-    owners      = ["099720109477"]
-  }
-
-  subnet_filter {
-    filters   = var.aws_subnet_filters
-    most_free = true
-    random    = false
-  }
-
-  vpc_filter {
-    filters = var.aws_vpc_filters
-  }
-}
-
 
 build {
   sources = [
     "sources.vsphere-iso.carbon-vm-ubuntu",
-    "sources.virtualbox-iso.carbon-vm-ubuntu",
-    "sources.amazon-ebs.carbon-vm-ubuntu",
   ]
-
-  provisioner "ansible" {
-    playbook_file = "../../ansible/ubuntu-desktop.yaml"
-  }
 
   provisioner "shell" {
     inline = [
-      "find /home/ -maxdepth 2 -type d -name '~*' -exec rm -rf {} \\;",
+      "/usr/bin/cloud-init status --wait",
     ]
   }
 }

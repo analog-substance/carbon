@@ -1,21 +1,9 @@
 packer {
   required_version = ">= 1.7.0"
   required_plugins {
-    amazon = {
-      version = ">= 1.2.8"
-      source  = "github.com/hashicorp/amazon"
-    }
-    ansible = {
-      version = ">= 1.1.1"
-      source  = "github.com/hashicorp/ansible"
-    }
     virtualbox = {
       version = "~> 1"
       source  = "github.com/hashicorp/virtualbox"
-    }
-    vsphere = {
-      version = "~> 1"
-      source  = "github.com/hashicorp/vsphere"
     }
   }
 }
@@ -50,87 +38,6 @@ variable "boot_command" {
   type        = string
   description = "Keyboard sequence to execute to properly boot the image."
   default     = "e<wait><down><down><down><end> autoinstall 'ds=nocloud-net;s=http://{{ .HTTPIP }}:{{ .HTTPPort }}/'<F10>"
-}
-
-variable "vsphere_endpoint" {
-  type        = string
-  description = "vSphere URL."
-  default     = ""
-
-}
-
-variable "vsphere_username" {
-  type        = string
-  description = "Username to authenticate to vShpere."
-  default     = ""
-
-}
-
-variable "vsphere_password" {
-  type        = string
-  description = "Password to authenticate with vSphere."
-  default     = ""
-
-}
-
-variable "vsphere_host" {
-  type        = string
-  description = "Host in vShere to provision VM on."
-  default     = ""
-
-}
-
-variable "vsphere_datastore" {
-  type        = string
-  description = "Datastore in vSphere to provision VM on."
-  default     = ""
-
-}
-
-variable "aws_profile" {
-  default     = "default"
-  description = "The aws credentials profile to use."
-  type        = string
-}
-
-variable "aws_build_region" {
-  default     = "us-east-1"
-  description = "The region in which to retrieve the base AMI from and build the new AMI."
-  type        = string
-}
-
-variable "aws_tags" {
-  default = {
-    Architecture = "x86_64"
-    OS_Version   = "Ubuntu Noble Numbat"
-  }
-
-  type = map(string)
-}
-
-variable "aws_run_tags" {
-  default = {
-    Environment = "testing"
-    Type        = "builder"
-  }
-
-  type = map(string)
-}
-
-variable "aws_vpc_filters" {
-  default = {
-    "Name" : "AMI Builds"
-  }
-
-  type = map(string)
-}
-
-variable "aws_subnet_filters" {
-  default = {
-    "Name" : "AMI Builds"
-  }
-
-  type = map(string)
 }
 
 locals {
@@ -174,106 +81,14 @@ source "virtualbox-iso" "carbon-vm-ubuntu" {
   ]
 }
 
-source "vsphere-iso" "carbon-vm-ubuntu" {
-  vcenter_server      = var.vsphere_endpoint
-  username            = var.vsphere_username
-  password            = var.vsphere_password
-  host                = var.vsphere_host
-  datastore           = var.vsphere_datastore
-  insecure_connection = "true"
-  iso_url             = var.iso_url
-  iso_checksum        = var.iso_checksum
-  ssh_username        = var.ssh_username
-  ssh_password        = var.ssh_password
-  communicator        = "ssh"
-  ssh_timeout         = "30m"
-
-  guest_os_type = "ubuntu64Guest"
-  RAM           = 8128
-  CPUs          = 4
-  cpu_cores     = 2
-  storage {
-    disk_size             = 80000
-    disk_thin_provisioned = true
-  }
-  network_adapters {
-    network_card = "vmxnet3"
-    network      = "VM Network"
-  }
-
-  shutdown_command = "echo '${var.ssh_password}' | sudo -S systemctl poweroff"
-
-  http_directory = "./http/24.04/"
-  boot_command   = [var.boot_command]
-  boot_wait      = "5s"
-
-  vm_name = "carbon-ubuntu-vm-${local.timestamp}"
-
-}
-
-source "amazon-ebs" "carbon-vm-ubuntu" {
-  profile = var.aws_profile
-  region  = var.aws_build_region
-
-  ami_name                    = "carbon-vm-ami-${local.timestamp}"
-  instance_type               = "t3.medium"
-  ssh_username                = "ubuntu"
-  ssh_interface               = "public_ip"
-  ssh_timeout                 = "10m"
-  encrypt_boot                = true
-  associate_public_ip_address = true
-  user_data_file              = "./http/24.04/user-data"
-
-  temporary_key_pair_type = "ed25519"
-
-  launch_block_device_mappings {
-    delete_on_termination = true
-    device_name           = "/dev/sda1"
-    encrypted             = true
-    volume_size           = 80
-    volume_type           = "gp3"
-  }
-
-  tags     = var.aws_tags
-  run_tags = var.aws_run_tags
-
-  source_ami_filter {
-    filters = {
-      architecture        = "x86_64"
-      name                = "ubuntu/images/hvm-ssd-gp3/ubuntu-noble-24.04-amd64-server*"
-      root-device-type    = "ebs"
-      virtualization-type = "hvm"
-    }
-    most_recent = true
-    owners      = ["099720109477"]
-  }
-
-  subnet_filter {
-    filters   = var.aws_subnet_filters
-    most_free = true
-    random    = false
-  }
-
-  vpc_filter {
-    filters = var.aws_vpc_filters
-  }
-}
-
-
 build {
   sources = [
-    "sources.vsphere-iso.carbon-vm-ubuntu",
     "sources.virtualbox-iso.carbon-vm-ubuntu",
-    "sources.amazon-ebs.carbon-vm-ubuntu",
   ]
-
-  provisioner "ansible" {
-    playbook_file = "../../ansible/ubuntu-desktop.yaml"
-  }
 
   provisioner "shell" {
     inline = [
-      "find /home/ -maxdepth 2 -type d -name '~*' -exec rm -rf {} \\;",
+      "/usr/bin/cloud-init status --wait",
     ]
   }
 }

@@ -13,4 +13,6 @@ packages:
   - fonts-noto-color-emoji
   - imagemagick
   - tigervnc-standalone-server
+  - xclip
+  - xdotool
   - xubuntu-desktop-minimal
