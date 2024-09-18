@@ -2,5 +2,5 @@ package files
 
 import "embed"
 
-//go:embed var/**
+//go:embed var
 var Files embed.FS

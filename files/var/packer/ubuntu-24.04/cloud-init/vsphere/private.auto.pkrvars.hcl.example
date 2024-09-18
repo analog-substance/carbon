@@ -1,7 +1,0 @@
-// vsphere configs
-
-vsphere_username  = "REPLACE"
-vsphere_password  = "REPLACE"
-vsphere_endpoint  = "REPLACE"
-vsphere_host      = "REPLACE"
-vsphere_datastore = "REPLACE"

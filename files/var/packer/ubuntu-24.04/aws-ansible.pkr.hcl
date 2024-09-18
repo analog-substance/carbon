@@ -1,64 +1,5 @@
-packer {
-  required_version = ">= 1.7.0"
-  required_plugins {
-    amazon = {
-      version = ">= 1.2.8"
-      source  = "github.com/hashicorp/amazon"
-    }
-  }
-}
 
-variable "aws_profile" {
-  default     = "default"
-  description = "The aws credentials profile to use."
-  type        = string
-}
-
-variable "aws_build_region" {
-  default     = "us-east-1"
-  description = "The region in which to retrieve the base AMI from and build the new AMI."
-  type        = string
-}
-
-variable "aws_tags" {
-  default = {
-    Architecture = "x86_64"
-    OS_Version   = "Ubuntu Noble Numbat"
-  }
-
-  type = map(string)
-}
-
-variable "aws_run_tags" {
-  default = {
-    Environment = "testing"
-    Type        = "builder"
-  }
-
-  type = map(string)
-}
-
-variable "aws_vpc_filters" {
-  default = {
-    "Name" : "AMI Builds"
-  }
-
-  type = map(string)
-}
-
-variable "aws_subnet_filters" {
-  default = {
-    "Name" : "AMI Builds"
-  }
-
-  type = map(string)
-}
-
-locals {
-  timestamp = formatdate("YYYYMMDDhhmmss", timestamp())
-}
-
-source "amazon-ebs" "carbon-vm-ubuntu" {
+source "amazon-ebs" "carbon-vm-ubuntu-ansible" {
   profile = var.aws_profile
   region  = var.aws_build_region
 
@@ -69,7 +10,7 @@ source "amazon-ebs" "carbon-vm-ubuntu" {
   ssh_timeout                 = "10m"
   encrypt_boot                = true
   associate_public_ip_address = true
-  user_data_file              = "./http/24.04/user-data"
+  user_data_file              = "./cloud-init/default-ansible/user-data"
 
   temporary_key_pair_type = "ed25519"
 
@@ -106,14 +47,19 @@ source "amazon-ebs" "carbon-vm-ubuntu" {
   }
 }
 
+
 build {
   sources = [
-    "sources.amazon-ebs.carbon-vm-ubuntu",
+    "sources.amazon-ebs.carbon-vm-ubuntu-ansible",
   ]
+
+  provisioner "ansible" {
+    playbook_file = "../../ansible/ubuntu-desktop.yaml"
+  }
 
   provisioner "shell" {
     inline = [
-      "/usr/bin/cloud-init status --wait",
+      "find /home/ -maxdepth 2 -type d -name '~*' -exec rm -rf {} \\;",
     ]
   }
 }

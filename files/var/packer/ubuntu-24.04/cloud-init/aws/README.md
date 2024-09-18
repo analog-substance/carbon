@@ -1,6 +1,0 @@
-
-# AWS
-
-```bash
-packer build .
-```

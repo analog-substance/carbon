@@ -1,5 +1,0 @@
-# QEMU
-
-```bash
-packer build .
-```
