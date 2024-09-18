@@ -27,7 +27,11 @@ build {
 
   provisioner "shell" {
     inline = [
-      "/usr/bin/cloud-init status --wait",
+      # without sudo
+      #util.py[WARNING]: REDACTED config part /etc/cloud/cloud.cfg.d/99-installer.cfg, insufficient permissions
+      #util.py[WARNING]: REDACTED config part /etc/cloud/cloud.cfg.d/90-installer-network.cfg, insufficient permissions
+      #"/usr/bin/cloud-init status --wait",
+      "sudo /usr/bin/cloud-init status --wait",
     ]
   }
 }
