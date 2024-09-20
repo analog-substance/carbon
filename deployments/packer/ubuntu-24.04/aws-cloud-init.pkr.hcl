@@ -11,7 +11,7 @@ source "amazon-ebs" "carbon-vm-ubuntu" {
   ssh_timeout                 = "10m"
   encrypt_boot                = true
   associate_public_ip_address = true
-  user_data_file              = "./cloud-init/default/user-data"
+  user_data_file              = "${path.root}/cloud-init/default/user-data"
 
   temporary_key_pair_type = "ed25519"
 

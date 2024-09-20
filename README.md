@@ -1,118 +1,112 @@
 # Carbon
-
-Infrastructure Automations and Configurations
+> Infrastructure automation and configuration management
+___
 
 ## Purpose
 
-Carbon's primary purpose is to provide a consistent execution environment to facilitate offensive security assessments.
+Carbon's primary purpose is to provide a consistent execution environment to
+facilitate offensive security assessments.
+
+It uses:
+- Packer to build images.
+- Terraform to provision infrastructure.
+- Golang project structure.
+
+It is aimed at supporting various services to ensure it can scale with you as
+your operations become more complex.
+
+| Feature                 | AWS ✅ | Azure ❌ | GCP ❌ | QEMU ✅ | Multipass ✅ | VirtualBox ✅ | vSphere ❌ |
+|-------------------------|-------|---------|-------|--------|-------------|--------------|-----------|
+| Image build templates   | ✅     | ❌       | ❌     | ✅      | ❌ N/A       | ✅            | ✅         |
+| Create Images           | ✅     | ❌       | ❌     | ✅      | ❌           | ✅            | ✅         |
+| Infrastructure Creation | ❌     | ❌       | ❌     | ❌      | ❌ N/A       | ❌            | ❌         |
+| VM Management           | ✅     | ❌       | ❌     | ✅      | ✅           | ✅            | ❌         |
+
+❌ = Not Right Now, but soon  
+✅ = Supported
+
+_____
+
+## Install
+
+```bash
+go install github.com/analog-substance/carbon@latest
+```
+
+_____
+## Usage
+_____
+
+### Images
+
+#### Bootstrap Image Build Configuration
+
+```bash
+carbon image bootstrap -n my-image -t ubuntu-24.04 -s aws
+```
+
+#### Build Images
 
 
+```bash
+carbon image build -n my-image
+```
+
+#### Manage Images and Image Builds
+
+List image build configs.
+
+```bash
+carbon image list -b
+```
+_____
+
+### Infrastructure
+
+#### Create New Infrastructure
+
+#### Modify Infrastructure
+
+#### Teardown Infrastructure
+_____
+
+### Operating
+
+#### Starting and Stopping 
+
+```bash
+carbon vm start -i i-afde123ae43
+carbon vm stop -i i-afde123ae43
+```
+#### Connecting to VMs
+
+```bash
+carbon vm ssh -i i-afde123ae43
+```
 
 ***
 
-## Ideas
-
-- [ ] Support different linux distributions
-- [ ] Minimal Base VM
-    - [ ] VirtualBox
-    - [ ] ESXi
-    - [ ] LXD
-    - [ ] ProxMox
-    - [ ] QEMU
-    - [ ] AWS AMI
-    - [ ] GCP
-    - [ ] Azure Virtual Image
-- [ ] Desktop VM
-    - [x] VirtualBox
-    - [x] vSphere (ESXi)
-    - [ ] Azure Virtual Image
-    - [ ] LXD
-    - [ ] ProxMox
-    - [ ] QEMU
-    - [ ] AWS AMI
-    - [ ] GCP
-- [ ] Guacamole Server
-    - [ ] VirtualBox
-    - [ ] ESXi
-    - [ ] LXD
-    - [ ] ProxMox
-    - [ ] QEMU
-    - [ ] AWS AMI
-    - [ ] GCP
-    - [ ] Azure Virtual Image
-- [ ] Implant VM
-    - [ ] VirtualBox
-    - [ ] ESXi
-    - [ ] LXD
-    - [ ] ProxMox
-    - [ ] QEMU
-    - [ ] AWS AMI
-    - [ ] GCP
-    - [ ] Azure Virtual Image
-- [ ] Terraform
-- [ ] Op Templates
-- [ ] CLI (probably separate repo)
-    - [ ] Self Test Dependencies Met
-    - [ ] Self Update
-    - [ ] Build VMs
-    - [ ] Point Domains
-        - [ ] AWS (Route53)
-        - [ ] GCP
-        - [ ] Azure
-    - [ ] Infrastucture Management
-    - [ ] Connect to infrastructure
-    - [ ] Slack Bot (maybe separate repo)
-
-
-
-```
-carbon
-    vm
-        create
-        ssh
-        start
-        stop
-        delete
-        vnc
-        restart
-    infra
-        create
-        destroy
-        list
-    image
-        create
-        build
-        delete
-    dns
-        list
-        create
-        delete
-    jobs (maybe not this, probably just use argo or embed the argo cli with params already populated based on the context)
-        create
-        list
-        delete
-        run
-```
-
 Things to do
 
-- build image (call packer)
 - provision aws env (create files, call terraform)
 - create a new vm on infrastructure
-- ssh to an vm
-- start an vm
-- stop an vm
 - vnc to vm
-- create new build config
 - point a domain
 - list domains
-
-****
-
-What will we use to deploy resources?
-- AWS
-- QEMU
-- VirtualBox
-- vSphere
-
-****
+- Jobs / Distributed execution
+- Cloud init templates (Base, Operator, Operator Desktop, Implant VM)
+- Simple deploy/config of services (Pwndoc, Gophish, modlishka, Guacamole, Sliver, Mythic)
+- vSphere provider
+- GCP Provider
+- Azure Provider
+- LXD Provider
+- Different OS (CentOS, Arch)
+- Self Test to ensure dependencies are met
+- Slack Bot
+- Discord Bot
+- Web GUI
+- DNS management
+- docsy config
+- vhs example gifs
+- docs
+- tests

@@ -310,7 +310,7 @@ func fileContainsString(path string, needle string, embeddedFS embed.FS) (bool, 
 		return false, err
 	}
 
-	return bytes.ContainsAny(fileBytes, needle), nil
+	return bytes.Contains(fileBytes, []byte(needle)), nil
 }
 
 func copyFileFromEmbeddedFS(src, dest string, embeddedFS embed.FS) error {

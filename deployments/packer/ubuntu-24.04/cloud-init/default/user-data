@@ -200,6 +200,7 @@ packages:
   - silversearcher-ag
   - swaks
   - sxhkd
+  - tcpdump
   - tigervnc-standalone-server
   - tmux
   - tree
@@ -213,6 +214,6 @@ packages:
   - yq
   - zlib1g-dev
   - zsh
-  # - wireshark-qt
+  - wireshark
 runcmd:
 - [sh, -c, "/usr/local/bin/carbon-init.sh"]
