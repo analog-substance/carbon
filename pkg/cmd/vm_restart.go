@@ -26,8 +26,8 @@ import (
 	"log"
 )
 
-// vmStop represents the config command
-var vmStop = &cobra.Command{
+// vmRestart represents the config command
+var vmRestart = &cobra.Command{
 	Use:   "stop",
 	Short: "Stop a vm",
 	Long:  `Stop a vm`,
@@ -45,5 +45,5 @@ var vmStop = &cobra.Command{
 }
 
 func init() {
-	vmCmd.AddCommand(vmStop)
+	vmCmd.AddCommand(vmRestart)
 }

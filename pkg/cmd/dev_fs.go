@@ -22,28 +22,36 @@ THE SOFTWARE.
 package cmd
 
 import (
+	"fmt"
+	"github.com/analog-substance/carbon/deployments"
 	"github.com/spf13/cobra"
 	"log"
+	"path"
 )
 
-// vmStop represents the config command
-var vmStop = &cobra.Command{
-	Use:   "stop",
-	Short: "Stop a vm",
-	Long:  `Stop a vm`,
+// fsCmd represents the new command
+var fsCmd = &cobra.Command{
+	Use:   "fs",
+	Short: "List fs contents",
+	Long:  `for testing things`,
 	Run: func(cmd *cobra.Command, args []string) {
-		vm := getVMFromArgs(cmd, args)
-		if vm != nil {
-			err := vm.Stop()
-			if err != nil {
-				log.Println("Error starting VM:", err)
-			}
-		} else {
-			log.Println("VM not found")
-		}
+		ListingDir(".")
 	},
 }
 
 func init() {
-	vmCmd.AddCommand(vmStop)
+	devCmd.AddCommand(fsCmd)
+}
+
+func ListingDir(dir string) {
+	listing, err := deployments.Files.ReadDir(dir)
+	if err != nil {
+		log.Fatal(err)
+	}
+	for _, file := range listing {
+		fmt.Println(path.Join(dir, file.Name()))
+		if file.IsDir() {
+			ListingDir(path.Join(dir, file.Name()))
+		}
+	}
 }

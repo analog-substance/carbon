@@ -32,10 +32,10 @@ var vmSSH = &cobra.Command{
 	Short: "ssh to a vm",
 	Long:  `ssh to a vm`,
 	Run: func(cmd *cobra.Command, args []string) {
-		id, _ := cmd.Flags().GetString("id")
-		vm := carbonObj.FindVMByID(id)
+		user, _ := cmd.Flags().GetString("user")
+		vm := getVMFromArgs(cmd, args)
 		if vm != nil {
-			err := vm.ExecSSH()
+			err := vm.ExecSSH(user)
 			if err != nil {
 				log.Println("Error SSHing to VM:", err)
 			}
@@ -47,5 +47,4 @@ var vmSSH = &cobra.Command{
 
 func init() {
 	vmCmd.AddCommand(vmSSH)
-	vmSSH.Flags().StringP("id", "i", "", "ID of machine to start")
 }

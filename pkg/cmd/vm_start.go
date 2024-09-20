@@ -32,8 +32,7 @@ var vmStart = &cobra.Command{
 	Short: "Start a vm",
 	Long:  `start a vm`,
 	Run: func(cmd *cobra.Command, args []string) {
-		id, _ := cmd.Flags().GetString("id")
-		vm := carbonObj.FindVMByID(id)
+		vm := getVMFromArgs(cmd, args)
 		if vm != nil {
 			err := vm.Start()
 			if err != nil {
@@ -47,5 +46,4 @@ var vmStart = &cobra.Command{
 
 func init() {
 	vmCmd.AddCommand(vmStart)
-	vmStart.Flags().StringP("id", "i", "", "ID of machine to start")
 }

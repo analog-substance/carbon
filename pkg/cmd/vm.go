@@ -23,6 +23,7 @@ package cmd
 
 import (
 	"fmt"
+	"github.com/analog-substance/carbon/pkg/providers/types"
 	"github.com/spf13/cobra"
 )
 
@@ -41,13 +42,19 @@ So you type less and be more productive!`,
 func init() {
 	RootCmd.AddCommand(vmCmd)
 
-	// Here you will define your flags and configuration settings.
+	vmCmd.PersistentFlags().StringP("name", "n", "", "Name of the VM")
+	vmCmd.PersistentFlags().StringP("id", "i", "", "ID of machine to start")
+	vmCmd.PersistentFlags().StringP("user", "u", "ubuntu", "SSH Username")
+}
 
-	// Cobra supports Persistent Flags which will work for this command
-	// and all subcommands, e.g.:
-	// configCmd.PersistentFlags().String("foo", "", "A help for foo")
-
-	// Cobra supports local flags which will only run when this command
-	// is called directly, e.g.:
-	// configCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
+func getVMFromArgs(cmd *cobra.Command, args []string) types.VM {
+	id, _ := cmd.Flags().GetString("id")
+	name, _ := cmd.Flags().GetString("name")
+	var vm types.VM
+	if name != "" {
+		vm = carbonObj.FindVMByName(name)
+	} else if id != "" {
+		vm = carbonObj.FindVMByID(id)
+	}
+	return vm
 }

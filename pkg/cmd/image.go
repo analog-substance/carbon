@@ -23,27 +23,15 @@ package cmd
 
 import (
 	"github.com/spf13/cobra"
-	"log"
 )
 
-// vmStop represents the config command
-var vmStop = &cobra.Command{
-	Use:   "stop",
-	Short: "Stop a vm",
-	Long:  `Stop a vm`,
-	Run: func(cmd *cobra.Command, args []string) {
-		vm := getVMFromArgs(cmd, args)
-		if vm != nil {
-			err := vm.Stop()
-			if err != nil {
-				log.Println("Error starting VM:", err)
-			}
-		} else {
-			log.Println("VM not found")
-		}
-	},
+// imageCmd represents the image command
+var imageCmd = &cobra.Command{
+	Use:   "image",
+	Short: "manage images and image builds",
+	Long:  `manage images and image builds`,
 }
 
 func init() {
-	vmCmd.AddCommand(vmStop)
+	RootCmd.AddCommand(imageCmd)
 }

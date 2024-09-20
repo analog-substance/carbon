@@ -26,24 +26,25 @@ import (
 	"log"
 )
 
-// vmStop represents the config command
-var vmStop = &cobra.Command{
-	Use:   "stop",
-	Short: "Stop a vm",
-	Long:  `Stop a vm`,
+// imageBootstrapCmd represents the image command
+var imageBootstrapCmd = &cobra.Command{
+	Use:   "bootstrap",
+	Short: "create image build configs",
+	Long:  `create image build configs`,
 	Run: func(cmd *cobra.Command, args []string) {
-		vm := getVMFromArgs(cmd, args)
-		if vm != nil {
-			err := vm.Stop()
-			if err != nil {
-				log.Println("Error starting VM:", err)
-			}
-		} else {
-			log.Println("VM not found")
+		name, _ := cmd.Flags().GetString("name")
+		osDir, _ := cmd.Flags().GetString("template")
+		serviceProvider, _ := cmd.Flags().GetString("service")
+		err := carbonObj.CreateImageBuild(name, osDir, serviceProvider)
+		if err != nil {
+			log.Fatal(err)
 		}
 	},
 }
 
 func init() {
-	vmCmd.AddCommand(vmStop)
+	imageCmd.AddCommand(imageBootstrapCmd)
+	imageBootstrapCmd.Flags().StringP("name", "n", "", "Name of image build")
+	imageBootstrapCmd.Flags().StringP("template", "t", "ubuntu-24.04", "Template to use")
+	imageBootstrapCmd.Flags().StringP("service", "s", "", "Service provider (aws, virtualbox, qemu, multipass)")
 }

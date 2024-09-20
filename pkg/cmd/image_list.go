@@ -22,28 +22,34 @@ THE SOFTWARE.
 package cmd
 
 import (
+	"fmt"
 	"github.com/spf13/cobra"
 	"log"
 )
 
-// vmStop represents the config command
-var vmStop = &cobra.Command{
-	Use:   "stop",
-	Short: "Stop a vm",
-	Long:  `Stop a vm`,
+// imageListCmd represents the image command
+var imageListCmd = &cobra.Command{
+	Use:   "list",
+	Short: "list images",
+	Long:  `list images`,
 	Run: func(cmd *cobra.Command, args []string) {
-		vm := getVMFromArgs(cmd, args)
-		if vm != nil {
-			err := vm.Stop()
+		listBuilds, _ := cmd.Flags().GetBool("list-builds")
+		if listBuilds {
+			imagesBuilds, err := carbonObj.GetImageBuilds()
 			if err != nil {
-				log.Println("Error starting VM:", err)
+				log.Fatal(err)
+			}
+			for _, imageBuild := range imagesBuilds {
+				fmt.Println(imageBuild)
 			}
 		} else {
-			log.Println("VM not found")
+			fmt.Println("Currently only listing image build is possible. to be implemented")
 		}
+
 	},
 }
 
 func init() {
-	vmCmd.AddCommand(vmStop)
+	imageCmd.AddCommand(imageListCmd)
+	imageListCmd.Flags().BoolP("builds", "b", false, "List build configs")
 }

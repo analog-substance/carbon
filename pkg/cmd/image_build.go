@@ -26,24 +26,21 @@ import (
 	"log"
 )
 
-// vmStop represents the config command
-var vmStop = &cobra.Command{
-	Use:   "stop",
-	Short: "Stop a vm",
-	Long:  `Stop a vm`,
+// imageBuildCmd represents the image command
+var imageBuildCmd = &cobra.Command{
+	Use:   "build",
+	Short: "build an image",
+	Long:  `build an image`,
 	Run: func(cmd *cobra.Command, args []string) {
-		vm := getVMFromArgs(cmd, args)
-		if vm != nil {
-			err := vm.Stop()
-			if err != nil {
-				log.Println("Error starting VM:", err)
-			}
-		} else {
-			log.Println("VM not found")
+		name, _ := cmd.Flags().GetString("name")
+		err := carbonObj.BuildImage(name)
+		if err != nil {
+			log.Fatal(err)
 		}
 	},
 }
 
 func init() {
-	vmCmd.AddCommand(vmStop)
+	imageCmd.AddCommand(imageBuildCmd)
+	imageBuildCmd.Flags().StringP("name", "n", "", "Name of image build")
 }
