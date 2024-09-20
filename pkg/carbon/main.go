@@ -1,14 +1,14 @@
 package carbon
 
 import (
+	"bytes"
+	"embed"
+	"fmt"
 	"github.com/analog-substance/carbon/files"
-	"github.com/analog-substance/carbon/pkg/cloud_init"
 	"github.com/analog-substance/carbon/pkg/providers/aws"
 	"github.com/analog-substance/carbon/pkg/providers/multipass"
 	"github.com/analog-substance/carbon/pkg/providers/types"
 	"github.com/analog-substance/carbon/pkg/providers/virtualbox"
-	"gopkg.in/yaml.v3"
-	"log"
 	"os"
 	"path"
 	"strings"
@@ -101,45 +101,95 @@ const embeddedRootDir = "var"
 const CloudInitDir = "cloud-init"
 const PackerDir = "packer"
 
-func (c *Carbon) CreateImageBuild(name, osDir, service string) error {
+const PackerFileSuffixCloudInit = "-cloud-init.pkr.hcl"
+const PackerFileSuffixAnsible = "-ansible.pkr.hcl"
+const PackerFileSuffixVariables = "-variables.pkr.hcl"
+const PackerFilePrivateVarsExample = "private.auto.pkrvars.hcl.example"
+const PackerFileIsoVars = "iso-variables.pkr.hcl"
+const PackerFileLocalVars = "local-variables.pkr.hcl"
+const PackerFilePacker = "packer.pkr.hcl"
+
+const ISOVarUsage = "var.iso_url"
+
+func (c *Carbon) CreateImageBuild(name, tplDir, service string) error {
+	autoinstall := false
+	cloudInitDir := ""
+	userDataFile := ""
+
+	// mkdir for new image build
 	bootstrappedDir := path.Join("packer", name)
-	cloudInitDir := path.Join(bootstrappedDir, CloudInitDir)
-	err := os.MkdirAll(cloudInitDir, 0755)
+	err := os.MkdirAll(bootstrappedDir, 0755)
 	if err != nil {
 		return err
 	}
 	embeddedFS := files.Files
-	baseCloudInitDir := path.Join(embeddedRootDir, CloudInitDir, osDir)
-	basePackerDir := path.Join(embeddedRootDir, PackerDir, osDir, CloudInitDir, service)
-	cloudInitListing, err := embeddedFS.ReadDir(baseCloudInitDir)
+	tplPackerDir := path.Join(embeddedRootDir, PackerDir, tplDir)
+
+	// copy packer file
+	packerFilename := fmt.Sprintf("%s%s", service, PackerFileSuffixCloudInit)
+	tplPackerFile := path.Join(tplPackerDir, packerFilename)
+	bootstrappedPackerFile := path.Join(bootstrappedDir, packerFilename)
+	err = copyFileFromEmbeddedFS(tplPackerFile, bootstrappedPackerFile, embeddedFS)
 	if err != nil {
 		return err
 	}
-	packerListing, err := embeddedFS.ReadDir(basePackerDir)
+
+	// don't care if it fails. file may not exist
+	// copy packer vars
+	packerVarsFilename := fmt.Sprintf("%s%s", service, PackerFileSuffixVariables)
+	tplPackerVarsFile := path.Join(tplPackerDir, packerVarsFilename)
+	bootstrappedPackerVarsFile := path.Join(bootstrappedDir, packerVarsFilename)
+	_ = copyFileFromEmbeddedFS(tplPackerVarsFile, bootstrappedPackerVarsFile, embeddedFS)
+
+	// copy local vars
+	tplLocalVarsFile := path.Join(tplPackerDir, PackerFileLocalVars)
+	bootstrappedLocalVarsFile := path.Join(bootstrappedDir, PackerFileLocalVars)
+	err = copyFileFromEmbeddedFS(tplLocalVarsFile, bootstrappedLocalVarsFile, embeddedFS)
 	if err != nil {
 		return err
 	}
 
-	tpls := map[string]*cloud_init.CloudConfig{}
-	endResult := &cloud_init.CloudConfig{}
-	for _, d := range cloudInitListing {
-		if strings.HasSuffix(d.Name(), ".yaml") {
-			filebytes, err := embeddedFS.ReadFile(path.Join(baseCloudInitDir, d.Name()))
-			if err != nil {
-				log.Fatal(err)
-			}
+	// copy private vars example
+	tplPrivateVarsExampleFile := path.Join(tplPackerDir, PackerFilePrivateVarsExample)
+	bootstrappedPrivateVarsExampleFile := path.Join(bootstrappedDir, PackerFilePrivateVarsExample)
+	err = copyFileFromEmbeddedFS(tplPrivateVarsExampleFile, bootstrappedPrivateVarsExampleFile, embeddedFS)
+	if err != nil {
+		return err
+	}
 
-			tpls[d.Name()] = &cloud_init.CloudConfig{}
+	// copy private vars example
+	tplPackerFilePacker := path.Join(tplPackerDir, PackerFilePacker)
+	bootstrappedPackerFilePacker := path.Join(bootstrappedDir, PackerFilePacker)
+	err = copyFileFromEmbeddedFS(tplPackerFilePacker, bootstrappedPackerFilePacker, embeddedFS)
+	if err != nil {
+		return err
+	}
 
-			err = yaml.Unmarshal(filebytes, tpls[d.Name()])
-			if err != nil {
-				return err
-			}
-
-			endResult.MergeWith(tpls[d.Name()])
+	// check for iso_vars in the packer file. so we can copy the variables over
+	containsVars, err := fileContainsString(tplPackerFile, ISOVarUsage, embeddedFS)
+	if err != nil {
+		return err
+	}
+	if containsVars {
+		err = copyFileFromEmbeddedFS(path.Join(tplPackerDir, PackerFileIsoVars), path.Join(bootstrappedDir, PackerFileIsoVars), embeddedFS)
+		if err != nil {
+			return err
 		}
+
+		// if we need iso vars, we also need autoinstall
+		autoinstall = true
 	}
-	d, err := yaml.Marshal(&endResult)
+
+	// determine user-data type (autoinstall or native cloud init)
+	if autoinstall {
+		cloudInitDir = path.Join(bootstrappedDir, CloudInitDir, "autoinstall")
+		userDataFile = path.Join(tplPackerDir, CloudInitDir, "autoinstall", "user-data")
+	} else {
+		cloudInitDir = path.Join(bootstrappedDir, CloudInitDir, "default")
+		userDataFile = path.Join(tplPackerDir, CloudInitDir, "default", "user-data")
+	}
+
+	err = os.MkdirAll(cloudInitDir, 0755)
 	if err != nil {
 		return err
 	}
@@ -148,21 +198,52 @@ func (c *Carbon) CreateImageBuild(name, osDir, service string) error {
 	if err != nil {
 		return err
 	}
-	err = os.WriteFile(path.Join(cloudInitDir, "user-data"), d, 0644)
+
+	err = copyFileFromEmbeddedFS(userDataFile, path.Join(cloudInitDir, "user-data"), embeddedFS)
 	if err != nil {
 		return err
 	}
 
-	for _, d := range packerListing {
-		filebytes, err := embeddedFS.ReadFile(path.Join(basePackerDir, d.Name()))
-		if err != nil {
-			return err
-		}
-		err = os.WriteFile(path.Join(bootstrappedDir, d.Name()), filebytes, 0644)
-		if err != nil {
-			return err
-		}
-	}
+	// Eventually we need want to allow customizing the user-data
+	// this could be useful for the future
+	//
+	//cloudInitListing, err := embeddedFS.ReadDir(baseCloudInitDir)
+	//if err != nil {
+	//	return err
+	//}
+	//packerListing, err := embeddedFS.ReadDir(tplPackerDir)
+	//if err != nil {
+	//	return err
+	//}
+	//
+	//tpls := map[string]*cloud_init.CloudConfig{}
+	//endResult := &cloud_init.CloudConfig{}
+	//for _, d := range cloudInitListing {
+	//	if strings.HasSuffix(d.Name(), ".yaml") {
+	//		filebytes, err := embeddedFS.ReadFile(path.Join(baseCloudInitDir, d.Name()))
+	//		if err != nil {
+	//			log.Fatal(err)
+	//		}
+	//
+	//		tpls[d.Name()] = &cloud_init.CloudConfig{}
+	//
+	//		err = yaml.Unmarshal(filebytes, tpls[d.Name()])
+	//		if err != nil {
+	//			return err
+	//		}
+	//
+	//		endResult.MergeWith(tpls[d.Name()])
+	//	}
+	//}
+	//d, err := yaml.Marshal(&endResult)
+	//if err != nil {
+	//	return err
+	//}
+	//
+	//err = os.WriteFile(path.Join(cloudInitDir, "user-data"), d, 0644)
+	//if err != nil {
+	//	return err
+	//}
 
 	return nil
 }
@@ -186,4 +267,25 @@ func AvailableProviders() []types.Provider {
 	}
 
 	return availableProviders
+}
+
+func fileContainsString(path string, needle string, embeddedFS embed.FS) (bool, error) {
+	fileBytes, err := embeddedFS.ReadFile(path)
+	if err != nil {
+		return false, err
+	}
+
+	return bytes.ContainsAny(fileBytes, needle), nil
+}
+
+func copyFileFromEmbeddedFS(src, dest string, embeddedFS embed.FS) error {
+	filebytes, err := embeddedFS.ReadFile(src)
+	if err != nil {
+		return err
+	}
+	err = os.WriteFile(dest, filebytes, 0644)
+	if err != nil {
+		return err
+	}
+	return nil
 }
