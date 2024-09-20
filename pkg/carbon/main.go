@@ -4,14 +4,18 @@ import (
 	"bytes"
 	"embed"
 	"fmt"
-	"github.com/analog-substance/carbon/files"
+	builder "github.com/NoF0rte/cmd-builder"
+	"github.com/analog-substance/carbon/deployments"
 	"github.com/analog-substance/carbon/pkg/providers/aws"
 	"github.com/analog-substance/carbon/pkg/providers/multipass"
 	"github.com/analog-substance/carbon/pkg/providers/types"
 	"github.com/analog-substance/carbon/pkg/providers/virtualbox"
 	"os"
+	"os/exec"
 	"path"
+	"runtime"
 	"strings"
+	"syscall"
 )
 
 type Options struct {
@@ -97,9 +101,8 @@ func (c *Carbon) FindVMByName(name string) types.VM {
 	return nil
 }
 
-const embeddedRootDir = "var"
 const CloudInitDir = "cloud-init"
-const PackerDir = "packer"
+const PackerDir = "deployments/packer"
 
 const PackerFileSuffixCloudInit = "-cloud-init.pkr.hcl"
 const PackerFileSuffixAnsible = "-ansible.pkr.hcl"
@@ -117,13 +120,13 @@ func (c *Carbon) CreateImageBuild(name, tplDir, service string) error {
 	userDataFile := ""
 
 	// mkdir for new image build
-	bootstrappedDir := path.Join("packer", name)
+	bootstrappedDir := path.Join(PackerDir, name)
 	err := os.MkdirAll(bootstrappedDir, 0755)
 	if err != nil {
 		return err
 	}
-	embeddedFS := files.Files
-	tplPackerDir := path.Join(embeddedRootDir, PackerDir, tplDir)
+	embeddedFS := deployments.Files
+	tplPackerDir := path.Join("packer", tplDir)
 
 	// copy packer file
 	packerFilename := fmt.Sprintf("%s%s", service, PackerFileSuffixCloudInit)
@@ -246,6 +249,26 @@ func (c *Carbon) CreateImageBuild(name, tplDir, service string) error {
 	//}
 
 	return nil
+}
+
+func (c *Carbon) BuildImage(name string) error {
+	packerPath, err := exec.LookPath("packer")
+	if err != nil {
+		return err
+	}
+
+	args := []string{
+		"packer",
+		"build",
+		path.Join(PackerDir, name),
+	}
+
+	//args = append(args, additionalArgs...)
+	if //goland:noinspection GoBoolExpressions
+	runtime.GOOS == "windows" {
+		return builder.Cmd(args[0], args[1:]...).Interactive().Run()
+	}
+	return syscall.Exec(packerPath, args, os.Environ())
 }
 
 var availableProviders []types.Provider

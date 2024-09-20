@@ -78,7 +78,7 @@ func (m Machine) Restart() error {
 }
 
 func (m Machine) ExecSSH(user string) error {
-	path, _ := exec.LookPath("ssh")
+	sshPath, _ := exec.LookPath("ssh")
 	ip := m.IPAddress()
 
 	args := []string{
@@ -97,5 +97,5 @@ func (m Machine) ExecSSH(user string) error {
 	runtime.GOOS == "windows" {
 		return builder.Cmd(args[0], args[1:]...).Interactive().Run()
 	}
-	return syscall.Exec(path, args, os.Environ())
+	return syscall.Exec(sshPath, args, os.Environ())
 }

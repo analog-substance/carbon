@@ -1,5 +1,5 @@
 
-source "vsphere-iso" "carbon-vm-ubuntu-ansible" {
+source "vsphere-iso" "carbon-vm-ubuntu" {
   vcenter_server      = var.vsphere_endpoint
   username            = var.vsphere_username
   password            = var.vsphere_password
@@ -27,24 +27,22 @@ source "vsphere-iso" "carbon-vm-ubuntu-ansible" {
   }
 
   shutdown_command = "echo '${var.ssh_password}' | sudo -S systemctl poweroff"
-  http_directory = "./cloud-init/autoinstall-ansible/"
+  http_directory = "${path.root}/cloud-init/autoinstall/"
   boot_command   = [var.boot_command]
   boot_wait      = "5s"
+
   vm_name = "carbon-ubuntu-vm-${local.timestamp}"
+
 }
 
 build {
   sources = [
-    "sources.vsphere-iso.carbon-vm-ubuntu-ansible",
+    "sources.vsphere-iso.carbon-vm-ubuntu",
   ]
-
-  provisioner "ansible" {
-    playbook_file = "../../ansible/ubuntu-desktop.yaml"
-  }
 
   provisioner "shell" {
     inline = [
-      "find /home/ -maxdepth 2 -type d -name '~*' -exec rm -rf {} \\;",
+      "/usr/bin/cloud-init status --wait",
     ]
   }
 }

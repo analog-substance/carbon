@@ -22,8 +22,8 @@ THE SOFTWARE.
 package cmd
 
 import (
-	"fmt"
 	"github.com/spf13/cobra"
+	"log"
 )
 
 // imageBuildCmd represents the image command
@@ -32,20 +32,15 @@ var imageBuildCmd = &cobra.Command{
 	Short: "build images",
 	Long:  `build images`,
 	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Println("this is unstable called")
+		name, _ := cmd.Flags().GetString("name")
+		err := carbonObj.BuildImage(name)
+		if err != nil {
+			log.Fatal(err)
+		}
 	},
 }
 
 func init() {
 	imageCmd.AddCommand(imageBuildCmd)
-
-	// Here you will define your flags and configuration settings.
-
-	// Cobra supports Persistent Flags which will work for this command
-	// and all subcommands, e.g.:
-	// imageCmd.PersistentFlags().String("foo", "", "A help for foo")
-
-	// Cobra supports local flags which will only run when this command
-	// is called directly, e.g.:
-	// imageCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
+	imageBuildCmd.Flags().StringP("name", "n", "", "Name of image build")
 }

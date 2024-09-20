@@ -23,7 +23,7 @@ package cmd
 
 import (
 	"fmt"
-	"github.com/analog-substance/carbon/files"
+	"github.com/analog-substance/carbon/deployments"
 	"github.com/spf13/cobra"
 	"log"
 	"path"
@@ -44,7 +44,7 @@ func init() {
 }
 
 func ListingDir(dir string) {
-	listing, err := files.Files.ReadDir(dir)
+	listing, err := deployments.Files.ReadDir(dir)
 	if err != nil {
 		log.Fatal(err)
 	}

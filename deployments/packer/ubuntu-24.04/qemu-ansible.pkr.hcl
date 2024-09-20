@@ -13,13 +13,13 @@ source "qemu" "carbon-vm-ubuntu-ansible" {
   disk_size      = "50G"
   format         = "qcow2"
   accelerator    = "kvm"
-  http_directory = "./cloud-init/autoinstall-ansible/"
+  http_directory = "${path.root}/cloud-init/autoinstall-ansible/"
   ssh_timeout    = "20m"
   vm_name        = "carbon-ubuntu-vm-${local.timestamp}"
   disk_interface = "virtio"
   boot_wait      = "5s"
   boot_command = [var.boot_command]
-  output_directory = "../../../outputs/qemu-ansible-carbon-ubuntu-vm-${local.timestamp}"
+  output_directory = "outputs/qemu-ansible-carbon-ubuntu-vm-${local.timestamp}"
 }
 
 build {

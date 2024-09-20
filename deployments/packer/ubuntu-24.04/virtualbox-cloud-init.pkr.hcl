@@ -1,5 +1,5 @@
 
-source "virtualbox-iso" "carbon-vm-ubuntu-ansible" {
+source "virtualbox-iso" "carbon-vm-ubuntu" {
   guest_os_type    = "Ubuntu_64"
   vm_name          = "carbon-ubuntu-vm-${local.timestamp}"
   iso_url          = var.iso_url
@@ -11,7 +11,7 @@ source "virtualbox-iso" "carbon-vm-ubuntu-ansible" {
   shutdown_command = "echo '${var.ssh_password}' | sudo -S shutdown -P now"
   headless         = false
   firmware         = "efi"
-  http_directory = "./cloud-init/autoinstall-ansible/"
+  http_directory = "${path.root}/cloud-init/autoinstall/"
   boot_command     = [var.boot_command]
   boot_wait        = "5s"
   vboxmanage = [
@@ -38,16 +38,12 @@ source "virtualbox-iso" "carbon-vm-ubuntu-ansible" {
 
 build {
   sources = [
-    "sources.virtualbox-iso.carbon-vm-ubuntu-ansible",
+    "sources.virtualbox-iso.carbon-vm-ubuntu",
   ]
-
-  provisioner "ansible" {
-    playbook_file = "../../ansible/ubuntu-desktop.yaml"
-  }
 
   provisioner "shell" {
     inline = [
-      "find /home/ -maxdepth 2 -type d -name '~*' -exec rm -rf {} \\;",
+      "/usr/bin/cloud-init status --wait",
     ]
   }
 }

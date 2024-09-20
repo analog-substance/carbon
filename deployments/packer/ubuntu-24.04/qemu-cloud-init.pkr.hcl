@@ -12,13 +12,13 @@ source "qemu" "carbon-vm-ubuntu" {
   memory           = 8128
   format           = "qcow2"
   accelerator      = "kvm"
-  http_directory   = "./cloud-init/autoinstall/"
+  http_directory = "${path.root}/cloud-init/autoinstall/"
   ssh_timeout      = "20m"
   vm_name          = "carbon-ubuntu-vm-${local.timestamp}"
   disk_interface   = "virtio"
   boot_wait        = "5s"
   boot_command = [var.boot_command]
-  output_directory = "../../../outputs/qemu-carbon-ubuntu-vm-${local.timestamp}"
+  output_directory = "outputs/qemu-carbon-ubuntu-vm-${local.timestamp}"
 
 }
 
