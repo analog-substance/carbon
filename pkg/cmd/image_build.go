@@ -29,8 +29,8 @@ import (
 // imageBuildCmd represents the image command
 var imageBuildCmd = &cobra.Command{
 	Use:   "build",
-	Short: "build images",
-	Long:  `build images`,
+	Short: "build an image",
+	Long:  `build an image`,
 	Run: func(cmd *cobra.Command, args []string) {
 		name, _ := cmd.Flags().GetString("name")
 		err := carbonObj.BuildImage(name)

@@ -28,23 +28,10 @@ import (
 // imageCmd represents the image command
 var imageCmd = &cobra.Command{
 	Use:   "image",
-	Short: "manage images",
-	Long:  `manage images`,
-	//Run: func(cmd *cobra.Command, args []string) {
-	//	fmt.Println("this is unstable called")
-	//},
+	Short: "manage images and image builds",
+	Long:  `manage images and image builds`,
 }
 
 func init() {
-	devCmd.AddCommand(imageCmd)
-
-	// Here you will define your flags and configuration settings.
-
-	// Cobra supports Persistent Flags which will work for this command
-	// and all subcommands, e.g.:
-	// imageCmd.PersistentFlags().String("foo", "", "A help for foo")
-
-	// Cobra supports local flags which will only run when this command
-	// is called directly, e.g.:
-	// imageCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
+	RootCmd.AddCommand(imageCmd)
 }

@@ -271,6 +271,18 @@ func (c *Carbon) BuildImage(name string) error {
 	return syscall.Exec(packerPath, args, os.Environ())
 }
 
+func (c *Carbon) GetImageBuilds() ([]string, error) {
+	ret := []string{}
+	listing, err := os.ReadDir(PackerDir)
+	if err != nil {
+		return ret, err
+	}
+	for _, file := range listing {
+		ret = append(ret, file.Name())
+	}
+	return ret, nil
+}
+
 var availableProviders []types.Provider
 
 func AvailableProviders() []types.Provider {
