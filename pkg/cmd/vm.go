@@ -23,7 +23,7 @@ package cmd
 
 import (
 	"fmt"
-	"github.com/analog-substance/carbon/pkg/providers/types"
+	"github.com/analog-substance/carbon/pkg/types"
 	"github.com/spf13/cobra"
 )
 

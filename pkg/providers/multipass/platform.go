@@ -1,7 +1,7 @@
 package multipass
 
 import (
-	"github.com/analog-substance/carbon/pkg/providers/types"
+	types2 "github.com/analog-substance/carbon/pkg/types"
 	"slices"
 )
 
@@ -12,20 +12,20 @@ type platform struct {
 
 const platformName = "local"
 
-func (p platform) Environments(validNames ...string) []types.Environment {
+func (p platform) Environments(validNames ...string) []types2.Environment {
 	if len(validNames) == 0 || slices.Contains(validNames, platformName) {
-		return []types.Environment{environment{
+		return []types2.Environment{environment{
 			platformName,
 			p,
 		}}
 	}
-	return []types.Environment{}
+	return []types2.Environment{}
 }
 
 func (p platform) Name() string {
 	return p.profileName
 }
 
-func (p platform) Provider() types.Provider {
+func (p platform) Provider() types2.Provider {
 	return p.provider
 }

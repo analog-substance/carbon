@@ -1,28 +1,28 @@
 package virtualbox
 
 import (
-	"github.com/analog-substance/carbon/pkg/providers/types"
 	"github.com/analog-substance/carbon/pkg/providers/virtualbox/api"
+	types2 "github.com/analog-substance/carbon/pkg/types"
 )
 
 type environment struct {
 	name     string
-	platform types.Platform
+	platform types2.Platform
 }
 
 func (e environment) Name() string {
 	return e.name
 }
 
-func (e environment) Platform() types.Platform {
+func (e environment) Platform() types2.Platform {
 	return e.platform
 }
 
-func (e environment) VMs() []types.VM {
-	var vms []types.VM
+func (e environment) VMs() []types2.VM {
+	var vms []types2.VM
 	for _, vboxVM := range api.ListVMs() {
 
-		vms = append(vms, types.Machine{
+		vms = append(vms, types2.Machine{
 			InstanceName: vboxVM.Name,
 			CurrentState: stateFromVboxInfo(vboxVM.State),
 			InstanceID:   vboxVM.ID,
@@ -46,12 +46,12 @@ func (e environment) RestartVM(id string) error {
 	return api.RestartVM(id)
 }
 
-func stateFromVboxInfo(state string) types.MachineState {
+func stateFromVboxInfo(state string) types2.MachineState {
 	if state == "poweroff" {
-		return types.StateOff
+		return types2.StateOff
 	}
 	if state == "poweron" {
-		return types.StateRunning
+		return types2.StateRunning
 	}
-	return types.StateUnknown
+	return types2.StateUnknown
 }

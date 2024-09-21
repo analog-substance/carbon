@@ -2,7 +2,7 @@ package libvirt
 
 import (
 	"fmt"
-	"github.com/analog-substance/carbon/pkg/providers/types"
+	types2 "github.com/analog-substance/carbon/pkg/types"
 	"libvirt.org/go/libvirt"
 	"log"
 	"strconv"
@@ -10,7 +10,7 @@ import (
 
 type environment struct {
 	name     string
-	platform types.Platform
+	platform types2.Platform
 	conn     *libvirt.Connect
 }
 
@@ -18,12 +18,12 @@ func (e environment) Name() string {
 	return e.name
 }
 
-func (e environment) Platform() types.Platform {
+func (e environment) Platform() types2.Platform {
 	return e.platform
 }
 
-func (e environment) VMs() []types.VM {
-	var vms []types.VM
+func (e environment) VMs() []types2.VM {
+	var vms []types2.VM
 	doms, err := e.conn.ListAllDomains(libvirt.CONNECT_LIST_DOMAINS_ACTIVE)
 	if err != nil {
 		log.Println("error getting librt domains", e.Platform().Name(), err)
@@ -88,7 +88,7 @@ func (e environment) VMs() []types.VM {
 			}
 		}
 
-		vms = append(vms, types.Machine{
+		vms = append(vms, types2.Machine{
 			InstanceName:       name,
 			CurrentState:       stateFromVboxInfo(info.State),
 			InstanceID:         fmt.Sprintf("%d", id),
@@ -147,15 +147,15 @@ func (e environment) RestartVM(id string) error {
 	return err
 }
 
-func stateFromVboxInfo(state libvirt.DomainState) types.MachineState {
+func stateFromVboxInfo(state libvirt.DomainState) types2.MachineState {
 	if state == libvirt.DOMAIN_PMSUSPENDED {
-		return types.StateSleeping
+		return types2.StateSleeping
 	}
 	if state == libvirt.DOMAIN_SHUTOFF {
-		return types.StateOff
+		return types2.StateOff
 	}
 	if state == libvirt.DOMAIN_RUNNING {
-		return types.StateRunning
+		return types2.StateRunning
 	}
-	return types.StateUnknown
+	return types2.StateUnknown
 }

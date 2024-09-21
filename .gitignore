@@ -13,3 +13,17 @@ test/
 /packer/
 /terraform/
 outputs/
+
+*.tfstate
+*.tfstate.backup
+*.terraform
+*.terraform.lock.hcl
+
+!terraform/deployments/_remote-state/terraform.tfstate
+!terraform/deployments/_remote-state/terraform.tfstate.backup
+
+.hugo/public
+.hugo/resources/
+node_modules/
+.hugo_build.lock
+scratch

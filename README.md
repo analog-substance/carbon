@@ -1,8 +1,12 @@
-# Carbon
-> Infrastructure automation and configuration management
-___
+---
+title: Carbon
+linkTitle: Docs
+menu: {main: {weight: 20}}
+---
+> Infrastructure automation for offensive operations.
 
 ## Purpose
+***
 
 Carbon's primary purpose is to provide a consistent execution environment to
 facilitate offensive security assessments.
@@ -11,6 +15,9 @@ It uses:
 - Packer to build images.
 - Terraform to provision infrastructure.
 - Golang project structure.
+
+## Features
+***
 
 It is aimed at supporting various services to ensure it can scale with you as
 your operations become more complex.
@@ -25,19 +32,50 @@ your operations become more complex.
 ❌ = Not Right Now, but soon  
 ✅ = Supported
 
-_____
 
 ## Install
+***
+You can download a prebuilt release from our [GitHub Releases](https://github.com/analog-substance/carbon/releases) page.
+Or use `go install`.
 
-```bash
+```sh
 go install github.com/analog-substance/carbon@latest
 ```
 
-_____
+Carbon expects Packer, Terraform, and an SSH client to be installed and accessible in your `$PATH`.
+
 ## Usage
-_____
+***
+
+```
+Manage and use infrastructure with a consistent interface, regardless of where it lives.
+
+Usage:
+  carbon [command]
+
+Available Commands:
+  completion  Generate the autocompletion script for the specified shell
+  config      Display config information
+  dev         Unstable sub-commands for testing random ideas
+  help        Help about any command
+  image       manage images and image builds
+  vm          Manage and interact with VMs
+
+Flags:
+      --config string         config file (default is $HOME/.carbon.yaml)
+  -e, --environment strings   Environment to use. Some platforms support many environments.
+  -h, --help                  help for carbon
+  -j, --json                  Output in JSON
+  -p, --platform strings      Platform to use. Like an instance of a provider. Used to specify aws profiles
+  -P, --provider strings      Provider to use vbox, aws
+  -v, --version               version for carbon
+
+Use "carbon [command] --help" for more information about a command.
+
+```
 
 ### Images
+***
 
 #### Bootstrap Image Build Configuration
 
@@ -46,7 +84,6 @@ carbon image bootstrap -n my-image -t ubuntu-24.04 -s aws
 ```
 
 #### Build Images
-
 
 ```bash
 carbon image build -n my-image
@@ -59,23 +96,26 @@ List image build configs.
 ```bash
 carbon image list -b
 ```
-_____
 
 ### Infrastructure
+***
 
 #### Create New Infrastructure
 
 #### Modify Infrastructure
 
 #### Teardown Infrastructure
-_____
 
 ### Operating
+***
 
-#### Starting and Stopping 
-
+#### Starting
 ```bash
 carbon vm start -i i-afde123ae43
+```
+
+#### Stopping
+```bash
 carbon vm stop -i i-afde123ae43
 ```
 #### Connecting to VMs
@@ -84,29 +124,28 @@ carbon vm stop -i i-afde123ae43
 carbon vm ssh -i i-afde123ae43
 ```
 
+## Things to do
 ***
 
-Things to do
-
+- docs
+  - vhs example gifs
+- create/destroy one off VMs
 - provision aws env (create files, call terraform)
-- create a new vm on infrastructure
+- Self Test to ensure dependencies are met
+- vSphere provider
 - vnc to vm
-- point a domain
-- list domains
+- DNS management
+    - point a domain
+    - list domains
 - Jobs / Distributed execution
 - Cloud init templates (Base, Operator, Operator Desktop, Implant VM)
 - Simple deploy/config of services (Pwndoc, Gophish, modlishka, Guacamole, Sliver, Mythic)
-- vSphere provider
 - GCP Provider
 - Azure Provider
 - LXD Provider
 - Different OS (CentOS, Arch)
-- Self Test to ensure dependencies are met
-- Slack Bot
-- Discord Bot
+- Chat Bots
+    - Slack Bot
+    - Discord Bot
 - Web GUI
-- DNS management
-- docsy config
-- vhs example gifs
-- docs
-- tests
+- tests (lol, this should not be last)

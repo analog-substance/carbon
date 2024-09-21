@@ -2,31 +2,31 @@ package multipass
 
 import (
 	"github.com/analog-substance/carbon/pkg/providers/multipass/api"
-	"github.com/analog-substance/carbon/pkg/providers/types"
+	types2 "github.com/analog-substance/carbon/pkg/types"
 )
 
 type environment struct {
 	name     string
-	platform types.Platform
+	platform types2.Platform
 }
 
 func (e environment) Name() string {
 	return e.name
 }
 
-func (e environment) Platform() types.Platform {
+func (e environment) Platform() types2.Platform {
 	return e.platform
 }
 
-func (e environment) VMs() []types.VM {
-	var vms []types.VM
+func (e environment) VMs() []types2.VM {
+	var vms []types2.VM
 	for _, mpVM := range api.ListVMs() {
 		publicIPs := []string{}
 		privateIPs := []string{}
 
 		publicIPs = append(publicIPs, mpVM.Ipv4...)
 
-		vms = append(vms, types.Machine{
+		vms = append(vms, types2.Machine{
 			InstanceName:       mpVM.Name,
 			CurrentState:       stateFromVboxInfo(mpVM.State),
 			InstanceID:         mpVM.Name,
@@ -52,15 +52,15 @@ func (e environment) RestartVM(id string) error {
 	return api.SleepVM(id)
 }
 
-func stateFromVboxInfo(state string) types.MachineState {
+func stateFromVboxInfo(state string) types2.MachineState {
 	if state == "Suspended" {
-		return types.StateSleeping
+		return types2.StateSleeping
 	}
 	if state == "Stopped" {
-		return types.StateOff
+		return types2.StateOff
 	}
 	if state == "Running" {
-		return types.StateRunning
+		return types2.StateRunning
 	}
-	return types.StateUnknown
+	return types2.StateUnknown
 }

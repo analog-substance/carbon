@@ -2,7 +2,7 @@ package aws
 
 import (
 	"context"
-	"github.com/analog-substance/carbon/pkg/providers/types"
+	types3 "github.com/analog-substance/carbon/pkg/types"
 	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/service/ec2"
 	types2 "github.com/aws/aws-sdk-go-v2/service/ec2/types"
@@ -22,12 +22,12 @@ func (e *environment) Name() string {
 	return e.name
 }
 
-func (e *environment) Platform() types.Platform {
+func (e *environment) Platform() types3.Platform {
 	return e.platform
 }
 
-func (e *environment) VMs() []types.VM {
-	var vms []types.VM
+func (e *environment) VMs() []types3.VM {
+	var vms []types3.VM
 	ec2Results, err := e.ec2Client.DescribeInstances(context.Background(), &ec2.DescribeInstancesInput{
 		Filters: []types2.Filter{
 			types2.Filter{
@@ -75,8 +75,8 @@ func (e *environment) RestartVM(id string) error {
 	return err
 }
 
-func awsInstanceToMachine(instance types2.Instance) types.Machine {
-	machine := types.Machine{
+func awsInstanceToMachine(instance types2.Instance) types3.Machine {
+	machine := types3.Machine{
 		InstanceID: *instance.InstanceId,
 	}
 
@@ -95,14 +95,14 @@ func awsInstanceToMachine(instance types2.Instance) types.Machine {
 		machine.PrivateIPAddresses = []string{*instance.PrivateIpAddress}
 	}
 
-	state := types.StateUnknown
+	state := types3.StateUnknown
 	if instance.StateReason != nil {
 		if strings.EqualFold(*instance.StateReason.Code, "Client.UserInitiatedHibernate") {
-			state = types.StateSleeping
+			state = types3.StateSleeping
 		}
 	}
 
-	if state == types.StateUnknown {
+	if state == types3.StateUnknown {
 		state = stateFromEC2(instance.State.Name)
 	}
 
@@ -114,18 +114,18 @@ func awsInstanceToMachine(instance types2.Instance) types.Machine {
 	return machine
 }
 
-func stateFromEC2(state types2.InstanceStateName) types.MachineState {
+func stateFromEC2(state types2.InstanceStateName) types3.MachineState {
 	if state == types2.InstanceStateNameRunning {
-		return types.StateRunning
+		return types3.StateRunning
 	}
 	if state == types2.InstanceStateNameStopped {
-		return types.StateOff
+		return types3.StateOff
 	}
 	if state == types2.InstanceStateNameStopping {
-		return types.StateStopping
+		return types3.StateStopping
 	}
 	if state == types2.InstanceStateNameTerminated {
-		return types.StateTerminating
+		return types3.StateTerminating
 	}
-	return types.StateUnknown
+	return types3.StateUnknown
 }

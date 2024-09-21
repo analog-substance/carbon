@@ -8,8 +8,8 @@ import (
 	"github.com/analog-substance/carbon/deployments"
 	"github.com/analog-substance/carbon/pkg/providers/aws"
 	"github.com/analog-substance/carbon/pkg/providers/multipass"
-	"github.com/analog-substance/carbon/pkg/providers/types"
 	"github.com/analog-substance/carbon/pkg/providers/virtualbox"
+	types2 "github.com/analog-substance/carbon/pkg/types"
 	"os"
 	"os/exec"
 	"path"
@@ -26,10 +26,10 @@ type Options struct {
 
 type Carbon struct {
 	options      Options
-	providers    []types.Provider
-	platforms    []types.Platform
-	environments []types.Environment
-	machines     []types.VM
+	providers    []types2.Provider
+	platforms    []types2.Platform
+	environments []types2.Environment
+	machines     []types2.VM
 }
 
 func New(options Options) *Carbon {
@@ -39,7 +39,7 @@ func New(options Options) *Carbon {
 	if options.Providers == nil || len(options.Providers) == 0 {
 		carbon.providers = AvailableProviders()
 	} else {
-		provs := []types.Provider{}
+		provs := []types2.Provider{}
 		for _, provider := range AvailableProviders() {
 			for _, providerStr := range options.Providers {
 				if strings.ToLower(providerStr) == strings.ToLower(provider.Name()) {
@@ -53,13 +53,13 @@ func New(options Options) *Carbon {
 	return carbon
 }
 
-func (c *Carbon) Providers() []types.Provider {
+func (c *Carbon) Providers() []types2.Provider {
 	return c.providers
 }
 
-func (c *Carbon) Platforms() []types.Platform {
+func (c *Carbon) Platforms() []types2.Platform {
 	if len(c.platforms) == 0 {
-		c.platforms = []types.Platform{}
+		c.platforms = []types2.Platform{}
 		for _, provider := range c.Providers() {
 			c.platforms = append(c.platforms, provider.Platforms(c.options.Platforms...)...)
 		}
@@ -68,9 +68,9 @@ func (c *Carbon) Platforms() []types.Platform {
 	return c.platforms
 }
 
-func (c *Carbon) GetVMs() []types.VM {
+func (c *Carbon) GetVMs() []types2.VM {
 	if len(c.machines) == 0 {
-		c.machines = []types.VM{}
+		c.machines = []types2.VM{}
 		for _, platform := range c.Platforms() {
 			for _, env := range platform.Environments(c.options.Environments...) {
 				c.machines = append(c.machines, env.VMs()...)
@@ -81,7 +81,7 @@ func (c *Carbon) GetVMs() []types.VM {
 	return c.machines
 }
 
-func (c *Carbon) FindVMByID(id string) types.VM {
+func (c *Carbon) FindVMByID(id string) types2.VM {
 	for _, vm := range c.GetVMs() {
 		if vm.ID() == id {
 			return vm
@@ -90,7 +90,7 @@ func (c *Carbon) FindVMByID(id string) types.VM {
 	return nil
 }
 
-func (c *Carbon) FindVMByName(name string) types.VM {
+func (c *Carbon) FindVMByName(name string) types2.VM {
 	for _, vm := range c.GetVMs() {
 		lowerName := strings.ToLower(vm.Name())
 		name = strings.ToLower(name)
@@ -283,11 +283,11 @@ func (c *Carbon) GetImageBuilds() ([]string, error) {
 	return ret, nil
 }
 
-var availableProviders []types.Provider
+var availableProviders []types2.Provider
 
-func AvailableProviders() []types.Provider {
+func AvailableProviders() []types2.Provider {
 	if len(availableProviders) == 0 {
-		allProviders := []types.Provider{
+		allProviders := []types2.Provider{
 			aws.New(),
 			//libvirt.New(),
 			virtualbox.New(),
