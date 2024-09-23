@@ -33,7 +33,7 @@ var imageListCmd = &cobra.Command{
 	Short: "list images",
 	Long:  `list images`,
 	Run: func(cmd *cobra.Command, args []string) {
-		listBuilds, _ := cmd.Flags().GetBool("list-builds")
+		listBuilds, _ := cmd.Flags().GetBool("builds")
 		if listBuilds {
 			imagesBuilds, err := carbonObj.GetImageBuilds()
 			if err != nil {
