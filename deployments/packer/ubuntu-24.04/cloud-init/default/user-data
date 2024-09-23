@@ -33,6 +33,7 @@ write_files:
     github.com/analog-substance/nex@latest
     github.com/analog-substance/as-gold@latest
     github.com/analog-substance/copper/cmd/copper@latest
+    github.com/analog-substance/scopious@latest
     github.com/defektive/fast-resolv@latest
     github.com/OJ/gobuster/v3@latest
     github.com/ffuf/ffuf@latest
@@ -44,6 +45,7 @@ write_files:
     github.com/projectdiscovery/katana/cmd/katana@latest
     github.com/projectdiscovery/subfinder/v2/cmd/subfinder@latest
     github.com/sensepost/gowitness@latest
+    github.com/projectdiscovery/cdncheck/cmd/cdncheck@latest
   owner: 'root:root'
   permissions: '0o644'
 - path: /usr/local/bin/carbon-init.sh

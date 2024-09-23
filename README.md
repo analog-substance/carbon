@@ -130,15 +130,16 @@ carbon vm ssh -i i-afde123ae43
 - docs
   - vhs example gifs
 - create/destroy one off VMs
+- vm search argument
 - provision aws env (create files, call terraform)
 - Self Test to ensure dependencies are met
+- Cloud init from templates (Base, Operator, Operator Desktop, Implant VM)
 - vSphere provider
 - vnc to vm
 - DNS management
     - point a domain
     - list domains
 - Jobs / Distributed execution
-- Cloud init templates (Base, Operator, Operator Desktop, Implant VM)
 - Simple deploy/config of services (Pwndoc, Gophish, modlishka, Guacamole, Sliver, Mythic)
 - GCP Provider
 - Azure Provider
