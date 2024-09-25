@@ -1,7 +1,7 @@
 package virtualbox
 
 import (
-	types2 "github.com/analog-substance/carbon/pkg/types"
+	"github.com/analog-substance/carbon/pkg/types"
 	"os/exec"
 	"path/filepath"
 	"slices"
@@ -12,7 +12,7 @@ type provider struct {
 	path string
 }
 
-func New() types2.Provider {
+func New() types.Provider {
 	return &provider{}
 }
 
@@ -30,8 +30,8 @@ func (p *provider) IsAvailable() bool {
 	return p.vboxPath() != ""
 }
 
-func (p *provider) Platforms(validNames ...string) []types2.Platform {
-	platforms := []types2.Platform{}
+func (p *provider) Platforms(validNames ...string) []types.Platform {
+	platforms := []types.Platform{}
 
 	// we have filters, check if we are wanted
 	if len(validNames) > 0 && !slices.Contains(validNames, strings.ToLower(p.Name())) {

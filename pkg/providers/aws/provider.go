@@ -1,7 +1,7 @@
 package aws
 
 import (
-	types2 "github.com/analog-substance/carbon/pkg/types"
+	"github.com/analog-substance/carbon/pkg/types"
 	"github.com/aws/aws-sdk-go-v2/config"
 	"gopkg.in/ini.v1"
 	"log"
@@ -13,7 +13,7 @@ type provider struct {
 	profiles []string
 }
 
-func New() types2.Provider {
+func New() types.Provider {
 	return &provider{}
 }
 
@@ -50,8 +50,8 @@ func (p *provider) IsAvailable() bool {
 	return len(p.Profiles()) > 0
 }
 
-func (p *provider) Platforms(validNames ...string) []types2.Platform {
-	platforms := []types2.Platform{}
+func (p *provider) Platforms(validNames ...string) []types.Platform {
+	platforms := []types.Platform{}
 
 	for _, s := range p.Profiles() {
 		// we have filters, check if we are wanted

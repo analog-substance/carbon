@@ -42,19 +42,25 @@ So you type less and be more productive!`,
 func init() {
 	RootCmd.AddCommand(vmCmd)
 
-	vmCmd.PersistentFlags().StringP("name", "n", "", "Name of the VM")
-	vmCmd.PersistentFlags().StringP("id", "i", "", "ID of machine to start")
-	vmCmd.PersistentFlags().StringP("user", "u", "ubuntu", "SSH Username")
+	vmCmd.PersistentFlags().StringP("name", "n", "", "Name of the VM.")
+	vmCmd.PersistentFlags().StringP("id", "i", "", "ID of machine to start.")
+	vmCmd.PersistentFlags().StringP("user", "u", "ubuntu", "SSH Username.")
+	vmCmd.PersistentFlags().StringSlice("host", []string{}, "Hostname or IP Address.")
 }
 
-func getVMFromArgs(cmd *cobra.Command, args []string) types.VM {
+func getVMsFromArgs(cmd *cobra.Command, args []string) []types.VM {
+	hosts, _ := cmd.Flags().GetStringSlice("host")
 	id, _ := cmd.Flags().GetString("id")
 	name, _ := cmd.Flags().GetString("name")
-	var vm types.VM
-	if name != "" {
-		vm = carbonObj.FindVMByName(name)
-	} else if id != "" {
-		vm = carbonObj.FindVMByID(id)
+
+	if len(hosts) > 0 {
+		return carbonObj.VMsFromHosts(hosts)
 	}
-	return vm
+
+	if name != "" {
+		return carbonObj.FindVMByName(name)
+	} else if id != "" {
+		return carbonObj.FindVMByID(id)
+	}
+	return carbonObj.GetVMs()
 }

@@ -22,6 +22,7 @@ THE SOFTWARE.
 package cmd
 
 import (
+	"fmt"
 	"github.com/spf13/cobra"
 	"log"
 )
@@ -33,11 +34,13 @@ var vmSSH = &cobra.Command{
 	Long:  `ssh to a vm`,
 	Run: func(cmd *cobra.Command, args []string) {
 		user, _ := cmd.Flags().GetString("user")
-		vm := getVMFromArgs(cmd, args)
-		if vm != nil {
-			err := vm.ExecSSH(user)
+		vms := getVMsFromArgs(cmd, args)
+		if len(vms) > 1 {
+			fmt.Println("Too many vms specified.")
+		} else if len(vms) == 1 {
+			err := vms[0].ExecSSH(user)
 			if err != nil {
-				log.Println("Error SSHing to VM:", err)
+				log.Fatal(err)
 			}
 		} else {
 			log.Println("VM not found")

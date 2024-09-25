@@ -8,8 +8,9 @@ import (
 	"github.com/analog-substance/carbon/deployments"
 	"github.com/analog-substance/carbon/pkg/providers/aws"
 	"github.com/analog-substance/carbon/pkg/providers/multipass"
+	"github.com/analog-substance/carbon/pkg/providers/simple"
 	"github.com/analog-substance/carbon/pkg/providers/virtualbox"
-	types2 "github.com/analog-substance/carbon/pkg/types"
+	"github.com/analog-substance/carbon/pkg/types"
 	"os"
 	"os/exec"
 	"path"
@@ -26,10 +27,10 @@ type Options struct {
 
 type Carbon struct {
 	options      Options
-	providers    []types2.Provider
-	platforms    []types2.Platform
-	environments []types2.Environment
-	machines     []types2.VM
+	providers    []types.Provider
+	platforms    []types.Platform
+	environments []types.Environment
+	machines     []types.VM
 }
 
 func New(options Options) *Carbon {
@@ -39,7 +40,7 @@ func New(options Options) *Carbon {
 	if options.Providers == nil || len(options.Providers) == 0 {
 		carbon.providers = AvailableProviders()
 	} else {
-		provs := []types2.Provider{}
+		provs := []types.Provider{}
 		for _, provider := range AvailableProviders() {
 			for _, providerStr := range options.Providers {
 				if strings.ToLower(providerStr) == strings.ToLower(provider.Name()) {
@@ -53,13 +54,13 @@ func New(options Options) *Carbon {
 	return carbon
 }
 
-func (c *Carbon) Providers() []types2.Provider {
+func (c *Carbon) Providers() []types.Provider {
 	return c.providers
 }
 
-func (c *Carbon) Platforms() []types2.Platform {
+func (c *Carbon) Platforms() []types.Platform {
 	if len(c.platforms) == 0 {
-		c.platforms = []types2.Platform{}
+		c.platforms = []types.Platform{}
 		for _, provider := range c.Providers() {
 			c.platforms = append(c.platforms, provider.Platforms(c.options.Platforms...)...)
 		}
@@ -68,9 +69,9 @@ func (c *Carbon) Platforms() []types2.Platform {
 	return c.platforms
 }
 
-func (c *Carbon) GetVMs() []types2.VM {
+func (c *Carbon) GetVMs() []types.VM {
 	if len(c.machines) == 0 {
-		c.machines = []types2.VM{}
+		c.machines = []types.VM{}
 		for _, platform := range c.Platforms() {
 			for _, env := range platform.Environments(c.options.Environments...) {
 				c.machines = append(c.machines, env.VMs()...)
@@ -81,24 +82,47 @@ func (c *Carbon) GetVMs() []types2.VM {
 	return c.machines
 }
 
-func (c *Carbon) FindVMByID(id string) types2.VM {
+func (c *Carbon) FindVMByID(id string) []types.VM {
 	for _, vm := range c.GetVMs() {
 		if vm.ID() == id {
-			return vm
+			return []types.VM{vm}
 		}
 	}
-	return nil
+	return []types.VM{}
 }
 
-func (c *Carbon) FindVMByName(name string) types2.VM {
+func (c *Carbon) FindVMByName(name string) []types.VM {
+
+	vms := []types.VM{}
+
 	for _, vm := range c.GetVMs() {
 		lowerName := strings.ToLower(vm.Name())
 		name = strings.ToLower(name)
 		if strings.Contains(lowerName, name) {
-			return vm
+			vms = append(vms, vm)
 		}
 	}
-	return nil
+	return vms
+}
+
+func (c *Carbon) VMsFromHosts(hostnames []string) []types.VM {
+
+	simpleProvider := simple.New()
+	platforms := simpleProvider.Platforms()
+	envs := platforms[0].Environments()
+
+	vms := []types.VM{}
+	for _, hostname := range hostnames {
+		vms = append(vms, types.Machine{
+			InstanceName:       hostname,
+			CurrentState:       types.StateUnknown,
+			InstanceID:         hostname,
+			Env:                envs[0],
+			PublicIPAddresses:  []string{hostname},
+			PrivateIPAddresses: []string{hostname},
+		})
+	}
+	return vms
 }
 
 const CloudInitDir = "cloud-init"
@@ -115,7 +139,7 @@ const PackerFilePacker = "packer.pkr.hcl"
 const ISOVarUsage = "var.iso_url"
 
 func (c *Carbon) CreateImageBuild(name, tplDir, service string) error {
-	autoinstall := false
+	autoInstall := false
 	cloudInitDir := ""
 	userDataFile := ""
 
@@ -180,11 +204,11 @@ func (c *Carbon) CreateImageBuild(name, tplDir, service string) error {
 		}
 
 		// if we need iso vars, we also need autoinstall
-		autoinstall = true
+		autoInstall = true
 	}
 
 	// determine user-data type (autoinstall or native cloud init)
-	if autoinstall {
+	if autoInstall {
 		cloudInitDir = path.Join(bootstrappedDir, CloudInitDir, "autoinstall")
 		userDataFile = path.Join(tplPackerDir, CloudInitDir, "autoinstall", "user-data")
 	} else {
@@ -283,11 +307,11 @@ func (c *Carbon) GetImageBuilds() ([]string, error) {
 	return ret, nil
 }
 
-var availableProviders []types2.Provider
+var availableProviders []types.Provider
 
-func AvailableProviders() []types2.Provider {
+func AvailableProviders() []types.Provider {
 	if len(availableProviders) == 0 {
-		allProviders := []types2.Provider{
+		allProviders := []types.Provider{
 			aws.New(),
 			//libvirt.New(),
 			virtualbox.New(),
@@ -314,11 +338,11 @@ func fileContainsString(path string, needle string, embeddedFS embed.FS) (bool, 
 }
 
 func copyFileFromEmbeddedFS(src, dest string, embeddedFS embed.FS) error {
-	filebytes, err := embeddedFS.ReadFile(src)
+	fileBytes, err := embeddedFS.ReadFile(src)
 	if err != nil {
 		return err
 	}
-	err = os.WriteFile(dest, filebytes, 0644)
+	err = os.WriteFile(dest, fileBytes, 0644)
 	if err != nil {
 		return err
 	}
