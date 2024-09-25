@@ -2,10 +2,10 @@ package aws
 
 import (
 	"context"
-	types3 "github.com/analog-substance/carbon/pkg/types"
+	"github.com/analog-substance/carbon/pkg/types"
 	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/service/ec2"
-	types2 "github.com/aws/aws-sdk-go-v2/service/ec2/types"
+	ec2Types "github.com/aws/aws-sdk-go-v2/service/ec2/types"
 	"log"
 	"strings"
 	"time"
@@ -22,15 +22,15 @@ func (e *environment) Name() string {
 	return e.name
 }
 
-func (e *environment) Platform() types3.Platform {
+func (e *environment) Platform() types.Platform {
 	return e.platform
 }
 
-func (e *environment) VMs() []types3.VM {
-	var vms []types3.VM
+func (e *environment) VMs() []types.VM {
+	var vms []types.VM
 	ec2Results, err := e.ec2Client.DescribeInstances(context.Background(), &ec2.DescribeInstancesInput{
-		Filters: []types2.Filter{
-			types2.Filter{
+		Filters: []ec2Types.Filter{
+			ec2Types.Filter{
 				Name:   aws.String("vpc-id"),
 				Values: []string{e.vpcId},
 			},
@@ -75,8 +75,8 @@ func (e *environment) RestartVM(id string) error {
 	return err
 }
 
-func awsInstanceToMachine(instance types2.Instance) types3.Machine {
-	machine := types3.Machine{
+func awsInstanceToMachine(instance ec2Types.Instance) types.Machine {
+	machine := types.Machine{
 		InstanceID: *instance.InstanceId,
 	}
 
@@ -95,37 +95,39 @@ func awsInstanceToMachine(instance types2.Instance) types3.Machine {
 		machine.PrivateIPAddresses = []string{*instance.PrivateIpAddress}
 	}
 
-	state := types3.StateUnknown
+	state := types.StateUnknown
 	if instance.StateReason != nil {
 		if strings.EqualFold(*instance.StateReason.Code, "Client.UserInitiatedHibernate") {
-			state = types3.StateSleeping
+			state = types.StateSleeping
 		}
 	}
 
-	if state == types3.StateUnknown {
+	if state == types.StateUnknown {
 		state = stateFromEC2(instance.State.Name)
 	}
 
 	machine.CurrentState = state
-	if instance.State.Name == types2.InstanceStateNameRunning {
+	if instance.State.Name == ec2Types.InstanceStateNameRunning {
 		machine.CurrentUpTime = time.Duration(time.Now().UnixNano() - instance.LaunchTime.UnixNano())
 	}
 
 	return machine
 }
 
-func stateFromEC2(state types2.InstanceStateName) types3.MachineState {
-	if state == types2.InstanceStateNameRunning {
-		return types3.StateRunning
+func stateFromEC2(state ec2Types.InstanceStateName) types.MachineState {
+	if state == ec2Types.InstanceStateNameRunning {
+		return types.StateRunning
 	}
-	if state == types2.InstanceStateNameStopped {
-		return types3.StateOff
+	if state == ec2Types.InstanceStateNameStopped {
+		return types.StateStopped
 	}
-	if state == types2.InstanceStateNameStopping {
-		return types3.StateStopping
+	if state == ec2Types.InstanceStateNameStopping {
+		return types.StateStopping
 	}
-	if state == types2.InstanceStateNameTerminated {
-		return types3.StateTerminating
+	if state == ec2Types.InstanceStateNameTerminated {
+		return types.StateTerminating
 	}
-	return types3.StateUnknown
+
+	log.Println("Unknown state for AWS VM:", state)
+	return types.StateUnknown
 }

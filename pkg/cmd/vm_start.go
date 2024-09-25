@@ -29,17 +29,19 @@ import (
 // vmStart represents the config command
 var vmStart = &cobra.Command{
 	Use:   "start",
-	Short: "Start a vm",
-	Long:  `start a vm`,
+	Short: "Start VMs",
+	Long:  `start VMs`,
 	Run: func(cmd *cobra.Command, args []string) {
-		vm := getVMFromArgs(cmd, args)
-		if vm != nil {
-			err := vm.Start()
-			if err != nil {
-				log.Println("Error starting VM:", err)
+		vms := getVMsFromArgs(cmd, args)
+		if len(vms) > 0 {
+			for _, vm := range vms {
+				err := vm.Start()
+				if err != nil {
+					log.Printf("Error starting VM (%s): %s", vm.Name(), err)
+				}
 			}
 		} else {
-			log.Println("VM not found")
+			log.Println("No VMs found.")
 		}
 	},
 }

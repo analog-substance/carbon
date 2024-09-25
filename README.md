@@ -4,6 +4,7 @@ linkTitle: Docs
 menu: {main: {weight: 20}}
 ---
 > Infrastructure automation for offensive operations.
+> https://analog-substance.github.io/carbon/
 
 ## Purpose
 ***

@@ -28,18 +28,20 @@ import (
 
 // vmRestart represents the config command
 var vmRestart = &cobra.Command{
-	Use:   "stop",
-	Short: "Stop a vm",
-	Long:  `Stop a vm`,
+	Use:   "restart",
+	Short: "Restart VM(s)",
+	Long:  `Restart VM(s)`,
 	Run: func(cmd *cobra.Command, args []string) {
-		vm := getVMFromArgs(cmd, args)
-		if vm != nil {
-			err := vm.Stop()
-			if err != nil {
-				log.Println("Error starting VM:", err)
+		vms := getVMsFromArgs(cmd, args)
+		if len(vms) > 0 {
+			for _, vm := range vms {
+				err := vm.Restart()
+				if err != nil {
+					log.Printf("Error restarting VM (%s): %s", vm.Name(), err)
+				}
 			}
 		} else {
-			log.Println("VM not found")
+			log.Println("No VMs found.")
 		}
 	},
 }

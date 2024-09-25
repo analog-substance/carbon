@@ -22,57 +22,32 @@ THE SOFTWARE.
 package cmd
 
 import (
-	"encoding/json"
 	"fmt"
-	"github.com/jedib0t/go-pretty/v6/table"
 	"github.com/spf13/cobra"
 	"log"
-	"os"
 )
 
-// vmList represents the config command
-var vmList = &cobra.Command{
-	Use:   "list",
-	Short: "List VMs",
-	Long:  `List VMs`,
+// vmVNCCmd represents the config command
+var vmVNCCmd = &cobra.Command{
+	Use:   "vnc",
+	Short: "vnc to a vm",
+	Long:  `vnc to a vm`,
 	Run: func(cmd *cobra.Command, args []string) {
-
+		user, _ := cmd.Flags().GetString("user")
 		vms := getVMsFromArgs(cmd, args)
-		if jsonOutput {
-			out, err := json.MarshalIndent(vms, "", "  ")
+		if len(vms) > 1 {
+			fmt.Println("Too many vms specified.")
+		} else if len(vms) == 1 {
+			err := vms[0].StartVNC(user)
 			if err != nil {
-				log.Println("error marshalling JSON", err)
+				log.Fatal(err)
 			}
-			fmt.Println(string(out))
 		} else {
-			t := table.NewWriter()
-			t.SetOutputMirror(os.Stdout)
-			t.AppendHeader(table.Row{"Name", "IP", "State", "Environment", "Platform"})
-
-			for _, vm := range vms {
-				var name string
-				if vm.ID() == vm.Name() {
-					name = vm.Name()
-				} else {
-					name = fmt.Sprintf("%s (%s)", vm.Name(), vm.ID())
-				}
-				t.AppendRows([]table.Row{
-					{
-						name,
-						vm.IPAddress(),
-						vm.State(),
-						vm.Environment().Name(),
-						vm.Environment().Platform().Name(),
-					},
-				})
-			}
-
-			t.Render()
-
+			log.Println("VM not found")
 		}
 	},
 }
 
 func init() {
-	vmCmd.AddCommand(vmList)
+	vmCmd.AddCommand(vmVNCCmd)
 }

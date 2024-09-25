@@ -29,17 +29,19 @@ import (
 // vmStop represents the config command
 var vmStop = &cobra.Command{
 	Use:   "stop",
-	Short: "Stop a vm",
-	Long:  `Stop a vm`,
+	Short: "Stop VM(s)",
+	Long:  `Stop VM(s)`,
 	Run: func(cmd *cobra.Command, args []string) {
-		vm := getVMFromArgs(cmd, args)
-		if vm != nil {
-			err := vm.Stop()
-			if err != nil {
-				log.Println("Error starting VM:", err)
+		vms := getVMsFromArgs(cmd, args)
+		if len(vms) > 0 {
+			for _, vm := range vms {
+				err := vm.Stop()
+				if err != nil {
+					log.Printf("Error stopping VM (%s): %s", vm.Name(), err)
+				}
 			}
 		} else {
-			log.Println("VM not found")
+			log.Println("No VMs found.")
 		}
 	},
 }

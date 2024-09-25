@@ -2,7 +2,7 @@ package aws
 
 import (
 	"context"
-	types2 "github.com/analog-substance/carbon/pkg/types"
+	"github.com/analog-substance/carbon/pkg/types"
 	"github.com/aws/aws-sdk-go-v2/config"
 	"github.com/aws/aws-sdk-go-v2/service/ec2"
 	"log"
@@ -15,9 +15,9 @@ type platform struct {
 	provider    *provider
 }
 
-func (p *platform) Environments(validNames ...string) []types2.Environment {
+func (p *platform) Environments(validNames ...string) []types.Environment {
 
-	var environments []types2.Environment
+	var environments []types.Environment
 	var options []func(*config.LoadOptions) error
 
 	options = append(options, config.WithSharedConfigProfile(p.profileName))
@@ -55,6 +55,6 @@ func (p *platform) Environments(validNames ...string) []types2.Environment {
 func (p *platform) Name() string {
 	return p.profileName
 }
-func (p *platform) Provider() types2.Provider {
+func (p *platform) Provider() types.Provider {
 	return p.provider
 }
