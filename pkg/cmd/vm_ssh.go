@@ -38,7 +38,7 @@ var vmSSH = &cobra.Command{
 		if len(vms) > 1 {
 			fmt.Println("Too many vms specified.")
 		} else if len(vms) == 1 {
-			err := vms[0].ExecSSH(user)
+			err := vms[0].ExecSSH(user, args...)
 			if err != nil {
 				log.Fatal(err)
 			}
