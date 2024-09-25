@@ -186,7 +186,7 @@ func getVNCPasswd() (string, string, error) {
 		}
 	}
 
-	base64Pass, err := builder.Shell(fmt.Sprintf("cat %s | base64 -w0", vncPasswdPath)).Output()
+	base64Pass, err := builder.Shell(fmt.Sprintf("cat %s | base64 ", vncPasswdPath)).Output()
 	if err != nil {
 		return "", "", err
 	}
