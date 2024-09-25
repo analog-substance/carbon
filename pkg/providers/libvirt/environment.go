@@ -152,7 +152,7 @@ func stateFromVboxInfo(state libvirt.DomainState) types.MachineState {
 		return types.StateSleeping
 	}
 	if state == libvirt.DOMAIN_SHUTOFF {
-		return types.StateOff
+		return types.StateStopped
 	}
 	if state == libvirt.DOMAIN_RUNNING {
 		return types.StateRunning

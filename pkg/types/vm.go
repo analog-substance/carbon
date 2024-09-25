@@ -18,7 +18,7 @@ import (
 type MachineState struct{ Name string }
 
 var StateRunning = MachineState{"Running"}
-var StateOff = MachineState{"Off"}
+var StateStopped = MachineState{"Stopped"}
 var StateStarting = MachineState{"Starting"}
 var StateStopping = MachineState{"Stopping"}
 var StateSleeping = MachineState{"Sleeping"}
@@ -106,7 +106,10 @@ func (m Machine) ExecSSH(user string, additionalArgs ...string) error {
 }
 
 func (m Machine) StartVNC(user string) error {
-	vncCmd := "ps aux | grep -v grep | grep -i vnc 2>&1 >/dev/null || vncserver -localhost -PasswordFile ~/.vnc/passwd -xstartup xfce4-session 2>&1 >/dev/null; lsof -i -n -o -P | grep -i vnc | grep 127 | cut -d : -f2 | awk '{print $1}'"
+
+	vncPassFile, vncPasswdB64, err := getVNCPasswd()
+
+	vncCmd := fmt.Sprintf("if ! ps aux | grep -v grep | grep -i vnc 2>&1 >/dev/null  ; then mkdir -p ~/.vnc; echo %s | base64 -d > ~/.vnc/passwd; vncserver -localhost -PasswordFile ~/.vnc/passwd -xstartup xfce4-session 2>&1 >/dev/null; fi; lsof -i -n -o -P | grep -i vnc | grep 127 | cut -d : -f2 | awk '{print $1}'", vncPasswdB64)
 	sshSession, err := m.NewSSHSession(user)
 	if err != nil {
 		return err
@@ -123,7 +126,6 @@ func (m Machine) StartVNC(user string) error {
 
 	localPort := 5901
 
-	home, err := homedir.Dir()
 	if err != nil {
 		return err
 	}
@@ -132,7 +134,7 @@ func (m Machine) StartVNC(user string) error {
 		vnc_viewer.Start(vnc_viewer.Options{
 			Delay:        3,
 			Host:         fmt.Sprintf("127.0.0.1:%d", vncPort),
-			PasswordFile: path.Join(home, ".vnc", "passwd"),
+			PasswordFile: vncPassFile,
 		})
 	}()
 
@@ -162,4 +164,43 @@ func (m Machine) NewSSHSession(user string) (*ssh_util.Session, error) {
 	}
 
 	return session, nil
+}
+
+func getVNCPasswd() (string, string, error) {
+	home, err := homedir.Dir()
+	if err != nil {
+		return "", "", err
+	}
+
+	vncPasswdPath := path.Join(home, ".vnc", "passwd")
+	exists, err := Exists(vncPasswdPath)
+	if err != nil {
+		return "", "", err
+	}
+
+	if !exists {
+		err = builder.Shell(fmt.Sprintf("echo -n carbon | vncpasswd -f > %s &&  chmod 600 %s", vncPasswdPath, vncPasswdPath)).Run()
+
+		if err != nil {
+			return "", "", err
+		}
+	}
+
+	base64Pass, err := builder.Shell(fmt.Sprintf("cat %s | base64 -w0", vncPasswdPath)).Output()
+	if err != nil {
+		return "", "", err
+	}
+
+	return vncPasswdPath, base64Pass, nil
+}
+
+func Exists(path string) (bool, error) {
+	_, err := os.Stat(path)
+	if err == nil {
+		return true, nil
+	}
+	if os.IsNotExist(err) {
+		return false, nil
+	}
+	return false, err
 }

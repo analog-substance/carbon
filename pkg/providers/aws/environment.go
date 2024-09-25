@@ -119,7 +119,7 @@ func stateFromEC2(state ec2Types.InstanceStateName) types.MachineState {
 		return types.StateRunning
 	}
 	if state == ec2Types.InstanceStateNameStopped {
-		return types.StateOff
+		return types.StateStopped
 	}
 	if state == ec2Types.InstanceStateNameStopping {
 		return types.StateStopping
@@ -127,5 +127,7 @@ func stateFromEC2(state ec2Types.InstanceStateName) types.MachineState {
 	if state == ec2Types.InstanceStateNameTerminated {
 		return types.StateTerminating
 	}
+
+	log.Println("Unknown state for AWS VM:", state)
 	return types.StateUnknown
 }

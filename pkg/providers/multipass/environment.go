@@ -3,6 +3,7 @@ package multipass
 import (
 	"github.com/analog-substance/carbon/pkg/providers/multipass/api"
 	"github.com/analog-substance/carbon/pkg/types"
+	"log"
 )
 
 type environment struct {
@@ -56,11 +57,16 @@ func stateFromVboxInfo(state string) types.MachineState {
 	if state == "Suspended" {
 		return types.StateSleeping
 	}
+	if state == "Starting" {
+		return types.StateStarting
+	}
 	if state == "Stopped" {
-		return types.StateOff
+		return types.StateStopped
 	}
 	if state == "Running" {
 		return types.StateRunning
 	}
+
+	log.Println("Unknown state for multipass VM:", state)
 	return types.StateUnknown
 }

@@ -3,6 +3,7 @@ package virtualbox
 import (
 	"github.com/analog-substance/carbon/pkg/providers/virtualbox/api"
 	"github.com/analog-substance/carbon/pkg/types"
+	"log"
 )
 
 type environment struct {
@@ -48,10 +49,12 @@ func (e environment) RestartVM(id string) error {
 
 func stateFromVboxInfo(state string) types.MachineState {
 	if state == "poweroff" {
-		return types.StateOff
+		return types.StateStopped
 	}
 	if state == "poweron" {
 		return types.StateRunning
 	}
+
+	log.Println("Unknown state for VirtualBox VM:", state)
 	return types.StateUnknown
 }
