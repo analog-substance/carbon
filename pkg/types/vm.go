@@ -179,7 +179,7 @@ func getVNCPasswd() (string, string, error) {
 	}
 
 	if !exists {
-		err = builder.Shell(fmt.Sprintf("echo -n carbon | vncpasswd -f > %s &&  chmod 600 %s", vncPasswdPath, vncPasswdPath)).Run()
+		err = builder.Shell(fmt.Sprintf("mkdir -p ~/.vnc; echo -n carbon | vncpasswd -f > %s &&  chmod 600 %s", vncPasswdPath, vncPasswdPath)).Run()
 
 		if err != nil {
 			return "", "", err

@@ -9,5 +9,5 @@ import (
 
 func StartViewer(options Options) error {
 	log.Println("starting vnc vierwwer")
-	return builder.Cmd("vncviewer", "-PasswordFile", options.PasswordFile, options.Host).Start()
+	return builder.Cmd("vncviewer", "-SecurityTypes", "VncAuth", "-PasswordFile", options.PasswordFile, options.Host).Start()
 }
