@@ -48,6 +48,18 @@ func (e environment) RestartVM(id string) error {
 	return api.RestartVM(id)
 }
 
+func (e environment) DestroyVM(id string) error {
+	return nil
+}
+
+func (e environment) CreateVM(options types.MachineLaunchOptions) error {
+	return nil
+}
+
+func (e environment) Images() []types.Image {
+	return []types.Image{}
+}
+
 func stateFromVboxInfo(state string) types.MachineState {
 	if state == "poweroff" {
 		return types.StateStopped

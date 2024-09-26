@@ -8,6 +8,7 @@ require (
 	github.com/aws/aws-sdk-go-v2 v1.31.0
 	github.com/aws/aws-sdk-go-v2/config v1.27.38
 	github.com/aws/aws-sdk-go-v2/service/ec2 v1.179.1
+	github.com/digitalocean/go-libvirt v0.0.0-20240916165608-bff44a349d9d
 	github.com/jedib0t/go-pretty/v6 v6.5.9
 	github.com/mitchellh/go-homedir v1.1.0
 	github.com/spf13/cobra v1.8.1
@@ -16,7 +17,6 @@ require (
 	golang.org/x/crypto v0.27.0
 	gopkg.in/ini.v1 v1.67.0
 	gopkg.in/yaml.v3 v3.0.1
-	libvirt.org/go/libvirt v1.10006.0
 )
 
 require (

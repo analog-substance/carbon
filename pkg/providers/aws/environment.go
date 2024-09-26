@@ -76,6 +76,18 @@ func (e *environment) RestartVM(id string) error {
 	return err
 }
 
+func (e *environment) DestroyVM(id string) error {
+	return nil
+}
+
+func (e *environment) CreateVM(options types.MachineLaunchOptions) error {
+	return nil
+}
+
+func (e *environment) Images() []types.Image {
+	return []types.Image{}
+}
+
 func awsInstanceToMachine(instance ec2Types.Instance) models.Machine {
 	machine := models.Machine{
 		InstanceID: *instance.InstanceId,

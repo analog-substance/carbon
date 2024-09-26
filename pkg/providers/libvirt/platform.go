@@ -2,8 +2,9 @@ package libvirt
 
 import (
 	"github.com/analog-substance/carbon/pkg/types"
-	"libvirt.org/go/libvirt"
+	"github.com/digitalocean/go-libvirt"
 	"log"
+	"net/url"
 	"slices"
 )
 
@@ -18,7 +19,8 @@ const platformName = "qemu"
 func (p platform) Environments(validNames ...string) []types.Environment {
 	if len(validNames) == 0 || slices.Contains(validNames, platformName) {
 
-		conn, err := libvirt.NewConnect(p.connectStr)
+		uri, _ := url.Parse(p.connectStr)
+		conn, err := libvirt.ConnectToURI(uri)
 		if err == nil {
 			return []types.Environment{environment{
 				platformName,

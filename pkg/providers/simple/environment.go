@@ -35,3 +35,15 @@ func (e *Environment) StopVM(id string) error {
 func (e *Environment) RestartVM(id string) error {
 	return errors.New("not implemented")
 }
+
+func (e *Environment) DestroyVM(id string) error {
+	return errors.New("not implemented")
+}
+
+func (e *Environment) CreateVM(options types.MachineLaunchOptions) error {
+	return errors.New("not implemented")
+}
+
+func (e *Environment) Images() []types.Image {
+	return []types.Image{}
+}

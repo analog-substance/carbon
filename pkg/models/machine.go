@@ -8,11 +8,13 @@ import (
 	"github.com/analog-substance/carbon/pkg/types"
 	"github.com/analog-substance/carbon/pkg/vnc_viewer"
 	"github.com/mitchellh/go-homedir"
+	"log/slog"
 	"os"
 	"os/exec"
 	"path"
 	"runtime"
 	"strconv"
+	"strings"
 	"syscall"
 	"time"
 )
@@ -25,6 +27,10 @@ type Machine struct {
 	PrivateIPAddresses []string
 	CurrentState       types.MachineState
 	Env                types.Environment
+}
+
+func init() {
+	slog.SetLogLoggerLevel(slog.LevelDebug)
 }
 
 func (m Machine) Environment() types.Environment {
@@ -84,19 +90,27 @@ func (m Machine) ExecSSH(user string, additionalArgs ...string) error {
 }
 
 func (m Machine) StartVNC(user string) error {
+	slog.Debug("new ssh session")
 	sshSession, err := m.NewSSHSession(user)
 	if err != nil {
 		return err
 	}
 
-	vncPassFile, err := m.getVNCPasswd(sshSession)
+	vncCmd := "if [ ! -f ~/.vnc/passwd ]; then mkdir -p ~/.vnc; echo -n carbon | vncpasswd -f > ~/.vnc/passwd; fi ; cat ~/.vnc/passwd | base64 -w0; echo; if ! ps aux | grep -v grep | grep -i vnc 2>&1 >/dev/null  ; then vncserver -localhost -PasswordFile ~/.vnc/passwd -xstartup xfce4-session 2>&1 >/dev/null; fi; lsof -i -n -o -P | grep -i vnc | grep 127 | cut -d : -f2 | awk '{print $1}'"
+
+	slog.Debug("start vnc")
+	sshSession.Session.Stdout = nil
+	vncConfig, err := sshSession.Output(vncCmd)
 	if err != nil {
 		return err
 	}
+	slog.Debug("vnc conf: " + vncConfig)
 
-	vncCmd := "if ! ps aux | grep -v grep | grep -i vnc 2>&1 >/dev/null  ; then vncserver -localhost -PasswordFile ~/.vnc/passwd -xstartup xfce4-session 2>&1 >/dev/null; fi; lsof -i -n -o -P | grep -i vnc | grep 127 | cut -d : -f2 | awk '{print $1}'"
+	vncConfigSlice := strings.Split(vncConfig, "\n")
+	passwdB64 := vncConfigSlice[0]
+	vncPortStr := vncConfigSlice[1]
 
-	vncPortStr, err := sshSession.Output(vncCmd)
+	vncPassFile, err := m.setVNCPasswd(passwdB64)
 	if err != nil {
 		return err
 	}
@@ -109,13 +123,14 @@ func (m Machine) StartVNC(user string) error {
 	localPort := 5901
 
 	go func() {
+		slog.Debug("start vncviewer")
 		vnc_viewer.Start(vnc_viewer.Options{
 			Delay:        3,
 			Host:         fmt.Sprintf("127.0.0.1:%d", vncPort),
 			PasswordFile: vncPassFile,
 		})
 	}()
-
+	slog.Debug("fwd port")
 	err = sshSession.ForwardLocalPort(localPort, vncPort)
 	if err != nil {
 		return err
@@ -144,12 +159,7 @@ func (m Machine) NewSSHSession(user string) (*ssh_util.Session, error) {
 	return session, nil
 }
 
-func (m Machine) getVNCPasswd(sshSession *ssh_util.Session) (string, error) {
-
-	vncPasswordB64, err := sshSession.Output("if [ ! -f ~/.vnc/passwd ]; then mkdir -p ~/.vnc; echo -n carbon | vncpasswd -f > ~/.vnc/passwd; fi ; cat ~/.vnc/passwd | base64 -w0")
-	if err != nil {
-		return "", err
-	}
+func (m Machine) setVNCPasswd(vncPasswordB64 string) (string, error) {
 
 	passwdBytes, err := base64.StdEncoding.DecodeString(vncPasswordB64)
 	if err != nil {

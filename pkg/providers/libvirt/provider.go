@@ -2,6 +2,7 @@ package libvirt
 
 import (
 	"github.com/analog-substance/carbon/pkg/types"
+	"github.com/digitalocean/go-libvirt"
 	"slices"
 	"strings"
 )
@@ -27,9 +28,10 @@ func (p *provider) Platforms(validNames ...string) []types.Platform {
 	}
 
 	if p.IsAvailable() {
-		platforms = append(platforms, platform{p.Name(), p, "qemu:///system"})
+		platforms = append(platforms, platform{p.Name(), p, string(libvirt.QEMUSystem)})
 	}
 	return platforms
+
 }
 func (p *provider) Name() string {
 	return "libvirt"

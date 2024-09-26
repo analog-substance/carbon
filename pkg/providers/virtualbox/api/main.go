@@ -43,7 +43,7 @@ func ListVMs() []VBoxVM {
 		Output()
 
 	if err != nil {
-		log.Println("Error listing VMs:", err)
+		log.Println("Error listing VirtualBox VMs:", err)
 	}
 
 	vms := []VBoxVM{}

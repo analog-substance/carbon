@@ -1,7 +1,6 @@
 package cmd
 
 import (
-	"encoding/json"
 	"github.com/analog-substance/carbon/pkg/carbon"
 	"github.com/mitchellh/go-homedir"
 	"github.com/spf13/viper"
@@ -108,10 +107,10 @@ func initConfig() {
 	//err := viper.ReadInConfig()
 	//cobra.CheckErr(err)
 
-	settings := viper.AllSettings()
-	bytes, err := json.MarshalIndent(settings, "", "  ")
-	cobra.CheckErr(err)
-	log.Printf(string(bytes))
+	//settings := viper.AllSettings()
+	//bytes, err := json.MarshalIndent(settings, "", "  ")
+	//cobra.CheckErr(err)
+	//log.Printf(string(bytes))
 
 	viper.AddConfigPath(".")
 
@@ -119,10 +118,10 @@ func initConfig() {
 	_ = viper.MergeInConfig()
 	//cobra.CheckErr(err)
 
-	settings = viper.AllSettings()
-	bytes, err = json.MarshalIndent(settings, "", "  ")
-	cobra.CheckErr(err)
-	log.Printf(string(bytes))
+	//settings = viper.AllSettings()
+	//bytes, err = json.MarshalIndent(settings, "", "  ")
+	//cobra.CheckErr(err)
+	//log.Printf(string(bytes))
 }
 
 func lowerStringSlice(strs []string) []string {

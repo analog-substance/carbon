@@ -39,7 +39,6 @@ func (e environment) VMs() []types.VM {
 	}
 	return vms
 }
-
 func (e environment) StartVM(id string) error {
 	return api.StartVM(id)
 }
@@ -52,6 +51,18 @@ func (e environment) StopVM(id string) error {
 func (e environment) RestartVM(id string) error {
 	// sleep
 	return api.SleepVM(id)
+}
+
+func (e environment) DestroyVM(id string) error {
+	return nil
+}
+
+func (e environment) CreateVM(options types.MachineLaunchOptions) error {
+	return nil
+}
+
+func (e environment) Images() []types.Image {
+	return []types.Image{}
 }
 
 func stateFromVboxInfo(state string) types.MachineState {
