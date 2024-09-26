@@ -4,4 +4,4 @@ description: LibVirt is broken right now
 weight: 20
 ---
 
-Initially I used the LibVirt SDK for go. This broke OSX and Windows builds. I plan on rewriting this to use `virsh` instead.
+This provider uses the libvirt sdk by digital ocean. Currently, it is hardcoded to use `qemu:///system`, this should change in the future.
