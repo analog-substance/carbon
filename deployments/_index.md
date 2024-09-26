@@ -4,7 +4,7 @@ description: >
   Packer, Cloud Init, Terraform and Ansible. 
 categories: [Infrastructure, How To]
 tags: [Packer, Terraform, Cloud Init]
-weight: 2
+weight: 30
 ---
 
 There are various configurations and applications required to build, deploy,

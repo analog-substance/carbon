@@ -2,6 +2,7 @@ package aws
 
 import (
 	"context"
+	"github.com/analog-substance/carbon/pkg/models"
 	"github.com/analog-substance/carbon/pkg/types"
 	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/service/ec2"
@@ -75,8 +76,8 @@ func (e *environment) RestartVM(id string) error {
 	return err
 }
 
-func awsInstanceToMachine(instance ec2Types.Instance) types.Machine {
-	machine := types.Machine{
+func awsInstanceToMachine(instance ec2Types.Instance) models.Machine {
+	machine := models.Machine{
 		InstanceID: *instance.InstanceId,
 	}
 

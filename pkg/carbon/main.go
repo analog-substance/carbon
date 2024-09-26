@@ -6,6 +6,7 @@ import (
 	"fmt"
 	builder "github.com/NoF0rte/cmd-builder"
 	"github.com/analog-substance/carbon/deployments"
+	"github.com/analog-substance/carbon/pkg/models"
 	"github.com/analog-substance/carbon/pkg/providers/aws"
 	"github.com/analog-substance/carbon/pkg/providers/multipass"
 	"github.com/analog-substance/carbon/pkg/providers/simple"
@@ -113,7 +114,7 @@ func (c *Carbon) VMsFromHosts(hostnames []string) []types.VM {
 
 	vms := []types.VM{}
 	for _, hostname := range hostnames {
-		vms = append(vms, types.Machine{
+		vms = append(vms, models.Machine{
 			InstanceName:       hostname,
 			CurrentState:       types.StateUnknown,
 			InstanceID:         hostname,

@@ -2,6 +2,7 @@ package libvirt
 
 import (
 	"fmt"
+	"github.com/analog-substance/carbon/pkg/models"
 	"github.com/analog-substance/carbon/pkg/types"
 	"libvirt.org/go/libvirt"
 	"log"
@@ -88,7 +89,7 @@ func (e environment) VMs() []types.VM {
 			}
 		}
 
-		vms = append(vms, types.Machine{
+		vms = append(vms, models.Machine{
 			InstanceName:       name,
 			CurrentState:       stateFromVboxInfo(info.State),
 			InstanceID:         fmt.Sprintf("%d", id),

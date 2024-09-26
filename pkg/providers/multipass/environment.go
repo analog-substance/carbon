@@ -1,6 +1,7 @@
 package multipass
 
 import (
+	"github.com/analog-substance/carbon/pkg/models"
 	"github.com/analog-substance/carbon/pkg/providers/multipass/api"
 	"github.com/analog-substance/carbon/pkg/types"
 	"log"
@@ -27,7 +28,7 @@ func (e environment) VMs() []types.VM {
 
 		publicIPs = append(publicIPs, mpVM.Ipv4...)
 
-		vms = append(vms, types.Machine{
+		vms = append(vms, models.Machine{
 			InstanceName:       mpVM.Name,
 			CurrentState:       stateFromVboxInfo(mpVM.State),
 			InstanceID:         mpVM.Name,

@@ -1,6 +1,7 @@
 package virtualbox
 
 import (
+	"github.com/analog-substance/carbon/pkg/models"
 	"github.com/analog-substance/carbon/pkg/providers/virtualbox/api"
 	"github.com/analog-substance/carbon/pkg/types"
 	"log"
@@ -23,7 +24,7 @@ func (e environment) VMs() []types.VM {
 	var vms []types.VM
 	for _, vboxVM := range api.ListVMs() {
 
-		vms = append(vms, types.Machine{
+		vms = append(vms, models.Machine{
 			InstanceName: vboxVM.Name,
 			CurrentState: stateFromVboxInfo(vboxVM.State),
 			InstanceID:   vboxVM.ID,
