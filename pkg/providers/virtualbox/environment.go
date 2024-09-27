@@ -1,29 +1,32 @@
 package virtualbox
 
 import (
+	"github.com/analog-substance/carbon/pkg/models"
 	"github.com/analog-substance/carbon/pkg/providers/virtualbox/api"
 	"github.com/analog-substance/carbon/pkg/types"
 	"log"
+	"os"
+	"path"
 )
 
 type environment struct {
-	name     string
-	platform types.Platform
+	name    string
+	profile types.Profile
 }
 
 func (e environment) Name() string {
 	return e.name
 }
 
-func (e environment) Platform() types.Platform {
-	return e.platform
+func (e environment) Profile() types.Profile {
+	return e.profile
 }
 
 func (e environment) VMs() []types.VM {
 	var vms []types.VM
 	for _, vboxVM := range api.ListVMs() {
 
-		vms = append(vms, types.Machine{
+		vms = append(vms, &models.Machine{
 			InstanceName: vboxVM.Name,
 			CurrentState: stateFromVboxInfo(vboxVM.State),
 			InstanceID:   vboxVM.ID,
@@ -47,12 +50,37 @@ func (e environment) RestartVM(id string) error {
 	return api.RestartVM(id)
 }
 
+func (e environment) DestroyVM(id string) error {
+	return nil
+}
+
+func (e environment) CreateVM(options types.MachineLaunchOptions) error {
+	return nil
+}
+
+func (e environment) ImageBuilds() ([]types.ImageBuild, error) {
+	return models.GetImageBuildsForProvider(e.profile.Provider().Type())
+}
+
+func (e environment) Images() ([]types.Image, error) {
+	ret := []types.Image{}
+	listing, _ := os.ReadDir("deployments/images/virtualbox")
+	for _, dirEntry := range listing {
+		ret = append(ret, models.NewImage(path.Join("deployments/images/virtualbox", dirEntry.Name()), e))
+
+	}
+	return ret, nil
+}
+
 func stateFromVboxInfo(state string) types.MachineState {
 	if state == "poweroff" {
 		return types.StateStopped
 	}
 	if state == "poweron" {
 		return types.StateRunning
+	}
+	if state == "aborted" {
+		return types.StateStopped
 	}
 
 	log.Println("Unknown state for VirtualBox VM:", state)

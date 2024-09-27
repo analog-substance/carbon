@@ -17,9 +17,17 @@ const defaultConfigFile = "carbon.yaml"
 // configCmd represents the config command
 var configCmd = &cobra.Command{
 	Use:   "config",
-	Short: "Display config information",
-	Long:  `Display config information.`,
-	Args:  cobra.RangeArgs(0, 3),
+	Short: "Get/Set config information",
+	Long: `Get/Set config information.
+
+Set vSphere credentials
+
+	carbon config carbon.credentials.vsphere_server.provider vsphere
+	carbon config carbon.credentials.vsphere_server.username vsphere_user@vsphere.example
+	carbon config carbon.credentials.vsphere_server.password_command 'op read op://Private/vSphere Creds/password'
+
+`,
+	Args: cobra.RangeArgs(0, 3),
 	Run: func(cmd *cobra.Command, args []string) {
 		count := len(args)
 		switch count {
@@ -157,7 +165,7 @@ func matchConfigType(currentValue interface{}, userValue string) (interface{}, e
 			}
 			return slice, nil
 		}
-	} else if currentValue == nil { // If currentValue is nil, we are setting a new key and we must guess the value type
+	} else if currentValue == nil { // If currentValue is nil, we are setting a new key, and we must guess the value type
 		intValue, err := strconv.Atoi(userValue)
 		if err == nil {
 			return intValue, nil

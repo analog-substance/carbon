@@ -4,9 +4,16 @@ import (
 	"encoding/json"
 	builder "github.com/NoF0rte/cmd-builder"
 	"log"
+	"os"
 	"os/exec"
 	"path/filepath"
 )
+
+var logger *log.Logger
+
+func init() {
+	logger = log.New(os.Stderr, "[Mutlipass]", 0)
+}
 
 type MultipassVM struct {
 	Ipv4    []string `json:"ipv4"`
@@ -40,7 +47,7 @@ func ListVMs() []MultipassVM {
 		Output()
 
 	if err != nil {
-		log.Println("Error listing VMs:", err)
+		log.Println("Error listing Multipass VMs:", err)
 	}
 
 	var listOutput MultipassListOutput

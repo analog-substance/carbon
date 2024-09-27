@@ -1,7 +1,7 @@
 ---
   - name: Clone oh-my-zsh
     tags:
-      # Suppress warning: [ANSIBLE0006] git used in place of git module
+      # Suppress warning: [ANSIBLE0006] git used in place of git module.
       # Git module doesn't allow us to set `core.autocrlf=input`.
       - skip_ansible_lint
     # core.autocrlf=input prevents https://github.com/robbyrussell/oh-my-zsh/issues/4402

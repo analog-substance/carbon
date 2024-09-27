@@ -1,28 +1,8 @@
-/*
-Copyright © 2024 defektive
-
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
-
-The above copyright notice and this permission notice shall be included in
-all copies or substantial portions of the Software.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-THE SOFTWARE.
-*/
 package cmd
 
 import (
 	"github.com/analog-substance/carbon/pkg/carbon"
+	"github.com/analog-substance/carbon/pkg/common"
 	"github.com/mitchellh/go-homedir"
 	"github.com/spf13/viper"
 	"log"
@@ -35,8 +15,8 @@ import (
 var cfgFile string
 
 // var providers []string
-var platforms []string
-var environments []string
+// var profiles []string
+// var environments []string
 var jsonOutput bool
 var carbonObj *carbon.Carbon
 
@@ -46,20 +26,15 @@ var RootCmd = &cobra.Command{
 	Short: "Infrastructure ops simplified",
 	Long:  `Manage and use infrastructure with a consistent interface, regardless of where it lives.`,
 	PersistentPreRunE: func(cmd *cobra.Command, args []string) error {
-		providers := viper.GetStringSlice("providers")
-		platforms := viper.GetStringSlice("platforms")
-		environments := viper.GetStringSlice("environments")
+		carbonConfigFile := common.CarbonConfigFile{}
+		err := viper.Unmarshal(&carbonConfigFile)
+		if err != nil {
+			log.Fatalf("unable to decode into config struct, %v", err)
+		}
 
-		carbonObj = carbon.New(carbon.Options{
-			Providers:    lowerStringSlice(providers),
-			Platforms:    lowerStringSlice(platforms),
-			Environments: lowerStringSlice(environments),
-		})
+		carbonObj = carbon.New(carbonConfigFile.Carbon)
 		return nil
 	},
-	// Uncomment the following line if your bare application
-	// has an action associated with it:
-	// Run: func(cmd *cobra.Command, args []string) { },
 }
 
 // Execute adds all child commands to the root command and sets flags appropriately.
@@ -73,58 +48,34 @@ func Execute() {
 
 func init() {
 	cobra.OnInitialize(initConfig)
-	// Here you will define your flags and configuration settings.
-	// Cobra supports persistent flags, which, if defined here,
-	// will be global for your application.
-
 	RootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is $HOME/.carbon.yaml)")
-	RootCmd.PersistentFlags().StringSliceP("provider", "P", []string{}, "Provider to use vbox, aws")
-	RootCmd.PersistentFlags().StringSliceVarP(&platforms, "platform", "p", []string{}, "Platform to use. Like an instance of a provider. Used to specify aws profiles")
-	RootCmd.PersistentFlags().StringSliceVarP(&environments, "environment", "e", []string{}, "Environment to use. Some platforms support many environments.")
+	// need to rethink how I want this to work
+	//RootCmd.PersistentFlags().StringSliceP("provider", "P", []string{}, "Provider to use vbox, aws")
+	//RootCmd.PersistentFlags().StringSliceVarP(&profiles, "profile", "p", []string{}, "Profile to use. Like an instance of a provider. Used to specify aws profiles")
+	//RootCmd.PersistentFlags().StringSliceVarP(&environments, "environment", "e", []string{}, "Environment to use. Some providers/profiles support many environments.")
 	RootCmd.PersistentFlags().BoolVarP(&jsonOutput, "json", "j", false, "Output in JSON")
-
-	err := viper.BindPFlag("providers", RootCmd.PersistentFlags().Lookup("provider"))
-	if err != nil {
-		log.Fatal(err)
-	}
-	err = viper.BindPFlag("platforms", RootCmd.PersistentFlags().Lookup("platform"))
-	if err != nil {
-		log.Fatal(err)
-	}
-	err = viper.BindPFlag("environments", RootCmd.PersistentFlags().Lookup("environment"))
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	// Cobra also supports local flags, which will only run
-	// when this action is called directly.
-
 }
 
 // initConfig reads in config file and ENV variables if set.
 func initConfig() {
+	viper.AutomaticEnv() // read in environment variables that match
 
-	cwd, err := os.Getwd()
-	if err != nil {
-		log.Println(err)
-	}
+	viper.SetDefault(common.ViperPackerDir, "deployments/packer")
+
 	if cfgFile != "" {
-		// Use config file from the flag.
 		viper.SetConfigFile(cfgFile)
 	} else {
-		// Find home directory.
 		home, err := homedir.Dir()
 		cobra.CheckErr(err)
 
-		viper.AddConfigPath(cwd)
 		viper.AddConfigPath(home)
 		viper.SetConfigName("carbon")
 	}
 
-	viper.AutomaticEnv() // read in environment variables that match
+	viper.AddConfigPath(".")
 
 	// do not need to handle err here. since an error will occur if the config file doesn't exist
-	_ = viper.ReadInConfig()
+	_ = viper.MergeInConfig()
 }
 
 func lowerStringSlice(strs []string) []string {

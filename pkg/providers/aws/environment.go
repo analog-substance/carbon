@@ -2,6 +2,7 @@ package aws
 
 import (
 	"context"
+	"github.com/analog-substance/carbon/pkg/models"
 	"github.com/analog-substance/carbon/pkg/types"
 	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/service/ec2"
@@ -13,7 +14,7 @@ import (
 
 type environment struct {
 	name      string
-	platform  *platform
+	profile   *profile
 	ec2Client *ec2.Client
 	vpcId     string
 }
@@ -22,8 +23,8 @@ func (e *environment) Name() string {
 	return e.name
 }
 
-func (e *environment) Platform() types.Platform {
-	return e.platform
+func (e *environment) Profile() types.Profile {
+	return e.profile
 }
 
 func (e *environment) VMs() []types.VM {
@@ -75,8 +76,23 @@ func (e *environment) RestartVM(id string) error {
 	return err
 }
 
-func awsInstanceToMachine(instance ec2Types.Instance) types.Machine {
-	machine := types.Machine{
+func (e *environment) DestroyVM(id string) error {
+	return nil
+}
+
+func (e *environment) CreateVM(options types.MachineLaunchOptions) error {
+	return nil
+}
+
+func (e *environment) ImageBuilds() ([]types.ImageBuild, error) {
+	return models.GetImageBuildsForProvider(e.profile.Provider().Type())
+}
+func (e environment) Images() ([]types.Image, error) {
+	return []types.Image{}, nil
+}
+
+func awsInstanceToMachine(instance ec2Types.Instance) *models.Machine {
+	machine := &models.Machine{
 		InstanceID: *instance.InstanceId,
 	}
 
@@ -115,17 +131,21 @@ func awsInstanceToMachine(instance ec2Types.Instance) types.Machine {
 }
 
 func stateFromEC2(state ec2Types.InstanceStateName) types.MachineState {
+
 	if state == ec2Types.InstanceStateNameRunning {
 		return types.StateRunning
 	}
 	if state == ec2Types.InstanceStateNameStopped {
 		return types.StateStopped
 	}
-	if state == ec2Types.InstanceStateNameStopping {
+	if state == ec2Types.InstanceStateNameStopping || state == ec2Types.InstanceStateNameShuttingDown {
 		return types.StateStopping
 	}
 	if state == ec2Types.InstanceStateNameTerminated {
 		return types.StateTerminating
+	}
+	if state == ec2Types.InstanceStateNamePending {
+		return types.StateStarting
 	}
 
 	log.Println("Unknown state for AWS VM:", state)

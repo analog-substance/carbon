@@ -1,23 +1,30 @@
 package aws
 
 import (
+	"github.com/analog-substance/carbon/pkg/common"
+	"github.com/analog-substance/carbon/pkg/providers/base"
 	"github.com/analog-substance/carbon/pkg/types"
 	"github.com/aws/aws-sdk-go-v2/config"
 	"gopkg.in/ini.v1"
 	"log"
-	"slices"
 	"strings"
 )
 
+const providerName = "AWS"
+
 type provider struct {
+	types.Provider
 	profiles []string
 }
 
 func New() types.Provider {
-	return &provider{}
+	return &provider{
+		base.NewWithName(providerName),
+		[]string{},
+	}
 }
 
-func (p *provider) Profiles() []string {
+func (p *provider) AWSProfiles() []string {
 	if len(p.profiles) > 0 {
 		return p.profiles
 	}
@@ -47,22 +54,22 @@ func (p *provider) Profiles() []string {
 }
 
 func (p *provider) IsAvailable() bool {
-	return len(p.Profiles()) > 0
+	return len(p.AWSProfiles()) > 0
 }
 
-func (p *provider) Platforms(validNames ...string) []types.Platform {
-	platforms := []types.Platform{}
-
-	for _, s := range p.Profiles() {
-		// we have filters, check if we are wanted
-		if len(validNames) == 0 || slices.Contains(validNames, strings.ToLower(s)) {
-			platforms = append(platforms, &platform{s, p})
+func (p *provider) Profiles() []types.Profile {
+	profiles := []types.Profile{}
+	for _, profileName := range p.AWSProfiles() {
+		profileConfig, ok := p.Provider.GetConfig().Profiles[profileName]
+		if !ok {
+			profileConfig = common.ProfileConfig{
+				Enabled: true,
+			}
+		}
+		if profileConfig.Enabled {
+			profiles = append(profiles, NewProfile(profileName, p, profileConfig))
 		}
 	}
 
-	return platforms
-}
-
-func (p *provider) Name() string {
-	return "AWS"
+	return profiles
 }

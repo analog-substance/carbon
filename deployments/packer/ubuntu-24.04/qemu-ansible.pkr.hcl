@@ -19,7 +19,7 @@ source "qemu" "carbon-vm-ubuntu-ansible" {
   disk_interface = "virtio"
   boot_wait      = "5s"
   boot_command = [var.boot_command]
-  output_directory = "outputs/qemu-ansible-carbon-ubuntu-vm-${local.timestamp}"
+  output_directory = "deployments/images/qemu/carbon-ubuntu-vm-ansible-${local.timestamp}"
 }
 
 build {

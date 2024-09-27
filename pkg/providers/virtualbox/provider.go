@@ -1,48 +1,55 @@
 package virtualbox
 
 import (
+	"github.com/analog-substance/carbon/pkg/common"
+	"github.com/analog-substance/carbon/pkg/providers/base"
 	"github.com/analog-substance/carbon/pkg/types"
 	"os/exec"
 	"path/filepath"
-	"slices"
-	"strings"
 )
 
+const providerName = "VirtualBox"
+const profileName = "default"
+const environmentName = "local"
+
 type provider struct {
-	path string
+	types.Provider
+	vboxmanageExecutablePath string
 }
 
 func New() types.Provider {
-	return &provider{}
+	return &provider{
+		base.NewWithName(providerName),
+		"",
+	}
 }
 
 func (p *provider) vboxPath() string {
-	if p.path == "" {
+	if p.vboxmanageExecutablePath == "" {
 		virtualBox, err := exec.LookPath("vboxmanage")
 		if err == nil {
-			p.path, err = filepath.Abs(virtualBox)
+			p.vboxmanageExecutablePath, err = filepath.Abs(virtualBox)
 		}
 	}
-	return p.path
+	return p.vboxmanageExecutablePath
 }
 
 func (p *provider) IsAvailable() bool {
 	return p.vboxPath() != ""
 }
 
-func (p *provider) Platforms(validNames ...string) []types.Platform {
-	platforms := []types.Platform{}
-
-	// we have filters, check if we are wanted
-	if len(validNames) > 0 && !slices.Contains(validNames, strings.ToLower(p.Name())) {
-		return platforms
-	}
-
+func (p *provider) Profiles() []types.Profile {
+	profiles := []types.Profile{}
 	if p.IsAvailable() {
-		platforms = append(platforms, platform{p.Name(), p})
+		config, ok := p.Provider.GetConfig().Profiles[profileName]
+		if !ok {
+			config = common.ProfileConfig{
+				Enabled: true,
+			}
+		}
+		if config.Enabled {
+			profiles = append(profiles, NewProfile(profileName, p, config))
+		}
 	}
-	return platforms
-}
-func (p *provider) Name() string {
-	return "VirtualBox"
+	return profiles
 }

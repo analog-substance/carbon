@@ -12,6 +12,7 @@ source "virtualbox-iso" "carbon-vm-ubuntu" {
   headless         = false
   firmware         = "efi"
   http_directory = "${path.root}/cloud-init/autoinstall/"
+  output_directory = "deployments/images/virtualbox/carbon-ubuntu-vm-${local.timestamp}"
   boot_command     = [var.boot_command]
   boot_wait        = "5s"
   vboxmanage = [
