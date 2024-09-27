@@ -1,32 +1,28 @@
 package virtualbox
 
 import (
+	"github.com/analog-substance/carbon/pkg/common"
+	"github.com/analog-substance/carbon/pkg/providers/base"
 	"github.com/analog-substance/carbon/pkg/types"
-	"slices"
 )
 
 type profile struct {
-	profileName string
-	provider    *provider
+	types.Profile
 }
 
-const profileName = "local"
+func NewProfile(name string, providerInstance *provider, config common.ProfileConfig) *profile {
+	return &profile{
+		base.NewProfile(name, providerInstance, config),
+	}
+}
 
-func (p profile) Environments(validNames ...string) []types.Environment {
-	// we have filters, check if we are wanted
-	if len(validNames) == 0 || slices.Contains(validNames, profileName) {
+func (p profile) Environments() []types.Environment {
+	enabled, ok := p.Profile.GetConfig().Environments[environmentName]
+	if !ok || enabled {
 		return []types.Environment{environment{
-			profileName,
+			environmentName,
 			p,
 		}}
 	}
 	return []types.Environment{}
-}
-
-func (p profile) Name() string {
-	return p.profileName
-}
-
-func (p profile) Provider() types.Provider {
-	return p.provider
 }

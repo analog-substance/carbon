@@ -1,0 +1,49 @@
+package base
+
+import (
+	"github.com/analog-substance/carbon/pkg/common"
+	"github.com/analog-substance/carbon/pkg/types"
+)
+
+type Profile struct {
+	profileName string
+	provider    types.Provider
+	config      common.ProfileConfig
+}
+
+//func New() types.Provider {
+//	return &Provider{
+//		name: providerName,
+//	}
+//}
+
+func NewProfile(name string, providerInstance types.Provider, config common.ProfileConfig) types.Profile {
+	return &Profile{
+		profileName: name,
+		provider:    providerInstance,
+		config:      config,
+	}
+}
+
+func (p *Profile) Environments() []types.Environment {
+	return []types.Environment{
+		&Environment{
+			name:    "simple",
+			profile: p,
+		},
+	}
+}
+func (p *Profile) Name() string {
+	return p.profileName
+}
+func (p *Profile) Provider() types.Provider {
+	return p.provider
+}
+
+func (p *Profile) SetConfig(config common.ProfileConfig) {
+	p.config = config
+}
+
+func (p *Profile) GetConfig() common.ProfileConfig {
+	return p.config
+}

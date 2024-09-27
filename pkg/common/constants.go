@@ -1,3 +1,4 @@
 package common
 
-const ConfigPackerDir = "carbon.packer.dir"
+const ViperPrefix = "carbon."
+const ViperPackerDir = ViperPrefix + "packer.dir"

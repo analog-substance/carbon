@@ -1,18 +1,26 @@
 package qemu
 
 import (
+	"github.com/analog-substance/carbon/pkg/common"
+	"github.com/analog-substance/carbon/pkg/providers/base"
 	"github.com/analog-substance/carbon/pkg/types"
 	"github.com/digitalocean/go-libvirt"
-	"slices"
-	"strings"
 )
 
 type provider struct {
+	types.Provider
 	path string
 }
 
+const providerName = "QEMU"
+const profileName = "default"
+const environmentName = "local"
+
 func New() types.Provider {
-	return &provider{}
+	return &provider{
+		base.NewWithName(providerName),
+		"",
+	}
 }
 
 func (p *provider) IsAvailable() bool {
@@ -20,23 +28,21 @@ func (p *provider) IsAvailable() bool {
 	return true
 }
 
-func (p *provider) Profiles(validNames ...string) []types.Profile {
+func (p *provider) Profiles() []types.Profile {
 	profiles := []types.Profile{}
-	// we have filters, check if we are wanted
-	if len(validNames) > 0 && !slices.Contains(validNames, strings.ToLower(p.Name())) {
-		return profiles
-	}
 
 	if p.IsAvailable() {
-		profiles = append(profiles, profile{p.Name(), p, string(libvirt.QEMUSystem)})
+		config, ok := p.Provider.GetConfig().Profiles[profileName]
+		if !ok {
+			config = common.ProfileConfig{
+				Enabled: true,
+				URL:     string(libvirt.QEMUSystem),
+			}
+		}
+		if config.Enabled {
+			profiles = append(profiles, NewProfile(profileName, p, config))
+		}
 	}
 	return profiles
 
-}
-func (p *provider) Name() string {
-	return "QEMU"
-}
-
-func (p *provider) Type() string {
-	return strings.ToLower(p.Name())
 }

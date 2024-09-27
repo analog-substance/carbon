@@ -5,11 +5,12 @@ import (
 	"embed"
 	"fmt"
 	"github.com/analog-substance/carbon/deployments"
+	"github.com/analog-substance/carbon/pkg/common"
 	"github.com/analog-substance/carbon/pkg/models"
 	"github.com/analog-substance/carbon/pkg/providers/aws"
+	"github.com/analog-substance/carbon/pkg/providers/base"
 	"github.com/analog-substance/carbon/pkg/providers/multipass"
 	"github.com/analog-substance/carbon/pkg/providers/qemu"
-	"github.com/analog-substance/carbon/pkg/providers/simple"
 	"github.com/analog-substance/carbon/pkg/providers/virtualbox"
 	"github.com/analog-substance/carbon/pkg/types"
 	"os"
@@ -24,7 +25,7 @@ type Options struct {
 }
 
 type Carbon struct {
-	options      Options
+	config       common.CarbonConfig
 	providers    []types.Provider
 	profiles     []types.Profile
 	environments []types.Environment
@@ -33,22 +34,17 @@ type Carbon struct {
 	images       []types.Image
 }
 
-func New(options Options) *Carbon {
+func New(config common.CarbonConfig) *Carbon {
+	carbon := &Carbon{config: config, providers: []types.Provider{}, profiles: []types.Profile{}, environments: []types.Environment{}}
 
-	carbon := &Carbon{options: options}
+	for _, provider := range AvailableProviders() {
 
-	if options.Providers == nil || len(options.Providers) == 0 {
-		carbon.providers = AvailableProviders()
-	} else {
-		provs := []types.Provider{}
-		for _, provider := range AvailableProviders() {
-			for _, providerStr := range options.Providers {
-				if strings.ToLower(providerStr) == strings.ToLower(provider.Name()) {
-					provs = append(provs, provider)
-				}
-			}
+		providerConfig, ok := config.Providers[provider.Type()]
+		if !ok || providerConfig.Enabled {
+			// no config, or explicitly enabled
+			carbon.providers = append(carbon.providers, provider)
+			provider.SetConfig(providerConfig)
 		}
-		carbon.providers = provs
 	}
 
 	return carbon
@@ -62,7 +58,7 @@ func (c *Carbon) Profiles() []types.Profile {
 	if len(c.profiles) == 0 {
 		c.profiles = []types.Profile{}
 		for _, provider := range c.Providers() {
-			c.profiles = append(c.profiles, provider.Profiles(c.options.Profiles...)...)
+			c.profiles = append(c.profiles, provider.Profiles()...)
 		}
 	}
 
@@ -73,7 +69,7 @@ func (c *Carbon) GetVMs() []types.VM {
 	if len(c.machines) == 0 {
 		c.machines = []types.VM{}
 		for _, profile := range c.Profiles() {
-			for _, env := range profile.Environments(c.options.Environments...) {
+			for _, env := range profile.Environments() {
 				c.machines = append(c.machines, env.VMs()...)
 			}
 		}
@@ -107,7 +103,7 @@ func (c *Carbon) FindVMByName(name string) []types.VM {
 
 func (c *Carbon) VMsFromHosts(hostnames []string) []types.VM {
 
-	simpleProvider := simple.New()
+	simpleProvider := base.New()
 	profile := simpleProvider.Profiles()
 	envs := profile[0].Environments()
 
@@ -291,7 +287,7 @@ func (c *Carbon) GetImageBuilds() ([]types.ImageBuild, error) {
 	if len(c.imageBuilds) == 0 {
 		c.imageBuilds = []types.ImageBuild{}
 		for _, profile := range c.Profiles() {
-			for _, env := range profile.Environments(c.options.Environments...) {
+			for _, env := range profile.Environments() {
 				imageBuilds, err := env.ImageBuilds()
 				if err != nil {
 					return nil, err
@@ -308,7 +304,7 @@ func (c *Carbon) GetImages() ([]types.Image, error) {
 	if len(c.images) == 0 {
 		c.images = []types.Image{}
 		for _, profiles := range c.Profiles() {
-			for _, env := range profiles.Environments(c.options.Environments...) {
+			for _, env := range profiles.Environments() {
 				images, err := env.Images()
 				if err != nil {
 					return nil, err

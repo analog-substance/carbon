@@ -26,15 +26,13 @@ var RootCmd = &cobra.Command{
 	Short: "Infrastructure ops simplified",
 	Long:  `Manage and use infrastructure with a consistent interface, regardless of where it lives.`,
 	PersistentPreRunE: func(cmd *cobra.Command, args []string) error {
-		providers := viper.GetStringSlice("carbon.providers")
-		profiles := viper.GetStringSlice("carbon.profiles")
-		environments := viper.GetStringSlice("carbon.environments")
+		carbonConfigFile := common.CarbonConfigFile{}
+		err := viper.Unmarshal(&carbonConfigFile)
+		if err != nil {
+			log.Fatalf("unable to decode into config struct, %v", err)
+		}
 
-		carbonObj = carbon.New(carbon.Options{
-			Providers:    lowerStringSlice(providers),
-			Profiles:     lowerStringSlice(profiles),
-			Environments: lowerStringSlice(environments),
-		})
+		carbonObj = carbon.New(carbonConfigFile.Carbon)
 		return nil
 	},
 }
@@ -56,18 +54,18 @@ func init() {
 	RootCmd.PersistentFlags().StringSliceVarP(&environments, "environment", "e", []string{}, "Environment to use. Some providers/profiles support many environments.")
 	RootCmd.PersistentFlags().BoolVarP(&jsonOutput, "json", "j", false, "Output in JSON")
 
-	err := viper.BindPFlag("carbon.providers", RootCmd.PersistentFlags().Lookup("provider"))
-	if err != nil {
-		log.Fatal(err)
-	}
-	err = viper.BindPFlag("carbon.profiles", RootCmd.PersistentFlags().Lookup("profiles"))
-	if err != nil {
-		log.Fatal(err)
-	}
-	err = viper.BindPFlag("carbon.environments", RootCmd.PersistentFlags().Lookup("environment"))
-	if err != nil {
-		log.Fatal(err)
-	}
+	//err := viper.BindPFlag("carbon.providers", RootCmd.PersistentFlags().Lookup("provider"))
+	//if err != nil {
+	//	log.Fatal(err)
+	//}
+	//err = viper.BindPFlag("carbon.profiles", RootCmd.PersistentFlags().Lookup("profiles"))
+	//if err != nil {
+	//	log.Fatal(err)
+	//}
+	//err = viper.BindPFlag("carbon.environments", RootCmd.PersistentFlags().Lookup("environment"))
+	//if err != nil {
+	//	log.Fatal(err)
+	//}
 
 	// Cobra also supports local flags, which will only run
 	// when this action is called directly.
@@ -78,30 +76,8 @@ func init() {
 func initConfig() {
 	viper.AutomaticEnv() // read in environment variables that match
 
-	viper.SetDefault("carbon.providers", []string{})
-	viper.SetDefault("carbon.profiles", []string{})
-	viper.SetDefault("carbon.environments", []string{})
-	viper.SetDefault("carbon.credentials", []map[string]string{})
-	viper.SetDefault("carbon.cloud-init.dir", "cloud-init")
-	viper.SetDefault(common.ConfigPackerDir, "deployments/packer")
+	viper.SetDefault(common.ViperPackerDir, "deployments/packer")
 
-	//const CloudInitDir = "cloud-init"
-	//const PackerDir = "deployments/packer"
-	//const PackerFileSuffixCloudInit = "-cloud-init.pkr.hcl"
-	//const PackerFileSuffixAnsible = "-ansible.pkr.hcl"
-	//const PackerFileSuffixVariables = "-variables.pkr.hcl"
-	//const PackerFilePrivateVarsExample = "private.auto.pkrvars.hcl.example"
-	//const PackerFileIsoVars = "iso-variables.pkr.hcl"
-	//const PackerFileLocalVars = "local-variables.pkr.hcl"
-	//const PackerFilePacker = "packer.pkr.hcl"
-	//const ISOVarUsage = "var.iso_url"
-
-	// Use config file from the flag.
-	// Find home directory.
-	//cwd, err := os.Getwd()
-	//if err != nil {
-	//	log.Println(err)
-	//}
 	if cfgFile != "" {
 		viper.SetConfigFile(cfgFile)
 	} else {
@@ -112,24 +88,10 @@ func initConfig() {
 		viper.SetConfigName("carbon")
 	}
 
-	//err := viper.ReadInConfig()
-	//cobra.CheckErr(err)
-
-	//settings := viper.AllSettings()
-	//bytes, err := json.MarshalIndent(settings, "", "  ")
-	//cobra.CheckErr(err)
-	//log.Printf(string(bytes))
-
 	viper.AddConfigPath(".")
 
 	// do not need to handle err here. since an error will occur if the config file doesn't exist
 	_ = viper.MergeInConfig()
-	//cobra.CheckErr(err)
-
-	//settings = viper.AllSettings()
-	//bytes, err = json.MarshalIndent(settings, "", "  ")
-	//cobra.CheckErr(err)
-	//log.Printf(string(bytes))
 }
 
 func lowerStringSlice(strs []string) []string {

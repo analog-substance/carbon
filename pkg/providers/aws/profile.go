@@ -2,25 +2,35 @@ package aws
 
 import (
 	"context"
+	"github.com/analog-substance/carbon/pkg/common"
+	"github.com/analog-substance/carbon/pkg/providers/base"
 	"github.com/analog-substance/carbon/pkg/types"
 	"github.com/aws/aws-sdk-go-v2/config"
 	"github.com/aws/aws-sdk-go-v2/service/ec2"
 	"log"
-	"slices"
-	"strings"
 )
 
+//type profile struct {
+//	profileName string
+//	provider    *provider
+//}
+
 type profile struct {
-	profileName string
-	provider    *provider
+	types.Profile
 }
 
-func (p *profile) Environments(validNames ...string) []types.Environment {
+func NewProfile(name string, providerInstance *provider, config common.ProfileConfig) *profile {
+	return &profile{
+		base.NewProfile(name, providerInstance, config),
+	}
+}
+
+func (p *profile) Environments() []types.Environment {
 
 	var environments []types.Environment
 	var options []func(*config.LoadOptions) error
 
-	options = append(options, config.WithSharedConfigProfile(p.profileName))
+	options = append(options, config.WithSharedConfigProfile(p.Name()))
 	cfg, err := config.LoadDefaultConfig(context.Background(), options...)
 	if err != nil {
 		log.Println("Error loading  AWS configuration", err)
@@ -34,16 +44,17 @@ func (p *profile) Environments(validNames ...string) []types.Environment {
 	}
 
 	for _, vpc := range vpcResults.Vpcs {
-		name := *vpc.VpcId
+		environmentName := *vpc.VpcId
 		for _, tag := range vpc.Tags {
 			if *tag.Key == "Name" {
-				name = *tag.Value
+				environmentName = *tag.Value
 			}
 		}
 
-		if len(validNames) == 0 || slices.Contains(validNames, strings.ToLower(name)) {
+		enabled, ok := p.Profile.GetConfig().Environments[environmentName]
+		if !ok || enabled {
 			environments = append(environments, &environment{
-				name:      name,
+				name:      environmentName,
 				profile:   p,
 				ec2Client: ec2Service,
 				vpcId:     *vpc.VpcId,
@@ -51,10 +62,4 @@ func (p *profile) Environments(validNames ...string) []types.Environment {
 		}
 	}
 	return environments
-}
-func (p *profile) Name() string {
-	return p.profileName
-}
-func (p *profile) Provider() types.Provider {
-	return p.provider
 }

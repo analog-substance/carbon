@@ -1,7 +1,11 @@
 package types
 
+import "github.com/analog-substance/carbon/pkg/common"
+
 type Profile interface {
-	Environments(validNames ...string) []Environment
+	Environments() []Environment
 	Name() string
 	Provider() Provider
+	SetConfig(config common.ProfileConfig)
+	GetConfig() common.ProfileConfig
 }

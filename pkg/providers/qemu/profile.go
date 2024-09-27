@@ -1,43 +1,59 @@
 package qemu
 
 import (
+	"github.com/analog-substance/carbon/pkg/common"
+	"github.com/analog-substance/carbon/pkg/providers/base"
 	"github.com/analog-substance/carbon/pkg/types"
 	"github.com/digitalocean/go-libvirt"
-	"log"
 	"net/url"
-	"slices"
 )
 
 type profile struct {
-	profileName string
-	provider    *provider
-	connectStr  string
+	types.Profile
 }
 
-const profileName = "qemu"
+func NewProfile(name string, providerInstance *provider, config common.ProfileConfig) *profile {
+	return &profile{
+		base.NewProfile(name, providerInstance, config),
+	}
+}
 
-func (p profile) Environments(validNames ...string) []types.Environment {
-	if len(validNames) == 0 || slices.Contains(validNames, profileName) {
-
-		uri, _ := url.Parse(p.connectStr)
+func (p profile) Environments() []types.Environment {
+	enabled, ok := p.Profile.GetConfig().Environments[environmentName]
+	if !ok || enabled {
+		uri, _ := url.Parse(p.GetConfig().URL)
 		conn, err := libvirt.ConnectToURI(uri)
 		if err == nil {
 			return []types.Environment{environment{
-				profileName,
+				environmentName,
 				p,
 				conn,
 			}}
-		} else {
-			log.Println("Error connecting to libvirt host", err)
 		}
 	}
+
+	//if len(validNames) == 0 || slices.Contains(validNames, profileName) {
+	//
+	//	uri, _ := url.Parse(p.connectStr)
+	//	conn, err := libvirt.ConnectToURI(uri)
+	//	if err == nil {
+	//		return []types.Environment{environment{
+	//			profileName,
+	//			p,
+	//			conn,
+	//		}}
+	//	} else {
+	//		log.Println("Error connecting to libvirt host", err)
+	//	}
+	//}
 	return []types.Environment{}
 }
 
-func (p profile) Name() string {
-	return p.profileName
-}
-
-func (p profile) Provider() types.Provider {
-	return p.provider
-}
+//
+//func (p profile) Name() string {
+//	return p.profileName
+//}
+//
+//func (p profile) Provider() types.Provider {
+//	return p.provider
+//}

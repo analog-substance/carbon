@@ -102,7 +102,7 @@ func GetImageBuildsForProvider(provider string) ([]types.ImageBuild, error) {
 
 func getImageBuilds() ([]types.ImageBuild, error) {
 	ret := []types.ImageBuild{}
-	packerDir := viper.GetString(common.ConfigPackerDir)
+	packerDir := viper.GetString(common.ViperPackerDir)
 	listing, err := os.ReadDir(packerDir)
 	if err != nil {
 		return ret, err
