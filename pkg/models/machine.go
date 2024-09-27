@@ -20,13 +20,13 @@ import (
 )
 
 type Machine struct {
-	InstanceName       string
-	InstanceID         string
-	CurrentUpTime      time.Duration
-	PublicIPAddresses  []string
-	PrivateIPAddresses []string
-	CurrentState       types.MachineState
-	Env                types.Environment
+	InstanceName       string             `json:"name"`
+	InstanceID         string             `json:"id"`
+	CurrentUpTime      time.Duration      `json:"up_time"`
+	PublicIPAddresses  []string           `json:"public_ip_addresses"`
+	PrivateIPAddresses []string           `json:"private_ip_addresses"`
+	CurrentState       types.MachineState `json:"current_state"`
+	Env                types.Environment  `json:"-"`
 }
 
 func init() {

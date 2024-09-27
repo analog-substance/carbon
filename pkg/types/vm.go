@@ -4,7 +4,9 @@ import (
 	"github.com/analog-substance/carbon/pkg/ssh_util"
 )
 
-type MachineState struct{ Name string }
+type MachineState struct {
+	Name string `json:"name"`
+}
 
 var StateRunning = MachineState{"Running"}
 var StateStopped = MachineState{"Stopped"}

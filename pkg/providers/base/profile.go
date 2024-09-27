@@ -11,12 +11,6 @@ type Profile struct {
 	config      common.ProfileConfig
 }
 
-//func New() types.Provider {
-//	return &Provider{
-//		name: providerName,
-//	}
-//}
-
 func NewProfile(name string, providerInstance types.Provider, config common.ProfileConfig) types.Profile {
 	return &Profile{
 		profileName: name,

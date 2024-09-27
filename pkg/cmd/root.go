@@ -15,8 +15,8 @@ import (
 var cfgFile string
 
 // var providers []string
-var profiles []string
-var environments []string
+// var profiles []string
+// var environments []string
 var jsonOutput bool
 var carbonObj *carbon.Carbon
 
@@ -49,27 +49,11 @@ func Execute() {
 func init() {
 	cobra.OnInitialize(initConfig)
 	RootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is $HOME/.carbon.yaml)")
-	RootCmd.PersistentFlags().StringSliceP("provider", "P", []string{}, "Provider to use vbox, aws")
-	RootCmd.PersistentFlags().StringSliceVarP(&profiles, "profile", "p", []string{}, "Profile to use. Like an instance of a provider. Used to specify aws profiles")
-	RootCmd.PersistentFlags().StringSliceVarP(&environments, "environment", "e", []string{}, "Environment to use. Some providers/profiles support many environments.")
+	// need to rethink how I want this to work
+	//RootCmd.PersistentFlags().StringSliceP("provider", "P", []string{}, "Provider to use vbox, aws")
+	//RootCmd.PersistentFlags().StringSliceVarP(&profiles, "profile", "p", []string{}, "Profile to use. Like an instance of a provider. Used to specify aws profiles")
+	//RootCmd.PersistentFlags().StringSliceVarP(&environments, "environment", "e", []string{}, "Environment to use. Some providers/profiles support many environments.")
 	RootCmd.PersistentFlags().BoolVarP(&jsonOutput, "json", "j", false, "Output in JSON")
-
-	//err := viper.BindPFlag("carbon.providers", RootCmd.PersistentFlags().Lookup("provider"))
-	//if err != nil {
-	//	log.Fatal(err)
-	//}
-	//err = viper.BindPFlag("carbon.profiles", RootCmd.PersistentFlags().Lookup("profiles"))
-	//if err != nil {
-	//	log.Fatal(err)
-	//}
-	//err = viper.BindPFlag("carbon.environments", RootCmd.PersistentFlags().Lookup("environment"))
-	//if err != nil {
-	//	log.Fatal(err)
-	//}
-
-	// Cobra also supports local flags, which will only run
-	// when this action is called directly.
-
 }
 
 // initConfig reads in config file and ENV variables if set.

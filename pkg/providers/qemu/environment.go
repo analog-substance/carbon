@@ -70,7 +70,6 @@ func (e environment) VMs() []types.VM {
 
 		if domainState == libvirt.DomainRunning {
 			ipAddresses, err := e.conn.DomainInterfaceAddresses(dom, 0, 0)
-			//ipAddresses, err := dom.ListAllInterfaceAddresses(libvirt.DOMAIN_INTERFACE_ADDRESSES_SRC_LEASE)
 			if err != nil {
 				log.Println("error getting librt domain interfaces", e.Profile().Name(), err)
 				continue

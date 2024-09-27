@@ -60,20 +60,16 @@ func (p *provider) IsAvailable() bool {
 func (p *provider) Profiles() []types.Profile {
 	profiles := []types.Profile{}
 	for _, profileName := range p.AWSProfiles() {
-		config, ok := p.Provider.GetConfig().Profiles[profileName]
+		profileConfig, ok := p.Provider.GetConfig().Profiles[profileName]
 		if !ok {
-			config = common.ProfileConfig{
+			profileConfig = common.ProfileConfig{
 				Enabled: true,
 			}
 		}
-		if config.Enabled {
-			profiles = append(profiles, NewProfile(profileName, p, config))
+		if profileConfig.Enabled {
+			profiles = append(profiles, NewProfile(profileName, p, profileConfig))
 		}
 	}
 
 	return profiles
 }
-
-//func (p *provider) Name() string {
-//	return "AWS"
-//}
