@@ -14,6 +14,7 @@ type Environment interface {
 	StartVM(string) error
 	StopVM(string) error
 	RestartVM(string) error
+	ImageBuilds() []ImageBuild
 	Images() []Image
 	CreateVM(MachineLaunchOptions) error
 	DestroyVM(string) error

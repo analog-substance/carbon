@@ -61,6 +61,9 @@ func (e environment) CreateVM(options types.MachineLaunchOptions) error {
 	return nil
 }
 
+func (e environment) ImageBuilds() []types.ImageBuild {
+	return []types.ImageBuild{}
+}
 func (e environment) Images() []types.Image {
 	return []types.Image{}
 }

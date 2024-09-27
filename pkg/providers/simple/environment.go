@@ -44,6 +44,9 @@ func (e *Environment) CreateVM(options types.MachineLaunchOptions) error {
 	return errors.New("not implemented")
 }
 
+func (e *Environment) ImageBuilds() []types.ImageBuild {
+	return []types.ImageBuild{}
+}
 func (e *Environment) Images() []types.Image {
 	return []types.Image{}
 }

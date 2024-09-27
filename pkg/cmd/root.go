@@ -2,6 +2,7 @@ package cmd
 
 import (
 	"github.com/analog-substance/carbon/pkg/carbon"
+	"github.com/analog-substance/carbon/pkg/common"
 	"github.com/mitchellh/go-homedir"
 	"github.com/spf13/viper"
 	"log"
@@ -81,6 +82,20 @@ func initConfig() {
 	viper.SetDefault("carbon.platforms", []string{})
 	viper.SetDefault("carbon.environments", []string{})
 	viper.SetDefault("carbon.credentials", []map[string]string{})
+	viper.SetDefault("carbon.cloud-init.dir", "cloud-init")
+	viper.SetDefault(common.ConfigPackerDir, "deployments/packer")
+
+	//const CloudInitDir = "cloud-init"
+	//const PackerDir = "deployments/packer"
+	//const PackerFileSuffixCloudInit = "-cloud-init.pkr.hcl"
+	//const PackerFileSuffixAnsible = "-ansible.pkr.hcl"
+	//const PackerFileSuffixVariables = "-variables.pkr.hcl"
+	//const PackerFilePrivateVarsExample = "private.auto.pkrvars.hcl.example"
+	//const PackerFileIsoVars = "iso-variables.pkr.hcl"
+	//const PackerFileLocalVars = "local-variables.pkr.hcl"
+	//const PackerFilePacker = "packer.pkr.hcl"
+	//const ISOVarUsage = "var.iso_url"
+
 	// Use config file from the flag.
 	// Find home directory.
 	//cwd, err := os.Getwd()

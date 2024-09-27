@@ -33,6 +33,7 @@ type Carbon struct {
 	platforms    []types.Platform
 	environments []types.Environment
 	machines     []types.VM
+	imageBuilds  []types.ImageBuild
 }
 
 func New(options Options) *Carbon {
@@ -129,7 +130,6 @@ func (c *Carbon) VMsFromHosts(hostnames []string) []types.VM {
 
 const CloudInitDir = "cloud-init"
 const PackerDir = "deployments/packer"
-
 const PackerFileSuffixCloudInit = "-cloud-init.pkr.hcl"
 const PackerFileSuffixAnsible = "-ansible.pkr.hcl"
 const PackerFileSuffixVariables = "-variables.pkr.hcl"
@@ -137,7 +137,6 @@ const PackerFilePrivateVarsExample = "private.auto.pkrvars.hcl.example"
 const PackerFileIsoVars = "iso-variables.pkr.hcl"
 const PackerFileLocalVars = "local-variables.pkr.hcl"
 const PackerFilePacker = "packer.pkr.hcl"
-
 const ISOVarUsage = "var.iso_url"
 
 func (c *Carbon) CreateImageBuild(name, tplDir, service string) error {
@@ -297,16 +296,18 @@ func (c *Carbon) BuildImage(name string) error {
 	return syscall.Exec(packerPath, args, os.Environ())
 }
 
-func (c *Carbon) GetImageBuilds() ([]string, error) {
-	ret := []string{}
-	listing, err := os.ReadDir(PackerDir)
-	if err != nil {
-		return ret, err
+func (c *Carbon) GetImageBuilds() ([]types.ImageBuild, error) {
+	if len(c.imageBuilds) == 0 {
+		c.imageBuilds = []types.ImageBuild{}
+		for _, platform := range c.Platforms() {
+			for _, env := range platform.Environments(c.options.Environments...) {
+				c.imageBuilds = append(c.imageBuilds, env.ImageBuilds()...)
+			}
+		}
+
 	}
-	for _, file := range listing {
-		ret = append(ret, file.Name())
-	}
-	return ret, nil
+
+	return c.imageBuilds, nil
 }
 
 var availableProviders []types.Provider

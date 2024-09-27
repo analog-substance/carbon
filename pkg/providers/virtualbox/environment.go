@@ -1,6 +1,7 @@
 package virtualbox
 
 import (
+	"github.com/analog-substance/carbon/pkg/image_build"
 	"github.com/analog-substance/carbon/pkg/models"
 	"github.com/analog-substance/carbon/pkg/providers/virtualbox/api"
 	"github.com/analog-substance/carbon/pkg/types"
@@ -54,6 +55,20 @@ func (e environment) DestroyVM(id string) error {
 
 func (e environment) CreateVM(options types.MachineLaunchOptions) error {
 	return nil
+}
+
+func (e environment) ImageBuilds() []types.ImageBuild {
+	imageBuilds, err := image_build.GetImageBuildsForProvider(e.platform.Provider().Name())
+	if err != nil {
+		log.Printf("Error getting image builds for %s: %s", e.Name(), err)
+	}
+	imageBuildStructs := []types.ImageBuild{}
+	for _, imageBuild := range imageBuilds {
+		imageBuildStructs = append(imageBuildStructs, &models.ImageBuild{
+			Path: imageBuild,
+		})
+	}
+	return imageBuildStructs
 }
 
 func (e environment) Images() []types.Image {
