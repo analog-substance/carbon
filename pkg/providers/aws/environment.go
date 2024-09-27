@@ -128,17 +128,21 @@ func awsInstanceToMachine(instance ec2Types.Instance) models.Machine {
 }
 
 func stateFromEC2(state ec2Types.InstanceStateName) types.MachineState {
+
 	if state == ec2Types.InstanceStateNameRunning {
 		return types.StateRunning
 	}
 	if state == ec2Types.InstanceStateNameStopped {
 		return types.StateStopped
 	}
-	if state == ec2Types.InstanceStateNameStopping {
+	if state == ec2Types.InstanceStateNameStopping || state == ec2Types.InstanceStateNameShuttingDown {
 		return types.StateStopping
 	}
 	if state == ec2Types.InstanceStateNameTerminated {
 		return types.StateTerminating
+	}
+	if state == ec2Types.InstanceStateNamePending {
+		return types.StateStarting
 	}
 
 	log.Println("Unknown state for AWS VM:", state)
