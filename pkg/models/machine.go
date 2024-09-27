@@ -29,10 +29,6 @@ type Machine struct {
 	Env                types.Environment  `json:"-"`
 }
 
-func init() {
-	slog.SetLogLoggerLevel(slog.LevelDebug)
-}
-
 func (m *Machine) Environment() types.Environment {
 	return m.Env
 }
@@ -108,7 +104,7 @@ func (m *Machine) StartVNC(user string, killVNC bool) error {
 	if err != nil {
 		return err
 	}
-	slog.Debug("vnc conf: " + vncConfig)
+	slog.Debug("vnc conf", "vncConfig", vncConfig, "machine", m.Name())
 
 	vncConfigSlice := strings.Split(vncConfig, "\n")
 	passwdB64 := vncConfigSlice[0]
@@ -127,14 +123,14 @@ func (m *Machine) StartVNC(user string, killVNC bool) error {
 	localPort := 5901
 
 	go func() {
-		slog.Debug("start vncviewer")
+		slog.Debug("start vncviewer", "machine", m.Name())
 		vnc_viewer.Start(vnc_viewer.Options{
 			Delay:        3,
 			Host:         fmt.Sprintf("127.0.0.1:%d", vncPort),
 			PasswordFile: vncPassFile,
 		})
 	}()
-	slog.Debug("fwd port")
+	slog.Debug("fwd port", "localPort", localPort, "vncPort", vncPort)
 	err = sshSession.ForwardLocalPort(localPort, vncPort)
 	if err != nil {
 		return err
