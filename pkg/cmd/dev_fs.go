@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"github.com/analog-substance/carbon/deployments"
 	"github.com/spf13/cobra"
-	"log"
+	"os"
 	"path"
 )
 
@@ -25,7 +25,8 @@ func init() {
 func ListingDir(dir string) {
 	listing, err := deployments.Files.ReadDir(dir)
 	if err != nil {
-		log.Fatal(err)
+		log.Error("failed to read embedded fs", err)
+		os.Exit(2)
 	}
 	for _, file := range listing {
 		fmt.Println(path.Join(dir, file.Name()))

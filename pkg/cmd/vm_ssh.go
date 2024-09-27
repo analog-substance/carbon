@@ -3,7 +3,6 @@ package cmd
 import (
 	"fmt"
 	"github.com/spf13/cobra"
-	"log"
 )
 
 // vmSSH represents the config command
@@ -19,10 +18,10 @@ var vmSSH = &cobra.Command{
 		} else if len(vms) == 1 {
 			err := vms[0].ExecSSH(user, args...)
 			if err != nil {
-				log.Fatal(err)
+				log.Error("failed to ssh to vm", err)
 			}
 		} else {
-			log.Println("VM not found")
+			fmt.Println("VM not found")
 		}
 	},
 }

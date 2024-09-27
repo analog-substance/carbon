@@ -3,7 +3,6 @@ package cmd
 import (
 	"fmt"
 	"github.com/spf13/cobra"
-	"log"
 )
 
 // vmVNCCmd represents the config command
@@ -20,10 +19,10 @@ var vmVNCCmd = &cobra.Command{
 		} else if len(vms) == 1 {
 			err := vms[0].StartVNC(user, killVNC)
 			if err != nil {
-				log.Fatal(err)
+				log.Error("failed to vnc to vm", err)
 			}
 		} else {
-			log.Println("VM not found")
+			fmt.Println("VM not found")
 		}
 	},
 }

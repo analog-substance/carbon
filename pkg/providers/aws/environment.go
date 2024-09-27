@@ -7,7 +7,6 @@ import (
 	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/service/ec2"
 	ec2Types "github.com/aws/aws-sdk-go-v2/service/ec2/types"
-	"log"
 	"strings"
 	"time"
 )
@@ -38,7 +37,7 @@ func (e *environment) VMs() []types.VM {
 		},
 	})
 	if err != nil {
-		log.Println("Error get VPCs", err)
+		log.Debug("Error get instances", "profile", e.Name(), "err", err)
 		return vms
 	}
 
@@ -148,6 +147,6 @@ func stateFromEC2(state ec2Types.InstanceStateName) types.MachineState {
 		return types.StateStarting
 	}
 
-	log.Println("Unknown state for AWS VM:", state)
+	log.Debug("unknown state for vm", "state", state)
 	return types.StateUnknown
 }

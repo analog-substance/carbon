@@ -3,7 +3,7 @@ package cmd
 import (
 	"fmt"
 	"github.com/spf13/cobra"
-	"log"
+	"os"
 )
 
 // imageListCmd represents the image command
@@ -16,7 +16,8 @@ var imageListCmd = &cobra.Command{
 		if listBuilds {
 			imagesBuilds, err := carbonObj.GetImageBuilds()
 			if err != nil {
-				log.Fatal(err)
+				log.Info("failed to list image builds", err)
+				os.Exit(2)
 			}
 			for _, imageBuild := range imagesBuilds {
 				fmt.Println(imageBuild.Name(), imageBuild.Provisioner(), imageBuild.ProviderType())
@@ -25,7 +26,8 @@ var imageListCmd = &cobra.Command{
 
 			imagesBuilds, err := carbonObj.GetImages()
 			if err != nil {
-				log.Fatal(err)
+				log.Info("failed to list images", err)
+				os.Exit(2)
 			}
 			for _, imageBuild := range imagesBuilds {
 				fmt.Println(imageBuild.Name(), imageBuild.Environment().Name())

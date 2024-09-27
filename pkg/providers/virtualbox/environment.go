@@ -4,7 +4,6 @@ import (
 	"github.com/analog-substance/carbon/pkg/models"
 	"github.com/analog-substance/carbon/pkg/providers/virtualbox/api"
 	"github.com/analog-substance/carbon/pkg/types"
-	"log"
 	"os"
 	"path"
 )
@@ -83,6 +82,6 @@ func stateFromVboxInfo(state string) types.MachineState {
 		return types.StateStopped
 	}
 
-	log.Println("Unknown state for VirtualBox VM:", state)
+	log.Debug("unknown state for VM", "state", state)
 	return types.StateUnknown
 }

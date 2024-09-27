@@ -8,4 +8,5 @@ type Profile interface {
 	Provider() Provider
 	SetConfig(config common.ProfileConfig)
 	GetConfig() common.ProfileConfig
+	ShouldIncludeEnvironment(envName string) bool
 }

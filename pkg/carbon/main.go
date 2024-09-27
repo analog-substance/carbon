@@ -13,6 +13,7 @@ import (
 	"github.com/analog-substance/carbon/pkg/providers/qemu"
 	"github.com/analog-substance/carbon/pkg/providers/virtualbox"
 	"github.com/analog-substance/carbon/pkg/types"
+	"log/slog"
 	"os"
 	"path"
 	"strings"
@@ -34,13 +35,26 @@ type Carbon struct {
 	images       []types.Image
 }
 
+var log *slog.Logger
+
+func init() {
+	log = common.WithGroup("carbon")
+}
+
 func New(config common.CarbonConfig) *Carbon {
 	carbon := &Carbon{config: config, providers: []types.Provider{}, profiles: []types.Profile{}, environments: []types.Environment{}}
 
 	for _, provider := range AvailableProviders() {
 
 		providerConfig, ok := config.Providers[provider.Type()]
-		if !ok || providerConfig.Enabled {
+		if !ok {
+			providerConfig = common.ProviderConfig{
+				Enabled: true,
+			}
+		}
+
+		log.Debug("adding provider", "provider", provider.Type(), "config_exists", ok, "enabled", providerConfig.Enabled)
+		if providerConfig.Enabled {
 			// no config, or explicitly enabled
 			carbon.providers = append(carbon.providers, provider)
 			provider.SetConfig(providerConfig)
@@ -141,6 +155,7 @@ func (c *Carbon) CreateImageBuild(name, tplDir, service string) error {
 	bootstrappedDir := path.Join(PackerDir, name)
 	err := os.MkdirAll(bootstrappedDir, 0755)
 	if err != nil {
+		log.Debug("failed to create new packer build dir", "dir", bootstrappedDir, "err", err)
 		return err
 	}
 	embeddedFS := deployments.Files
@@ -152,6 +167,7 @@ func (c *Carbon) CreateImageBuild(name, tplDir, service string) error {
 	bootstrappedPackerFile := path.Join(bootstrappedDir, packerFilename)
 	err = copyFileFromEmbeddedFS(tplPackerFile, bootstrappedPackerFile, embeddedFS)
 	if err != nil {
+		log.Debug("failed to copy file from embedded fs", "tplPackerFile", tplPackerFile, "err", err)
 		return err
 	}
 
@@ -329,7 +345,9 @@ func AvailableProviders() []types.Provider {
 		}
 
 		for _, provider := range allProviders {
-			if provider.IsAvailable() {
+			isAvailable := provider.IsAvailable()
+			log.Debug("assessing provider availability", "provider", provider.Type(), "isAvailable", isAvailable)
+			if isAvailable {
 				availableProviders = append(availableProviders, provider)
 			}
 		}

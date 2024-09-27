@@ -4,7 +4,6 @@ import (
 	"github.com/analog-substance/carbon/pkg/models"
 	"github.com/analog-substance/carbon/pkg/providers/multipass/api"
 	"github.com/analog-substance/carbon/pkg/types"
-	"log"
 )
 
 type environment struct {
@@ -85,6 +84,6 @@ func stateFromVboxInfo(state string) types.MachineState {
 		return types.StateTerminated
 	}
 
-	log.Println("Unknown state for multipass VM:", state)
+	log.Debug("unknown state for VM", "state", state)
 	return types.StateUnknown
 }

@@ -1,8 +1,8 @@
 package cmd
 
 import (
+	"fmt"
 	"github.com/spf13/cobra"
-	"log"
 )
 
 // vmStart represents the config command
@@ -16,11 +16,11 @@ var vmStart = &cobra.Command{
 			for _, vm := range vms {
 				err := vm.Start()
 				if err != nil {
-					log.Printf("Error starting VM (%s): %s", vm.Name(), err)
+					log.Error("Error starting VM", vm.Name(), err)
 				}
 			}
 		} else {
-			log.Println("No VMs found.")
+			fmt.Println("No VMs found.")
 		}
 	},
 }

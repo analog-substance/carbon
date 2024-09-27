@@ -4,12 +4,10 @@ import (
 	"github.com/analog-substance/carbon/pkg/carbon"
 	"github.com/analog-substance/carbon/pkg/common"
 	"github.com/mitchellh/go-homedir"
-	"github.com/spf13/viper"
-	"log"
-	"os"
-	"strings"
-
 	"github.com/spf13/cobra"
+	"github.com/spf13/viper"
+	"log/slog"
+	"os"
 )
 
 var cfgFile string
@@ -18,7 +16,9 @@ var cfgFile string
 // var profiles []string
 // var environments []string
 var jsonOutput bool
+var debug bool
 var carbonObj *carbon.Carbon
+var log *slog.Logger
 
 // RootCmd represents the base command when called without any subcommands
 var RootCmd = &cobra.Command{
@@ -26,10 +26,16 @@ var RootCmd = &cobra.Command{
 	Short: "Infrastructure ops simplified",
 	Long:  `Manage and use infrastructure with a consistent interface, regardless of where it lives.`,
 	PersistentPreRunE: func(cmd *cobra.Command, args []string) error {
+
+		if debug {
+			common.LogLevel(slog.LevelDebug)
+		}
+		log.Debug("debug mode", "debug", debug)
+
 		carbonConfigFile := common.CarbonConfigFile{}
 		err := viper.Unmarshal(&carbonConfigFile)
 		if err != nil {
-			log.Fatalf("unable to decode into config struct, %v", err)
+			log.Debug("failed to unmarshal viper config to carbon config struct")
 		}
 
 		carbonObj = carbon.New(carbonConfigFile.Carbon)
@@ -47,6 +53,8 @@ func Execute() {
 }
 
 func init() {
+	log = common.WithGroup("cmd")
+
 	cobra.OnInitialize(initConfig)
 	RootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is $HOME/.carbon.yaml)")
 	// need to rethink how I want this to work
@@ -54,6 +62,7 @@ func init() {
 	//RootCmd.PersistentFlags().StringSliceVarP(&profiles, "profile", "p", []string{}, "Profile to use. Like an instance of a provider. Used to specify aws profiles")
 	//RootCmd.PersistentFlags().StringSliceVarP(&environments, "environment", "e", []string{}, "Environment to use. Some providers/profiles support many environments.")
 	RootCmd.PersistentFlags().BoolVarP(&jsonOutput, "json", "j", false, "Output in JSON")
+	RootCmd.PersistentFlags().BoolVar(&debug, "debug", false, "Debug mode")
 }
 
 // initConfig reads in config file and ENV variables if set.
@@ -61,6 +70,15 @@ func initConfig() {
 	viper.AutomaticEnv() // read in environment variables that match
 
 	viper.SetDefault(common.ViperPackerDir, "deployments/packer")
+
+	viper.SetDefault("carbon.providers.aws.enabled", true)
+	viper.SetDefault("carbon.providers.aws.profiles.default.enabled", true)
+	viper.SetDefault("carbon.providers.virtualbox.enabled", true)
+	viper.SetDefault("carbon.providers.virtualbox.profiles.default.enabled", true)
+	viper.SetDefault("carbon.providers.qemu.enabled", true)
+	viper.SetDefault("carbon.providers.qemu.profiles.default.enabled", true)
+	viper.SetDefault("carbon.providers.multipass.enabled", true)
+	viper.SetDefault("carbon.providers.multipass.profiles.default.enabled", true)
 
 	if cfgFile != "" {
 		viper.SetConfigFile(cfgFile)
@@ -76,11 +94,4 @@ func initConfig() {
 
 	// do not need to handle err here. since an error will occur if the config file doesn't exist
 	_ = viper.MergeInConfig()
-}
-
-func lowerStringSlice(strs []string) []string {
-	for i, str := range strs {
-		strs[i] = strings.ToLower(str)
-	}
-	return strs
 }

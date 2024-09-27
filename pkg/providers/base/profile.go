@@ -3,6 +3,7 @@ package base
 import (
 	"github.com/analog-substance/carbon/pkg/common"
 	"github.com/analog-substance/carbon/pkg/types"
+	"strings"
 )
 
 type Profile struct {
@@ -40,4 +41,12 @@ func (p *Profile) SetConfig(config common.ProfileConfig) {
 
 func (p *Profile) GetConfig() common.ProfileConfig {
 	return p.config
+}
+
+func (p *Profile) ShouldIncludeEnvironment(envName string) bool {
+	envName = strings.ToLower(envName)
+
+	enabled, ok := p.GetConfig().Environments[envName]
+	return ok && enabled
+
 }

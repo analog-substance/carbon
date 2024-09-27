@@ -1,8 +1,8 @@
 package cmd
 
 import (
+	"fmt"
 	"github.com/spf13/cobra"
-	"log"
 )
 
 // vmStop represents the config command
@@ -16,11 +16,11 @@ var vmStop = &cobra.Command{
 			for _, vm := range vms {
 				err := vm.Stop()
 				if err != nil {
-					log.Printf("Error stopping VM (%s): %s", vm.Name(), err)
+					log.Error("Error stopping VM", vm.Name(), err)
 				}
 			}
 		} else {
-			log.Println("No VMs found.")
+			fmt.Println("No VMs found.")
 		}
 	},
 }

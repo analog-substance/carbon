@@ -6,7 +6,6 @@ import (
 	"github.com/analog-substance/carbon/pkg/types"
 	"github.com/aws/aws-sdk-go-v2/config"
 	"gopkg.in/ini.v1"
-	"log"
 	"strings"
 )
 
@@ -39,7 +38,7 @@ func (p *provider) AWSProfiles() []string {
 		if sl == "default" || strings.HasPrefix(sl, "profile") {
 			sec, err := sections.GetSection(s)
 			if err != nil {
-				log.Println("error getting config section:", s)
+				log.Debug("error getting config section:", "section", s)
 				continue
 			}
 

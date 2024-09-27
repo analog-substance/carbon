@@ -2,7 +2,6 @@ package api
 
 import (
 	builder "github.com/NoF0rte/cmd-builder"
-	"log"
 	"strings"
 )
 
@@ -43,7 +42,7 @@ func ListVMs() []VBoxVM {
 		Output()
 
 	if err != nil {
-		log.Println("Error listing VirtualBox VMs:", err)
+		log.Debug("error listing VMs:", "err", err)
 	}
 
 	vms := []VBoxVM{}
@@ -53,7 +52,7 @@ func ListVMs() []VBoxVM {
 		vm := VBoxVM{ID: vmID}
 		err = vm.loadInfo()
 		if err != nil {
-			log.Println("Error loading VM:", err)
+			log.Debug("error loading VM", "err", err)
 		}
 		vms = append(vms, vm)
 	}

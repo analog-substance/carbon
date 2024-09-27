@@ -2,7 +2,6 @@ package cmd
 
 import (
 	"github.com/spf13/cobra"
-	"log"
 )
 
 // imageBuildCmd represents the image command
@@ -16,7 +15,7 @@ var imageBuildCmd = &cobra.Command{
 		provisioner, _ := cmd.Flags().GetString("provisioner")
 		err := carbonObj.BuildImage(name, provider, provisioner)
 		if err != nil {
-			log.Fatal(err)
+			log.Error("failed to packer build", err)
 		}
 	},
 }

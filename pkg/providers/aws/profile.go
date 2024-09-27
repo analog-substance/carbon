@@ -7,13 +7,7 @@ import (
 	"github.com/analog-substance/carbon/pkg/types"
 	"github.com/aws/aws-sdk-go-v2/config"
 	"github.com/aws/aws-sdk-go-v2/service/ec2"
-	"log"
 )
-
-//type profile struct {
-//	profileName string
-//	provider    *provider
-//}
 
 type profile struct {
 	types.Profile
@@ -33,26 +27,33 @@ func (p *profile) Environments() []types.Environment {
 	options = append(options, config.WithSharedConfigProfile(p.Name()))
 	cfg, err := config.LoadDefaultConfig(context.Background(), options...)
 	if err != nil {
-		log.Println("Error loading  AWS configuration", err)
+		log.Debug("Error loading  AWS configuration", "profile", p.Name(), "err", err)
 		return environments
 	}
 	ec2Service := ec2.NewFromConfig(cfg)
 	vpcResults, err := ec2Service.DescribeVpcs(context.Background(), &ec2.DescribeVpcsInput{})
 	if err != nil {
-		log.Println("Error get VPCs", err)
+		log.Debug("Error get VPCs", "profile", p.Name(), "err", err)
 		return environments
 	}
 
 	for _, vpc := range vpcResults.Vpcs {
-		environmentName := *vpc.VpcId
+		vpcID := *vpc.VpcId
+		environmentName := vpcID
+
 		for _, tag := range vpc.Tags {
 			if *tag.Key == "Name" {
 				environmentName = *tag.Value
 			}
 		}
 
-		enabled, ok := p.Profile.GetConfig().Environments[environmentName]
-		if !ok || enabled {
+		shouldInclude := p.ShouldIncludeEnvironment(vpcID)
+		if !shouldInclude {
+			shouldInclude = p.ShouldIncludeEnvironment(environmentName)
+		}
+
+		log.Debug("validating environment visibility", "environment", environmentName, "shouldInclude", shouldInclude)
+		if shouldInclude {
 			environments = append(environments, &environment{
 				name:      environmentName,
 				profile:   p,

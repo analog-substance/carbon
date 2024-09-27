@@ -2,7 +2,6 @@ package cmd
 
 import (
 	"github.com/spf13/cobra"
-	"log"
 )
 
 // imageBootstrapCmd represents the image command
@@ -16,7 +15,7 @@ var imageBootstrapCmd = &cobra.Command{
 		serviceProvider, _ := cmd.Flags().GetString("service")
 		err := carbonObj.CreateImageBuild(name, osDir, serviceProvider)
 		if err != nil {
-			log.Fatal(err)
+			log.Error("failed to bootstrap packer build", err)
 		}
 	},
 }

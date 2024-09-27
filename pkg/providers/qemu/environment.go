@@ -6,7 +6,6 @@ import (
 	"github.com/analog-substance/carbon/pkg/models"
 	"github.com/analog-substance/carbon/pkg/types"
 	"github.com/digitalocean/go-libvirt"
-	"log"
 	"os"
 	"path"
 	"time"
@@ -31,7 +30,8 @@ func (e environment) VMs() []types.VM {
 	flags := libvirt.ConnectListDomainsActive | libvirt.ConnectListDomainsInactive
 	domains, _, err := e.conn.ConnectListAllDomains(1, flags)
 	if err != nil {
-		log.Fatalf("failed to retrieve domains: %v", err)
+		log.Debug("failed to retrieve domains", "profile", e.Profile().Name(), "err", err)
+		os.Exit(3)
 	}
 
 	allNets, _, err := e.conn.ConnectListAllNetworks(1, libvirt.ConnectListNetworksActive)
@@ -40,7 +40,8 @@ func (e environment) VMs() []types.VM {
 	for _, net := range allNets {
 		leases, _, err := e.conn.NetworkGetDhcpLeases(net, libvirt.OptString{}, 1, 0)
 		if err != nil {
-			log.Println("error getting leases", err)
+			log.Debug("error getting leases domain info", "profile", e.Profile().Name(), "err", err)
+			continue
 		}
 		for _, lease := range leases {
 			for _, hostname := range lease.Hostname {
@@ -57,7 +58,7 @@ func (e environment) VMs() []types.VM {
 		//state, maxMem, mem, virtCPUs, cpuTime, err := e.conn.DomainGetInfo(dom)
 		state, _, _, _, cpuTime, err := e.conn.DomainGetInfo(dom)
 		if err != nil {
-			log.Println("error getting libvirt domain info", e.Profile().Name(), err)
+			log.Debug("error getting libvirt domain info", "profile", e.Profile().Name(), "err", err)
 			continue
 		}
 
@@ -71,7 +72,7 @@ func (e environment) VMs() []types.VM {
 		if domainState == libvirt.DomainRunning {
 			ipAddresses, err := e.conn.DomainInterfaceAddresses(dom, 0, 0)
 			if err != nil {
-				log.Println("error getting librt domain interfaces", e.Profile().Name(), err)
+				log.Debug("error getting librt domain interfaces", "profile", e.Profile().Name(), "err", err)
 				continue
 			}
 
@@ -170,7 +171,7 @@ func stateFromVboxInfo(state libvirt.DomainState) types.MachineState {
 		return types.StateRunning
 	}
 
-	log.Println("unknown libvirt state", state)
+	log.Debug("unknown state for VM", "state", state)
 	return types.StateUnknown
 }
 
