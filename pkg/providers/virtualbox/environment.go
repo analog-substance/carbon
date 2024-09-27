@@ -67,6 +67,9 @@ func stateFromVboxInfo(state string) types.MachineState {
 	if state == "poweron" {
 		return types.StateRunning
 	}
+	if state == "aborted" {
+		return types.StateStopped
+	}
 
 	log.Println("Unknown state for VirtualBox VM:", state)
 	return types.StateUnknown

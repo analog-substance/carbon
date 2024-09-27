@@ -89,18 +89,22 @@ func (m Machine) ExecSSH(user string, additionalArgs ...string) error {
 	return syscall.Exec(sshPath, args, os.Environ())
 }
 
-func (m Machine) StartVNC(user string) error {
-	slog.Debug("new ssh session")
+func (m Machine) StartVNC(user string, killVNC bool) error {
 	sshSession, err := m.NewSSHSession(user)
 	if err != nil {
 		return err
 	}
 
-	vncCmd := "if [ ! -f ~/.vnc/passwd ]; then mkdir -p ~/.vnc; echo -n carbon | vncpasswd -f > ~/.vnc/passwd; fi ; cat ~/.vnc/passwd | base64 -w0; echo; if ! ps aux | grep -v grep | grep -i vnc 2>&1 >/dev/null  ; then vncserver -localhost -PasswordFile ~/.vnc/passwd -xstartup xfce4-session 2>&1 >/dev/null; fi; lsof -i -n -o -P | grep -i vnc | grep 127 | cut -d : -f2 | awk '{print $1}'"
+	vncCmd := []string{}
 
-	slog.Debug("start vnc")
+	if killVNC {
+		vncCmd = append(vncCmd, "killall vncserver > /dev/null 2>&1;")
+	}
+
+	vncCmd = append(vncCmd, "if [ ! -f ~/.vnc/passwd ]; then mkdir -p ~/.vnc; echo -n carbon | vncpasswd -f > ~/.vnc/passwd; fi ; cat ~/.vnc/passwd | base64 -w0; echo; if ! ps aux | grep -v grep | grep -i vnc 2>&1 >/dev/null  ; then vncserver -localhost -PasswordFile ~/.vnc/passwd -xstartup xfce4-session 2>&1 >/dev/null; fi; lsof -i -n -o -P | grep -i vnc | grep 127 | cut -d : -f2 | awk '{print $1}'")
+
 	sshSession.Session.Stdout = nil
-	vncConfig, err := sshSession.Output(vncCmd)
+	vncConfig, err := sshSession.Output(strings.Join(vncCmd, " "))
 	if err != nil {
 		return err
 	}

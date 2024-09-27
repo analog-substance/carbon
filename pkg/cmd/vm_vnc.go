@@ -13,11 +13,12 @@ var vmVNCCmd = &cobra.Command{
 	Long:  `vnc to a vm`,
 	Run: func(cmd *cobra.Command, args []string) {
 		user, _ := cmd.Flags().GetString("user")
+		killVNC, _ := cmd.Flags().GetBool("kill-vnc")
 		vms := getVMsFromArgs(cmd, args)
 		if len(vms) > 1 {
 			fmt.Println("Too many vms specified.")
 		} else if len(vms) == 1 {
-			err := vms[0].StartVNC(user)
+			err := vms[0].StartVNC(user, killVNC)
 			if err != nil {
 				log.Fatal(err)
 			}
@@ -29,4 +30,6 @@ var vmVNCCmd = &cobra.Command{
 
 func init() {
 	vmCmd.AddCommand(vmVNCCmd)
+
+	vmVNCCmd.Flags().BoolP("kill-vnc", "k", false, "Kill VNC before starting")
 }

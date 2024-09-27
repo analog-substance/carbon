@@ -12,6 +12,7 @@ var StateStarting = MachineState{"Starting"}
 var StateStopping = MachineState{"Stopping"}
 var StateSleeping = MachineState{"Sleeping"}
 var StateTerminating = MachineState{"Terminating"}
+var StateTerminated = MachineState{"Terminated"}
 var StateUnknown = MachineState{"Unknown"}
 
 type VM interface {
@@ -24,6 +25,6 @@ type VM interface {
 	Restart() error
 	Environment() Environment
 	ExecSSH(string, ...string) error
-	StartVNC(string) error
+	StartVNC(user string, killVNC bool) error
 	NewSSHSession(string) (*ssh_util.Session, error)
 }

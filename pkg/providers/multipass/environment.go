@@ -78,6 +78,9 @@ func stateFromVboxInfo(state string) types.MachineState {
 	if state == "Running" {
 		return types.StateRunning
 	}
+	if state == "Deleted" {
+		return types.StateTerminated
+	}
 
 	log.Println("Unknown state for multipass VM:", state)
 	return types.StateUnknown
