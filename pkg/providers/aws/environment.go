@@ -14,7 +14,7 @@ import (
 
 type environment struct {
 	name      string
-	platform  *platform
+	profile   *profile
 	ec2Client *ec2.Client
 	vpcId     string
 }
@@ -23,8 +23,8 @@ func (e *environment) Name() string {
 	return e.name
 }
 
-func (e *environment) Platform() types.Platform {
-	return e.platform
+func (e *environment) Profile() types.Profile {
+	return e.profile
 }
 
 func (e *environment) VMs() []types.VM {
@@ -84,16 +84,15 @@ func (e *environment) CreateVM(options types.MachineLaunchOptions) error {
 	return nil
 }
 
-func (e *environment) ImageBuilds() []types.ImageBuild {
-	return []types.ImageBuild{}
+func (e *environment) ImageBuilds() ([]types.ImageBuild, error) {
+	return models.GetImageBuildsForProvider(e.profile.Provider().Type())
+}
+func (e environment) Images() ([]types.Image, error) {
+	return []types.Image{}, nil
 }
 
-func (e *environment) Images() []types.Image {
-	return []types.Image{}
-}
-
-func awsInstanceToMachine(instance ec2Types.Instance) models.Machine {
-	machine := models.Machine{
+func awsInstanceToMachine(instance ec2Types.Instance) *models.Machine {
+	machine := &models.Machine{
 		InstanceID: *instance.InstanceId,
 	}
 

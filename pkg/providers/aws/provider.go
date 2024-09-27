@@ -17,7 +17,7 @@ func New() types.Provider {
 	return &provider{}
 }
 
-func (p *provider) Profiles() []string {
+func (p *provider) AWSProfiles() []string {
 	if len(p.profiles) > 0 {
 		return p.profiles
 	}
@@ -50,19 +50,23 @@ func (p *provider) IsAvailable() bool {
 	return len(p.Profiles()) > 0
 }
 
-func (p *provider) Platforms(validNames ...string) []types.Platform {
-	platforms := []types.Platform{}
+func (p *provider) Profiles(validNames ...string) []types.Profile {
+	profiles := []types.Profile{}
 
-	for _, s := range p.Profiles() {
+	for _, s := range p.AWSProfiles() {
 		// we have filters, check if we are wanted
 		if len(validNames) == 0 || slices.Contains(validNames, strings.ToLower(s)) {
-			platforms = append(platforms, &platform{s, p})
+			profiles = append(profiles, &profile{s, p})
 		}
 	}
 
-	return platforms
+	return profiles
 }
 
 func (p *provider) Name() string {
 	return "AWS"
+}
+
+func (p *provider) Type() string {
+	return strings.ToLower(p.Name())
 }

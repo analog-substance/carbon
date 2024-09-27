@@ -26,7 +26,7 @@ var vmList = &cobra.Command{
 		} else {
 			t := table.NewWriter()
 			t.SetOutputMirror(os.Stdout)
-			t.AppendHeader(table.Row{"Name", "IP", "State", "Environment", "Platform"})
+			t.AppendHeader(table.Row{"Name", "IP", "State", "Environment", "Profile"})
 
 			for _, vm := range vms {
 				var name string
@@ -41,7 +41,7 @@ var vmList = &cobra.Command{
 						vm.IPAddress(),
 						vm.State(),
 						vm.Environment().Name(),
-						vm.Environment().Platform().Name(),
+						vm.Environment().Profile().Name(),
 					},
 				})
 			}

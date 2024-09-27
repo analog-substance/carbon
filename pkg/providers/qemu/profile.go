@@ -1,4 +1,4 @@
-package libvirt
+package qemu
 
 import (
 	"github.com/analog-substance/carbon/pkg/types"
@@ -8,22 +8,22 @@ import (
 	"slices"
 )
 
-type platform struct {
+type profile struct {
 	profileName string
 	provider    *provider
 	connectStr  string
 }
 
-const platformName = "qemu"
+const profileName = "qemu"
 
-func (p platform) Environments(validNames ...string) []types.Environment {
-	if len(validNames) == 0 || slices.Contains(validNames, platformName) {
+func (p profile) Environments(validNames ...string) []types.Environment {
+	if len(validNames) == 0 || slices.Contains(validNames, profileName) {
 
 		uri, _ := url.Parse(p.connectStr)
 		conn, err := libvirt.ConnectToURI(uri)
 		if err == nil {
 			return []types.Environment{environment{
-				platformName,
+				profileName,
 				p,
 				conn,
 			}}
@@ -34,10 +34,10 @@ func (p platform) Environments(validNames ...string) []types.Environment {
 	return []types.Environment{}
 }
 
-func (p platform) Name() string {
+func (p profile) Name() string {
 	return p.profileName
 }
 
-func (p platform) Provider() types.Provider {
+func (p profile) Provider() types.Provider {
 	return p.provider
 }

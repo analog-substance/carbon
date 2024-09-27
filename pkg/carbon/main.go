@@ -4,36 +4,33 @@ import (
 	"bytes"
 	"embed"
 	"fmt"
-	builder "github.com/NoF0rte/cmd-builder"
 	"github.com/analog-substance/carbon/deployments"
 	"github.com/analog-substance/carbon/pkg/models"
 	"github.com/analog-substance/carbon/pkg/providers/aws"
-	"github.com/analog-substance/carbon/pkg/providers/libvirt"
 	"github.com/analog-substance/carbon/pkg/providers/multipass"
+	"github.com/analog-substance/carbon/pkg/providers/qemu"
 	"github.com/analog-substance/carbon/pkg/providers/simple"
 	"github.com/analog-substance/carbon/pkg/providers/virtualbox"
 	"github.com/analog-substance/carbon/pkg/types"
 	"os"
-	"os/exec"
 	"path"
-	"runtime"
 	"strings"
-	"syscall"
 )
 
 type Options struct {
 	Providers    []string
-	Platforms    []string
+	Profiles     []string
 	Environments []string
 }
 
 type Carbon struct {
 	options      Options
 	providers    []types.Provider
-	platforms    []types.Platform
+	profiles     []types.Profile
 	environments []types.Environment
 	machines     []types.VM
 	imageBuilds  []types.ImageBuild
+	images       []types.Image
 }
 
 func New(options Options) *Carbon {
@@ -61,22 +58,22 @@ func (c *Carbon) Providers() []types.Provider {
 	return c.providers
 }
 
-func (c *Carbon) Platforms() []types.Platform {
-	if len(c.platforms) == 0 {
-		c.platforms = []types.Platform{}
+func (c *Carbon) Profiles() []types.Profile {
+	if len(c.profiles) == 0 {
+		c.profiles = []types.Profile{}
 		for _, provider := range c.Providers() {
-			c.platforms = append(c.platforms, provider.Platforms(c.options.Platforms...)...)
+			c.profiles = append(c.profiles, provider.Profiles(c.options.Profiles...)...)
 		}
 	}
 
-	return c.platforms
+	return c.profiles
 }
 
 func (c *Carbon) GetVMs() []types.VM {
 	if len(c.machines) == 0 {
 		c.machines = []types.VM{}
-		for _, platform := range c.Platforms() {
-			for _, env := range platform.Environments(c.options.Environments...) {
+		for _, profile := range c.Profiles() {
+			for _, env := range profile.Environments(c.options.Environments...) {
 				c.machines = append(c.machines, env.VMs()...)
 			}
 		}
@@ -111,12 +108,12 @@ func (c *Carbon) FindVMByName(name string) []types.VM {
 func (c *Carbon) VMsFromHosts(hostnames []string) []types.VM {
 
 	simpleProvider := simple.New()
-	platforms := simpleProvider.Platforms()
-	envs := platforms[0].Environments()
+	profile := simpleProvider.Profiles()
+	envs := profile[0].Environments()
 
 	vms := []types.VM{}
 	for _, hostname := range hostnames {
-		vms = append(vms, models.Machine{
+		vms = append(vms, &models.Machine{
 			InstanceName:       hostname,
 			CurrentState:       types.StateUnknown,
 			InstanceID:         hostname,
@@ -276,38 +273,52 @@ func (c *Carbon) CreateImageBuild(name, tplDir, service string) error {
 	return nil
 }
 
-func (c *Carbon) BuildImage(name string) error {
-	packerPath, err := exec.LookPath("packer")
+func (c *Carbon) BuildImage(name, provider, provisioner string) error {
+	imageBuilds, err := c.GetImageBuilds()
 	if err != nil {
 		return err
 	}
 
-	args := []string{
-		"packer",
-		"build",
-		path.Join(PackerDir, name),
+	for _, imageBuild := range imageBuilds {
+		if imageBuild.Name() == name && imageBuild.ProviderType() == provider && imageBuild.Provisioner() == provisioner {
+			return imageBuild.Build()
+		}
 	}
-
-	//args = append(args, additionalArgs...)
-	if //goland:noinspection GoBoolExpressions
-	runtime.GOOS == "windows" {
-		return builder.Cmd(args[0], args[1:]...).Interactive().Run()
-	}
-	return syscall.Exec(packerPath, args, os.Environ())
+	return fmt.Errorf("image build not found")
 }
 
 func (c *Carbon) GetImageBuilds() ([]types.ImageBuild, error) {
 	if len(c.imageBuilds) == 0 {
 		c.imageBuilds = []types.ImageBuild{}
-		for _, platform := range c.Platforms() {
-			for _, env := range platform.Environments(c.options.Environments...) {
-				c.imageBuilds = append(c.imageBuilds, env.ImageBuilds()...)
+		for _, profile := range c.Profiles() {
+			for _, env := range profile.Environments(c.options.Environments...) {
+				imageBuilds, err := env.ImageBuilds()
+				if err != nil {
+					return nil, err
+				}
+				c.imageBuilds = append(c.imageBuilds, imageBuilds...)
 			}
 		}
-
 	}
 
 	return c.imageBuilds, nil
+}
+
+func (c *Carbon) GetImages() ([]types.Image, error) {
+	if len(c.images) == 0 {
+		c.images = []types.Image{}
+		for _, profiles := range c.Profiles() {
+			for _, env := range profiles.Environments(c.options.Environments...) {
+				images, err := env.Images()
+				if err != nil {
+					return nil, err
+				}
+				c.images = append(c.images, images...)
+			}
+		}
+	}
+
+	return c.images, nil
 }
 
 var availableProviders []types.Provider
@@ -316,7 +327,7 @@ func AvailableProviders() []types.Provider {
 	if len(availableProviders) == 0 {
 		allProviders := []types.Provider{
 			aws.New(),
-			libvirt.New(),
+			qemu.New(),
 			virtualbox.New(),
 			multipass.New(),
 		}

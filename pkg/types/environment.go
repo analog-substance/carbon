@@ -10,12 +10,12 @@ type MachineLaunchOptions struct {
 type Environment interface {
 	Name() string
 	VMs() []VM
-	Platform() Platform
+	Profile() Profile
 	StartVM(string) error
 	StopVM(string) error
 	RestartVM(string) error
-	ImageBuilds() []ImageBuild
-	Images() []Image
+	ImageBuilds() ([]ImageBuild, error)
+	Images() ([]Image, error)
 	CreateVM(MachineLaunchOptions) error
 	DestroyVM(string) error
 }

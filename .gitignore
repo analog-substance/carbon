@@ -12,7 +12,6 @@ test/
 
 /packer/
 /terraform/
-outputs/
 
 *.tfstate
 *.tfstate.backup
@@ -29,3 +28,5 @@ node_modules/
 scratch
 carbon.yaml
 /carbon
+deployments/images/
+!deployments/images/README.md

@@ -1,4 +1,4 @@
-package libvirt
+package qemu
 
 import (
 	"encoding/hex"
@@ -7,44 +7,34 @@ import (
 	"github.com/analog-substance/carbon/pkg/types"
 	"github.com/digitalocean/go-libvirt"
 	"log"
+	"os"
+	"path"
 	"time"
 )
 
 type environment struct {
-	name     string
-	platform types.Platform
-	conn     *libvirt.Libvirt
+	name    string
+	profile types.Profile
+	conn    *libvirt.Libvirt
 }
 
 func (e environment) Name() string {
 	return e.name
 }
 
-func (e environment) Platform() types.Platform {
-	return e.platform
+func (e environment) Profile() types.Profile {
+	return e.profile
 }
 
 func (e environment) VMs() []types.VM {
 	var vms []types.VM
-
-	//v, err := e.conn.ConnectGetLibVersion()
-	//if err != nil {
-	//	log.Fatalf("failed to retrieve libvirt version: %v", err)
-	//}
-	//fmt.Println("Version:", v)
-
 	flags := libvirt.ConnectListDomainsActive | libvirt.ConnectListDomainsInactive
 	domains, _, err := e.conn.ConnectListAllDomains(1, flags)
 	if err != nil {
 		log.Fatalf("failed to retrieve domains: %v", err)
 	}
 
-	//if err = l.Disconnect(); err != nil {
-	//	log.Fatalf("failed to disconnect: %v", err)
-	//}
-
 	allNets, _, err := e.conn.ConnectListAllNetworks(1, libvirt.ConnectListNetworksActive)
-	//allNets, err := e.conn.ListAllNetworks(libvirt.CONNECT_LIST_NETWORKS_ACTIVE)
 
 	leaseMap := map[string][]string{}
 	for _, net := range allNets {
@@ -67,7 +57,7 @@ func (e environment) VMs() []types.VM {
 		//state, maxMem, mem, virtCPUs, cpuTime, err := e.conn.DomainGetInfo(dom)
 		state, _, _, _, cpuTime, err := e.conn.DomainGetInfo(dom)
 		if err != nil {
-			log.Println("error getting libvirt domain info", e.Platform().Name(), err)
+			log.Println("error getting libvirt domain info", e.Profile().Name(), err)
 			continue
 		}
 
@@ -82,7 +72,7 @@ func (e environment) VMs() []types.VM {
 			ipAddresses, err := e.conn.DomainInterfaceAddresses(dom, 0, 0)
 			//ipAddresses, err := dom.ListAllInterfaceAddresses(libvirt.DOMAIN_INTERFACE_ADDRESSES_SRC_LEASE)
 			if err != nil {
-				log.Println("error getting librt domain interfaces", e.Platform().Name(), err)
+				log.Println("error getting librt domain interfaces", e.Profile().Name(), err)
 				continue
 			}
 
@@ -100,7 +90,7 @@ func (e environment) VMs() []types.VM {
 				}
 			}
 		}
-		vms = append(vms, models.Machine{
+		vms = append(vms, &models.Machine{
 			InstanceName:       name,
 			CurrentState:       stateFromVboxInfo(domainState),
 			InstanceID:         fmt.Sprintf("%s", id),
@@ -157,23 +147,20 @@ func (e environment) CreateVM(options types.MachineLaunchOptions) error {
 	return nil
 }
 
-func (e environment) ImageBuilds() []types.ImageBuild {
-	return []types.ImageBuild{}
-}
-func (e environment) Images() []types.Image {
-	return []types.Image{}
+func (e environment) ImageBuilds() ([]types.ImageBuild, error) {
+	return models.GetImageBuildsForProvider(e.profile.Provider().Type())
 }
 
+func (e environment) Images() ([]types.Image, error) {
+	ret := []types.Image{}
+	listing, _ := os.ReadDir("deployments/images/qemu")
+	for _, dirEntry := range listing {
+		ret = append(ret, models.NewImage(path.Join("deployments/images/qemu", dirEntry.Name()), e))
+
+	}
+	return ret, nil
+}
 func stateFromVboxInfo(state libvirt.DomainState) types.MachineState {
-	//DomainNostate     DomainState = iota
-	//DomainRunning     DomainState = 1
-	//DomainBlocked     DomainState = 2
-	//DomainPaused      DomainState = 3
-	//DomainShutdown    DomainState = 4
-	//DomainShutoff     DomainState = 5
-	//DomainCrashed     DomainState = 6
-	//DomainPmsuspended DomainState = 7
-
 	if state == libvirt.DomainPaused {
 		return types.StateSleeping
 	}

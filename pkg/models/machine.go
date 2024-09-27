@@ -33,42 +33,42 @@ func init() {
 	slog.SetLogLoggerLevel(slog.LevelDebug)
 }
 
-func (m Machine) Environment() types.Environment {
+func (m *Machine) Environment() types.Environment {
 	return m.Env
 }
 
-func (m Machine) Name() string {
+func (m *Machine) Name() string {
 	return m.InstanceName
 }
 
-func (m Machine) ID() string {
+func (m *Machine) ID() string {
 	return m.InstanceID
 }
 
-func (m Machine) IPAddress() string {
+func (m *Machine) IPAddress() string {
 	if len(m.PublicIPAddresses) > 0 {
 		return m.PublicIPAddresses[0]
 	}
 	return "unknown"
 }
 
-func (m Machine) State() string {
+func (m *Machine) State() string {
 	return m.CurrentState.Name
 }
 
-func (m Machine) Start() error {
+func (m *Machine) Start() error {
 	return m.Env.StartVM(m.InstanceID)
 }
 
-func (m Machine) Stop() error {
+func (m *Machine) Stop() error {
 	return m.Env.StopVM(m.InstanceID)
 }
 
-func (m Machine) Restart() error {
+func (m *Machine) Restart() error {
 	return m.Env.RestartVM(m.InstanceID)
 }
 
-func (m Machine) ExecSSH(user string, additionalArgs ...string) error {
+func (m *Machine) ExecSSH(user string, additionalArgs ...string) error {
 	sshPath, _ := exec.LookPath("ssh")
 	ip := m.IPAddress()
 
@@ -89,7 +89,7 @@ func (m Machine) ExecSSH(user string, additionalArgs ...string) error {
 	return syscall.Exec(sshPath, args, os.Environ())
 }
 
-func (m Machine) StartVNC(user string, killVNC bool) error {
+func (m *Machine) StartVNC(user string, killVNC bool) error {
 	sshSession, err := m.NewSSHSession(user)
 	if err != nil {
 		return err
@@ -143,7 +143,7 @@ func (m Machine) StartVNC(user string, killVNC bool) error {
 	return nil
 }
 
-func (m Machine) NewSSHSession(user string) (*ssh_util.Session, error) {
+func (m *Machine) NewSSHSession(user string) (*ssh_util.Session, error) {
 	session, err := ssh_util.NewSession()
 	if err != nil {
 		return nil, err
@@ -163,7 +163,7 @@ func (m Machine) NewSSHSession(user string) (*ssh_util.Session, error) {
 	return session, nil
 }
 
-func (m Machine) setVNCPasswd(vncPasswordB64 string) (string, error) {
+func (m *Machine) setVNCPasswd(vncPasswordB64 string) (string, error) {
 
 	passwdBytes, err := base64.StdEncoding.DecodeString(vncPasswordB64)
 	if err != nil {

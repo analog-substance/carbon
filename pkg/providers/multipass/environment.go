@@ -8,16 +8,16 @@ import (
 )
 
 type environment struct {
-	name     string
-	platform types.Platform
+	name    string
+	profile types.Profile
 }
 
 func (e environment) Name() string {
 	return e.name
 }
 
-func (e environment) Platform() types.Platform {
-	return e.platform
+func (e environment) Profile() types.Profile {
+	return e.profile
 }
 
 func (e environment) VMs() []types.VM {
@@ -28,7 +28,7 @@ func (e environment) VMs() []types.VM {
 
 		publicIPs = append(publicIPs, mpVM.Ipv4...)
 
-		vms = append(vms, models.Machine{
+		vms = append(vms, &models.Machine{
 			InstanceName:       mpVM.Name,
 			CurrentState:       stateFromVboxInfo(mpVM.State),
 			InstanceID:         mpVM.Name,
@@ -61,11 +61,11 @@ func (e environment) CreateVM(options types.MachineLaunchOptions) error {
 	return nil
 }
 
-func (e environment) ImageBuilds() []types.ImageBuild {
-	return []types.ImageBuild{}
+func (e environment) ImageBuilds() ([]types.ImageBuild, error) {
+	return models.GetImageBuildsForProvider(e.profile.Provider().Name())
 }
-func (e environment) Images() []types.Image {
-	return []types.Image{}
+func (e environment) Images() ([]types.Image, error) {
+	return []types.Image{}, nil
 }
 
 func stateFromVboxInfo(state string) types.MachineState {

@@ -5,28 +5,28 @@ import (
 	"slices"
 )
 
-type platform struct {
+type profile struct {
 	profileName string
 	provider    *provider
 }
 
-const platformName = "local"
+const profileName = "local"
 
-func (p platform) Environments(validNames ...string) []types.Environment {
+func (p profile) Environments(validNames ...string) []types.Environment {
 	// we have filters, check if we are wanted
-	if len(validNames) == 0 || slices.Contains(validNames, platformName) {
+	if len(validNames) == 0 || slices.Contains(validNames, profileName) {
 		return []types.Environment{environment{
-			platformName,
+			profileName,
 			p,
 		}}
 	}
 	return []types.Environment{}
 }
 
-func (p platform) Name() string {
+func (p profile) Name() string {
 	return p.profileName
 }
 
-func (p platform) Provider() types.Provider {
+func (p profile) Provider() types.Provider {
 	return p.provider
 }

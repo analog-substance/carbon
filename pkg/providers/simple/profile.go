@@ -4,22 +4,22 @@ import (
 	"github.com/analog-substance/carbon/pkg/types"
 )
 
-type Platform struct {
+type Profile struct {
 	profileName string
 	provider    *Provider
 }
 
-func (p *Platform) Environments(validNames ...string) []types.Environment {
+func (p *Profile) Environments(validNames ...string) []types.Environment {
 	return []types.Environment{
 		&Environment{
-			name:     "simple",
-			platform: p,
+			name:    "simple",
+			profile: p,
 		},
 	}
 }
-func (p *Platform) Name() string {
+func (p *Profile) Name() string {
 	return p.profileName
 }
-func (p *Platform) Provider() types.Provider {
+func (p *Profile) Provider() types.Provider {
 	return p.provider
 }

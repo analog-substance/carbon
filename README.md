@@ -23,12 +23,12 @@ It uses:
 It is aimed at supporting various services to ensure it can scale with you as
 your operations become more complex.
 
-| Feature                 | AWS ✅ | Azure ❌ | GCP ❌ | QEMU ✅ | Multipass ✅ | VirtualBox ✅ | vSphere ❌ |
-|-------------------------|-------|---------|-------|--------|-------------|--------------|-----------|
-| Image build templates   | ✅     | ❌       | ❌     | ✅      | ❌ N/A       | ✅            | ✅         |
-| Create Images           | ✅     | ❌       | ❌     | ✅      | ❌           | ✅            | ✅         |
-| Infrastructure Creation | ❌     | ❌       | ❌     | ❌      | ❌ N/A       | ❌            | ❌         |
-| VM Management           | ✅     | ❌       | ❌     | ✅      | ✅           | ✅            | ❌         |
+| Feature                 | AWS ✅ | QEMU ✅ | VirtualBox ✅ | vSphere ❌ | Multipass ✅ | Azure ❌ | GCP ❌ |
+|-------------------------|-------|--------|--------------|-----------|-------------|---------|-------|
+| Image build templates   | ✅     | ✅      | ✅            | ✅         | ❌ N/A       | ❌       | ❌     |
+| Build Images            | ✅     | ✅      | ✅            | ✅         | ❌ N/A       | ❌       | ❌     |
+| VM Management           | ✅     | ✅      | ✅            | ❌         | ✅           | ❌       | ❌     |
+| Infrastructure Creation | ❌     | ❌      | ❌            | ❌         | ❌ N/A       | ❌       | ❌     |
 
 ❌ = Not Right Now, but soon  
 ✅ = Supported
@@ -64,10 +64,10 @@ Available Commands:
 
 Flags:
       --config string         config file (default is $HOME/.carbon.yaml)
-  -e, --environment strings   Environment to use. Some platforms support many environments.
+  -e, --environment strings   Environment to use. Some providers/profiles support many environments.
   -h, --help                  help for carbon
   -j, --json                  Output in JSON
-  -p, --platform strings      Platform to use. Like an instance of a provider. Used to specify aws profiles
+  -p, --profile strings       Profile to use. Like an instance of a provider. Used to specify aws profiles
   -P, --provider strings      Provider to use vbox, aws
   -v, --version               version for carbon
 
@@ -131,12 +131,10 @@ carbon vm ssh -i i-afde123ae43
 - docs
   - vhs example gifs
 - create/destroy one off VMs
-- vm search argument
 - provision aws env (create files, call terraform)
 - Self Test to ensure dependencies are met
 - Cloud init from templates (Base, Operator, Operator Desktop, Implant VM)
 - vSphere provider
-- vnc to vm
 - DNS management
     - point a domain
     - list domains

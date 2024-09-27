@@ -10,12 +10,12 @@ import (
 	"strings"
 )
 
-type platform struct {
+type profile struct {
 	profileName string
 	provider    *provider
 }
 
-func (p *platform) Environments(validNames ...string) []types.Environment {
+func (p *profile) Environments(validNames ...string) []types.Environment {
 
 	var environments []types.Environment
 	var options []func(*config.LoadOptions) error
@@ -44,7 +44,7 @@ func (p *platform) Environments(validNames ...string) []types.Environment {
 		if len(validNames) == 0 || slices.Contains(validNames, strings.ToLower(name)) {
 			environments = append(environments, &environment{
 				name:      name,
-				platform:  p,
+				profile:   p,
 				ec2Client: ec2Service,
 				vpcId:     *vpc.VpcId,
 			})
@@ -52,9 +52,9 @@ func (p *platform) Environments(validNames ...string) []types.Environment {
 	}
 	return environments
 }
-func (p *platform) Name() string {
+func (p *profile) Name() string {
 	return p.profileName
 }
-func (p *platform) Provider() types.Provider {
+func (p *profile) Provider() types.Provider {
 	return p.provider
 }

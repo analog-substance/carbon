@@ -1,6 +1,6 @@
 ---
-title: LibVirt
-description: LibVirt is broken right now
+title: QEMU
+description: QEMU via LibVirt
 weight: 20
 ---
 

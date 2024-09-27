@@ -1,7 +1,8 @@
 package types
 
 type Provider interface {
-	Platforms(validNames ...string) []Platform
+	Profiles(validNames ...string) []Profile
 	Name() string
+	Type() string
 	IsAvailable() bool
 }

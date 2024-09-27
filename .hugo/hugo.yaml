@@ -2,6 +2,9 @@ baseURL: https://analog-substance.github.io/carbon/
 title: Carbon - Infrastructure automation for offensive operations.
 
 # cSpell:ignore goldmark github hugo readingtime docsy subdir lastmod pygments linenos catmullrom norsk gu
+#
+#excludeFile:
+#  - "**.go"
 
 # Language settings
 # contentDir: docs
@@ -241,7 +244,10 @@ module:
     target: content/
   - source: ../deployments/
     target: content/docs/deployments/
+    excludeFiles:
+      - "images/*/**"
   - source: ../pkg/
     target: content/docs/pkg/
+    excludeFiles: "**.go"
   - source: ../README.md
     target: content/docs/_index.md

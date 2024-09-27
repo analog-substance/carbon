@@ -19,10 +19,17 @@ var imageListCmd = &cobra.Command{
 				log.Fatal(err)
 			}
 			for _, imageBuild := range imagesBuilds {
-				fmt.Println(imageBuild)
+				fmt.Println(imageBuild.Name(), imageBuild.Provisioner(), imageBuild.ProviderType())
 			}
 		} else {
-			fmt.Println("Currently only listing image build is possible. to be implemented")
+
+			imagesBuilds, err := carbonObj.GetImages()
+			if err != nil {
+				log.Fatal(err)
+			}
+			for _, imageBuild := range imagesBuilds {
+				fmt.Println(imageBuild.Name(), imageBuild.Environment().Name())
+			}
 		}
 
 	},

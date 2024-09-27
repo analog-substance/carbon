@@ -15,7 +15,7 @@ import (
 var cfgFile string
 
 // var providers []string
-var platforms []string
+var profiles []string
 var environments []string
 var jsonOutput bool
 var carbonObj *carbon.Carbon
@@ -27,12 +27,12 @@ var RootCmd = &cobra.Command{
 	Long:  `Manage and use infrastructure with a consistent interface, regardless of where it lives.`,
 	PersistentPreRunE: func(cmd *cobra.Command, args []string) error {
 		providers := viper.GetStringSlice("carbon.providers")
-		platforms := viper.GetStringSlice("carbon.platforms")
+		profiles := viper.GetStringSlice("carbon.profiles")
 		environments := viper.GetStringSlice("carbon.environments")
 
 		carbonObj = carbon.New(carbon.Options{
 			Providers:    lowerStringSlice(providers),
-			Platforms:    lowerStringSlice(platforms),
+			Profiles:     lowerStringSlice(profiles),
 			Environments: lowerStringSlice(environments),
 		})
 		return nil
@@ -52,15 +52,15 @@ func init() {
 	cobra.OnInitialize(initConfig)
 	RootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is $HOME/.carbon.yaml)")
 	RootCmd.PersistentFlags().StringSliceP("provider", "P", []string{}, "Provider to use vbox, aws")
-	RootCmd.PersistentFlags().StringSliceVarP(&platforms, "platform", "p", []string{}, "Platform to use. Like an instance of a provider. Used to specify aws profiles")
-	RootCmd.PersistentFlags().StringSliceVarP(&environments, "environment", "e", []string{}, "Environment to use. Some platforms support many environments.")
+	RootCmd.PersistentFlags().StringSliceVarP(&profiles, "profile", "p", []string{}, "Profile to use. Like an instance of a provider. Used to specify aws profiles")
+	RootCmd.PersistentFlags().StringSliceVarP(&environments, "environment", "e", []string{}, "Environment to use. Some providers/profiles support many environments.")
 	RootCmd.PersistentFlags().BoolVarP(&jsonOutput, "json", "j", false, "Output in JSON")
 
 	err := viper.BindPFlag("carbon.providers", RootCmd.PersistentFlags().Lookup("provider"))
 	if err != nil {
 		log.Fatal(err)
 	}
-	err = viper.BindPFlag("carbon.platforms", RootCmd.PersistentFlags().Lookup("platform"))
+	err = viper.BindPFlag("carbon.profiles", RootCmd.PersistentFlags().Lookup("profiles"))
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -79,7 +79,7 @@ func initConfig() {
 	viper.AutomaticEnv() // read in environment variables that match
 
 	viper.SetDefault("carbon.providers", []string{})
-	viper.SetDefault("carbon.platforms", []string{})
+	viper.SetDefault("carbon.profiles", []string{})
 	viper.SetDefault("carbon.environments", []string{})
 	viper.SetDefault("carbon.credentials", []map[string]string{})
 	viper.SetDefault("carbon.cloud-init.dir", "cloud-init")

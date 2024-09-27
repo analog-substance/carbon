@@ -7,25 +7,25 @@ weight: 10
 Carbon organizes your machines in a tree like:
 
 - Providers
-  - Platforms
+  - Profiles
     - Environments
 
 An example could look like this:
 
 - Provider: AWS
-  - Platform: default aws profile
+  - Profile: default aws profile
     - Environment: VPC 001
     - Environment: VPC 002
-  - Platform: red team aws profile
+  - Profile: red team aws profile
       - Environment: VPC 001
       - Environment: VPC 002
 - Provider: VirtualBox
-    - Platform: local
+    - Profile: local
         - Environment: local
 - Provider: Multipass
-    - Platform: local
+    - Profile: local
         - Environment: local
 - Provider: vSphere
-    - Platform: whatever.vsphere.local
+    - Profile: whatever.vsphere.local
         - Environment: Datacenter 01
         - Environment: Datacenter 02

@@ -1,6 +1,6 @@
 package types
 
-type Platform interface {
+type Profile interface {
 	Environments(validNames ...string) []Environment
 	Name() string
 	Provider() Provider
