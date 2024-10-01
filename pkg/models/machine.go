@@ -8,10 +8,10 @@ import (
 	"github.com/analog-substance/carbon/pkg/types"
 	"github.com/analog-substance/carbon/pkg/vnc_viewer"
 	"github.com/mitchellh/go-homedir"
-	"log/slog"
 	"os"
 	"os/exec"
 	"path"
+	"regexp"
 	"runtime"
 	"strconv"
 	"strings"
@@ -23,6 +23,7 @@ type Machine struct {
 	InstanceName       string             `json:"name"`
 	InstanceID         string             `json:"id"`
 	CurrentUpTime      time.Duration      `json:"up_time"`
+	InstanceType       string             `json:"type"`
 	PublicIPAddresses  []string           `json:"public_ip_addresses"`
 	PrivateIPAddresses []string           `json:"private_ip_addresses"`
 	CurrentState       types.MachineState `json:"current_state"`
@@ -31,6 +32,14 @@ type Machine struct {
 
 func (m *Machine) Environment() types.Environment {
 	return m.Env
+}
+
+func (m *Machine) Profile() types.Profile {
+	return m.Env.Profile()
+}
+
+func (m *Machine) Provider() types.Provider {
+	return m.Env.Profile().Provider()
 }
 
 func (m *Machine) Name() string {
@@ -48,8 +57,16 @@ func (m *Machine) IPAddress() string {
 	return "unknown"
 }
 
+func (m *Machine) UpTime() time.Duration {
+	return m.CurrentUpTime
+}
+
 func (m *Machine) State() string {
 	return m.CurrentState.Name
+}
+
+func (m *Machine) Type() string {
+	return m.InstanceType
 }
 
 func (m *Machine) Start() error {
@@ -64,7 +81,7 @@ func (m *Machine) Restart() error {
 	return m.Env.RestartVM(m.InstanceID)
 }
 
-func (m *Machine) ExecSSH(user string, additionalArgs ...string) error {
+func (m *Machine) ExecSSH(user string, cmdArgs ...string) error {
 	sshPath, _ := exec.LookPath("ssh")
 	ip := m.IPAddress()
 
@@ -77,7 +94,7 @@ func (m *Machine) ExecSSH(user string, additionalArgs ...string) error {
 		fmt.Sprintf("%s@%s", user, ip),
 	}
 
-	args = append(args, additionalArgs...)
+	args = append(args, cmdArgs...)
 	if //goland:noinspection GoBoolExpressions
 	runtime.GOOS == "windows" {
 		return builder.Cmd(args[0], args[1:]...).Interactive().Run()
@@ -104,9 +121,12 @@ func (m *Machine) StartVNC(user string, killVNC bool) error {
 	if err != nil {
 		return err
 	}
-	slog.Debug("vnc conf", "vncConfig", vncConfig, "machine", m.Name())
+	log.Debug("vnc conf", "vncConfig", vncConfig, "machine", m.Name())
 
 	vncConfigSlice := strings.Split(vncConfig, "\n")
+	if len(vncConfigSlice) != 3 {
+		return fmt.Errorf("invalid vnc config %s", vncConfig)
+	}
 	passwdB64 := vncConfigSlice[0]
 	vncPortStr := vncConfigSlice[1]
 
@@ -123,14 +143,20 @@ func (m *Machine) StartVNC(user string, killVNC bool) error {
 	localPort := 5901
 
 	go func() {
-		slog.Debug("start vncviewer", "machine", m.Name())
-		vnc_viewer.Start(vnc_viewer.Options{
+		log.Debug("start vncviewer", "machine", m.Name())
+		err := vnc_viewer.Start(vnc_viewer.Options{
 			Delay:        3,
 			Host:         fmt.Sprintf("127.0.0.1:%d", vncPort),
 			PasswordFile: vncPassFile,
 		})
+		if err != nil {
+			fmt.Println("unable start vncviewer. Is it installed?")
+			fmt.Printf("try running\n\tvncviewer localhost:%d\n", localPort)
+			fmt.Println("You can install it using your systems package manager or")
+			fmt.Println("download a release from: https://github.com/TigerVNC/tigervnc/releases")
+		}
 	}()
-	slog.Debug("fwd port", "localPort", localPort, "vncPort", vncPort)
+	log.Debug("fwd port", "localPort", localPort, "vncPort", vncPort)
 	err = sshSession.ForwardLocalPort(localPort, vncPort)
 	if err != nil {
 		return err
@@ -140,6 +166,22 @@ func (m *Machine) StartVNC(user string, killVNC bool) error {
 }
 
 func (m *Machine) NewSSHSession(user string) (*ssh_util.Session, error) {
+	// Get SSH_AUTH_SOCK
+	// if its not set, look at .ssh/config for IdentityAgent
+	// use that value
+	sshAuthSock := os.Getenv("SSH_AUTH_SOCK")
+	if sshAuthSock == "" {
+		log.Debug("no SSH_AUTH_SOCK environment variable detected")
+		sshAuthSock = getAuthSockFromConfig()
+		if sshAuthSock != "" {
+			log.Debug("found SSH_AUTH_SOCK in ssh config", "sshAuthSock", sshAuthSock)
+			err := os.Setenv("SSH_AUTH_SOCK", sshAuthSock)
+			if err != nil {
+				log.Debug("cant set SSH_AUTH_SOCK")
+			}
+		}
+	}
+
 	session, err := ssh_util.NewSession()
 	if err != nil {
 		return nil, err
@@ -157,6 +199,17 @@ func (m *Machine) NewSSHSession(user string) (*ssh_util.Session, error) {
 	}
 
 	return session, nil
+}
+
+func (m *Machine) Cmd(user string, cmdArgs ...string) (string, error) {
+	sshSession, err := m.NewSSHSession(user)
+	if err != nil {
+		return "", err
+	}
+	defer sshSession.Close()
+
+	//sshSession.Session.Stdout = nil
+	return sshSession.Output(strings.Join(cmdArgs, " "))
 }
 
 func (m *Machine) setVNCPasswd(vncPasswordB64 string) (string, error) {
@@ -183,4 +236,27 @@ func (m *Machine) setVNCPasswd(vncPasswordB64 string) (string, error) {
 	}
 
 	return vncPasswdPath, nil
+}
+
+func getAuthSockFromConfig() string {
+	home, err := homedir.Dir()
+	if err != nil {
+		return ""
+	}
+	fileContents, err := os.ReadFile(path.Join(home, ".ssh", "config"))
+	if err != nil {
+		return ""
+	}
+
+	idRe := regexp.MustCompile(`\s*IdentityAgent "?([^"]+)"?`)
+	homeDirRe := regexp.MustCompile(`^~`)
+	lines := strings.Split(string(fileContents), "\n")
+	for _, line := range lines {
+		if strings.Contains(line, "IdentityAgent") {
+			agentSock := idRe.ReplaceAllString(line, "$1")
+			agentSock = homeDirRe.ReplaceAllString(agentSock, home)
+			return agentSock
+		}
+	}
+	return ""
 }

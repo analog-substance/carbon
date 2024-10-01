@@ -7,6 +7,7 @@ import (
 	"github.com/analog-substance/carbon/pkg/types"
 	"github.com/aws/aws-sdk-go-v2/config"
 	"github.com/aws/aws-sdk-go-v2/service/ec2"
+	"github.com/aws/aws-sdk-go-v2/service/sts"
 )
 
 type profile struct {
@@ -30,6 +31,14 @@ func (p *profile) Environments() []types.Environment {
 		log.Debug("Error loading  AWS configuration", "profile", p.Name(), "err", err)
 		return environments
 	}
+
+	stsClient := sts.NewFromConfig(cfg)
+	awsCaller, err := stsClient.GetCallerIdentity(context.Background(), &sts.GetCallerIdentityInput{})
+	if err != nil {
+		log.Debug("failed to get caller identity", "profile", p.Name(), "err", err)
+		return environments
+	}
+
 	ec2Service := ec2.NewFromConfig(cfg)
 	vpcResults, err := ec2Service.DescribeVpcs(context.Background(), &ec2.DescribeVpcsInput{})
 	if err != nil {
@@ -55,10 +64,11 @@ func (p *profile) Environments() []types.Environment {
 		log.Debug("validating environment visibility", "environment", environmentName, "shouldInclude", shouldInclude)
 		if shouldInclude {
 			environments = append(environments, &environment{
-				name:      environmentName,
-				profile:   p,
-				ec2Client: ec2Service,
-				vpcId:     *vpc.VpcId,
+				name:         environmentName,
+				profile:      p,
+				ec2Client:    ec2Service,
+				vpcId:        *vpc.VpcId,
+				awsAccountId: *awsCaller.Account,
 			})
 		}
 	}

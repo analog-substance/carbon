@@ -47,6 +47,5 @@ func (p *Profile) ShouldIncludeEnvironment(envName string) bool {
 	envName = strings.ToLower(envName)
 
 	enabled, ok := p.GetConfig().Environments[envName]
-	return ok && enabled
-
+	return !ok || enabled
 }

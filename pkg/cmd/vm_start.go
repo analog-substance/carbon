@@ -16,7 +16,7 @@ var vmStart = &cobra.Command{
 			for _, vm := range vms {
 				err := vm.Start()
 				if err != nil {
-					log.Error("Error starting VM", vm.Name(), err)
+					log.Error("Error starting VM", "name", vm.Name(), "err", err)
 				}
 			}
 		} else {

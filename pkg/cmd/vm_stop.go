@@ -16,7 +16,7 @@ var vmStop = &cobra.Command{
 			for _, vm := range vms {
 				err := vm.Stop()
 				if err != nil {
-					log.Error("Error stopping VM", vm.Name(), err)
+					log.Error("Error stopping VM", "name", vm.Name(), "err", err)
 				}
 			}
 		} else {

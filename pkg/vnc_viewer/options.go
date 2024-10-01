@@ -1,6 +1,7 @@
 package vnc_viewer
 
 import (
+	"os/exec"
 	"time"
 )
 
@@ -16,4 +17,13 @@ func Start(options Options) error {
 	}
 
 	return StartViewer(options)
+}
+
+func getVNCViewerPath() string {
+	vncViewerPath, err := exec.LookPath("vncviewer")
+	if err == nil {
+		return vncViewerPath
+	}
+
+	return ""
 }

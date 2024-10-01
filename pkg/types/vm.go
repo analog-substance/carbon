@@ -2,6 +2,7 @@ package types
 
 import (
 	"github.com/analog-substance/carbon/pkg/ssh_util"
+	"time"
 )
 
 type MachineState struct {
@@ -21,12 +22,20 @@ type VM interface {
 	Name() string
 	ID() string
 	IPAddress() string
+	UpTime() time.Duration
 	State() string
+	Type() string
+
+	Environment() Environment
+	Profile() Profile
+	Provider() Provider
+
 	Start() error
 	Stop() error
 	Restart() error
-	Environment() Environment
+
 	ExecSSH(string, ...string) error
 	StartVNC(user string, killVNC bool) error
+	Cmd(string, ...string) (string, error)
 	NewSSHSession(string) (*ssh_util.Session, error)
 }

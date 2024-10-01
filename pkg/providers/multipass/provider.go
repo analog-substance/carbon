@@ -27,9 +27,9 @@ func New() types.Provider {
 
 func (p *provider) appPath() string {
 	if p.path == "" {
-		virtualBox, err := exec.LookPath("multipass")
+		multipassPath, err := exec.LookPath("multipass")
 		if err == nil {
-			p.path, err = filepath.Abs(virtualBox)
+			p.path, err = filepath.Abs(multipassPath)
 		}
 	}
 	return p.path

@@ -155,7 +155,7 @@ func (e environment) Images() ([]types.Image, error) {
 	ret := []types.Image{}
 	listing, _ := os.ReadDir("deployments/images/qemu")
 	for _, dirEntry := range listing {
-		ret = append(ret, models.NewImage(path.Join("deployments/images/qemu", dirEntry.Name()), e))
+		ret = append(ret, models.NewImage(path.Join("deployments/images/qemu", dirEntry.Name()), dirEntry.Name(), time.Now(), e))
 
 	}
 	return ret, nil

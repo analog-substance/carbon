@@ -12,10 +12,11 @@ import (
 )
 
 type environment struct {
-	name      string
-	profile   *profile
-	ec2Client *ec2.Client
-	vpcId     string
+	name         string
+	profile      *profile
+	ec2Client    *ec2.Client
+	vpcId        string
+	awsAccountId string
 }
 
 func (e *environment) Name() string {
@@ -86,8 +87,31 @@ func (e *environment) CreateVM(options types.MachineLaunchOptions) error {
 func (e *environment) ImageBuilds() ([]types.ImageBuild, error) {
 	return models.GetImageBuildsForProvider(e.profile.Provider().Type())
 }
-func (e environment) Images() ([]types.Image, error) {
-	return []types.Image{}, nil
+func (e *environment) Images() ([]types.Image, error) {
+	log.Debug("getting images", "env", e.Name(), "profile", e.profile.Name(), "provider", e.profile.Provider().Name())
+	amis, err := e.ec2Client.DescribeImages(context.Background(), &ec2.DescribeImagesInput{
+		Filters: []ec2Types.Filter{
+			ec2Types.Filter{
+				Name: aws.String("owner-id"),
+				Values: []string{
+					e.awsAccountId,
+				},
+			},
+		},
+	})
+	if err != nil {
+		return nil, err
+	}
+	images := []types.Image{}
+	for _, image := range amis.Images {
+		createdAt, err := time.Parse(time.RFC3339Nano, *image.CreationDate)
+		if err != nil {
+			log.Debug("failed to parse created time, setting it to now", "creationDate", *image.CreationDate)
+			createdAt = time.Now()
+		}
+		images = append(images, models.NewImage(*image.ImageId, *image.Name, createdAt, e))
+	}
+	return images, nil
 }
 
 func awsInstanceToMachine(instance ec2Types.Instance) *models.Machine {
@@ -126,6 +150,7 @@ func awsInstanceToMachine(instance ec2Types.Instance) *models.Machine {
 		machine.CurrentUpTime = time.Duration(time.Now().UnixNano() - instance.LaunchTime.UnixNano())
 	}
 
+	machine.InstanceType = string(instance.InstanceType)
 	return machine
 }
 

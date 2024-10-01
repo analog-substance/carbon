@@ -6,21 +6,31 @@ import (
 )
 
 type Image struct {
-	Label     string
-	ID        string
-	CreatedAt time.Time
-	Env       types.Environment
+	imageID   string
+	imageName string
+	createdAt time.Time
+	env       types.Environment
 }
 
-func NewImage(imageID string, env types.Environment) types.Image {
+func NewImage(imageID string, imageName string, createdAt time.Time, env types.Environment) types.Image {
 	return &Image{
-		ID:  imageID,
-		Env: env,
+		imageID:   imageID,
+		imageName: imageName,
+		createdAt: createdAt,
+		env:       env,
 	}
 }
 
+func (i *Image) ID() string {
+	return i.imageID
+}
+
 func (i *Image) Name() string {
-	return i.ID
+	return i.imageName
+}
+
+func (i *Image) CreatedAt() string {
+	return i.createdAt.Format(time.RFC3339Nano)
 }
 
 func (i *Image) Launch() error {
@@ -28,5 +38,5 @@ func (i *Image) Launch() error {
 }
 
 func (i *Image) Environment() types.Environment {
-	return i.Env
+	return i.env
 }

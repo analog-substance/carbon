@@ -6,6 +6,7 @@ import (
 	"github.com/analog-substance/carbon/pkg/types"
 	"os"
 	"path"
+	"time"
 )
 
 type environment struct {
@@ -65,7 +66,7 @@ func (e environment) Images() ([]types.Image, error) {
 	ret := []types.Image{}
 	listing, _ := os.ReadDir("deployments/images/virtualbox")
 	for _, dirEntry := range listing {
-		ret = append(ret, models.NewImage(path.Join("deployments/images/virtualbox", dirEntry.Name()), e))
+		ret = append(ret, models.NewImage(path.Join("deployments/images/virtualbox", dirEntry.Name()), dirEntry.Name(), time.Now(), e))
 
 	}
 	return ret, nil

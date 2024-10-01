@@ -19,7 +19,7 @@ var vmVNCCmd = &cobra.Command{
 		} else if len(vms) == 1 {
 			err := vms[0].StartVNC(user, killVNC)
 			if err != nil {
-				log.Error("failed to vnc to vm", err)
+				log.Error("failed to vnc to vm", "name", vms[0].Name(), "err", err)
 			}
 		} else {
 			fmt.Println("VM not found")
@@ -29,6 +29,5 @@ var vmVNCCmd = &cobra.Command{
 
 func init() {
 	vmCmd.AddCommand(vmVNCCmd)
-
 	vmVNCCmd.Flags().BoolP("kill-vnc", "k", false, "Kill VNC before starting")
 }

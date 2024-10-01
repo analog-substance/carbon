@@ -16,7 +16,7 @@ var vmRestart = &cobra.Command{
 			for _, vm := range vms {
 				err := vm.Restart()
 				if err != nil {
-					log.Error("Error restarting VM", vm.Name(), err)
+					log.Error("Error restarting VM", "name", vm.Name(), "err", err)
 				}
 			}
 		} else {

@@ -1,7 +1,9 @@
 package cmd
 
 import (
+	"encoding/json"
 	"fmt"
+	"github.com/jedib0t/go-pretty/v6/table"
 	"github.com/spf13/cobra"
 	"os"
 )
@@ -13,27 +15,83 @@ var imageListCmd = &cobra.Command{
 	Long:  `list images`,
 	Run: func(cmd *cobra.Command, args []string) {
 		listBuilds, _ := cmd.Flags().GetBool("builds")
-		if listBuilds {
-			imagesBuilds, err := carbonObj.GetImageBuilds()
-			if err != nil {
-				log.Info("failed to list image builds", err)
-				os.Exit(2)
+
+		if jsonOutput {
+			if listBuilds {
+				imagesBuilds, err := carbonObj.GetImageBuilds()
+				if err != nil {
+					log.Info("failed to list image builds", err)
+					os.Exit(2)
+				}
+
+				out, err := json.MarshalIndent(imagesBuilds, "", "  ")
+				if err != nil {
+					log.Error("error marshalling JSON", err)
+				}
+				fmt.Println(string(out))
+
+			} else {
+
+				images, err := carbonObj.GetImages()
+				if err != nil {
+					log.Info("failed to list images", err)
+					os.Exit(2)
+				}
+				out, err := json.MarshalIndent(images, "", "  ")
+				if err != nil {
+					log.Error("error marshalling JSON", err)
+				}
+				fmt.Println(string(out))
+
 			}
-			for _, imageBuild := range imagesBuilds {
-				fmt.Println(imageBuild.Name(), imageBuild.Provisioner(), imageBuild.ProviderType())
-			}
+
 		} else {
 
-			imagesBuilds, err := carbonObj.GetImages()
-			if err != nil {
-				log.Info("failed to list images", err)
-				os.Exit(2)
-			}
-			for _, imageBuild := range imagesBuilds {
-				fmt.Println(imageBuild.Name(), imageBuild.Environment().Name())
-			}
-		}
+			t := table.NewWriter()
+			t.SetOutputMirror(os.Stdout)
 
+			if listBuilds {
+				imagesBuilds, err := carbonObj.GetImageBuilds()
+				if err != nil {
+					log.Info("failed to list image builds", err)
+					os.Exit(2)
+				}
+				t.AppendHeader(table.Row{"Name", "Provisioner", "Provider"})
+
+				for _, imageBuild := range imagesBuilds {
+					t.AppendRows([]table.Row{
+						{
+							imageBuild.Name(),
+							imageBuild.Provisioner(),
+							imageBuild.ProviderType(),
+						},
+					})
+				}
+			} else {
+
+				images, err := carbonObj.GetImages()
+				if err != nil {
+					log.Info("failed to list images", err)
+					os.Exit(2)
+				}
+				t.AppendHeader(table.Row{"Name", "Created", "Env", "Profile", "Provider", "ID"})
+
+				for _, image := range images {
+
+					t.AppendRows([]table.Row{
+						{
+							image.Name(),
+							image.CreatedAt(),
+							image.Environment().Name(),
+							image.Environment().Profile().Name(),
+							image.Environment().Profile().Provider().Name(),
+							image.ID(),
+						},
+					})
+				}
+			}
+			t.Render()
+		}
 	},
 }
 

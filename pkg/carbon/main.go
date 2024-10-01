@@ -45,7 +45,6 @@ func New(config common.CarbonConfig) *Carbon {
 	carbon := &Carbon{config: config, providers: []types.Provider{}, profiles: []types.Profile{}, environments: []types.Environment{}}
 
 	for _, provider := range AvailableProviders() {
-
 		providerConfig, ok := config.Providers[provider.Type()]
 		if !ok {
 			providerConfig = common.ProviderConfig{

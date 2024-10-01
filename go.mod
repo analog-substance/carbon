@@ -8,6 +8,7 @@ require (
 	github.com/aws/aws-sdk-go-v2 v1.31.0
 	github.com/aws/aws-sdk-go-v2/config v1.27.38
 	github.com/aws/aws-sdk-go-v2/service/ec2 v1.179.1
+	github.com/aws/aws-sdk-go-v2/service/sts v1.31.2
 	github.com/digitalocean/go-libvirt v0.0.0-20240916165608-bff44a349d9d
 	github.com/hashicorp/hcl/v2 v2.22.0
 	github.com/jedib0t/go-pretty/v6 v6.5.9
@@ -34,7 +35,6 @@ require (
 	github.com/aws/aws-sdk-go-v2/service/internal/presigned-url v1.11.20 // indirect
 	github.com/aws/aws-sdk-go-v2/service/sso v1.23.2 // indirect
 	github.com/aws/aws-sdk-go-v2/service/ssooidc v1.27.2 // indirect
-	github.com/aws/aws-sdk-go-v2/service/sts v1.31.2 // indirect
 	github.com/aws/smithy-go v1.21.0 // indirect
 	github.com/fsnotify/fsnotify v1.7.0 // indirect
 	github.com/google/go-cmp v0.6.0 // indirect
