@@ -124,7 +124,7 @@ func (m *Machine) StartVNC(user string, killVNC bool) error {
 	log.Debug("vnc conf", "vncConfig", vncConfig, "machine", m.Name())
 
 	vncConfigSlice := strings.Split(vncConfig, "\n")
-	if len(vncConfigSlice) != 3 {
+	if len(vncConfigSlice) != 2 {
 		return fmt.Errorf("invalid vnc config %s", vncConfig)
 	}
 	passwdB64 := vncConfigSlice[0]
