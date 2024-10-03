@@ -13,10 +13,13 @@ var vmRestart = &cobra.Command{
 	Run: func(cmd *cobra.Command, args []string) {
 		vms := getVMsFromArgs(cmd, args)
 		if len(vms) > 0 {
-			for _, vm := range vms {
-				err := vm.Restart()
-				if err != nil {
-					log.Error("Error restarting VM", "name", vm.Name(), "err", err)
+			vmTable(vms)
+			if AskIfSure(fmt.Sprintf("Do you want to restart %d machines?", len(vms))) {
+				for _, vm := range vms {
+					err := vm.Restart()
+					if err != nil {
+						log.Error("Error restarting VM", "name", vm.Name(), "err", err)
+					}
 				}
 			}
 		} else {
