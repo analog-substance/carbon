@@ -1,31 +1,19 @@
-terraform {
-  required_providers {
-    libvirt = {
-      source = "dmacvicar/libvirt"
-      version = "0.7.6"
-    }
-  }
-}
-# Configure the Libvirt provider
-provider "libvirt" {
-  uri = "qemu:///system"
-}
 
 # Create a new domain
-resource "libvirt_network" "kube_network" {
+resource "libvirt_network" "carbon_net" {
   # the name used by libvirt
-  name = "k8snet"
+  name = "carbon-net"
 
   # mode can be: "nat" (default), "none", "route", "open", "bridge"
   mode = "nat"
 
   #  the domain used by the DNS server in this network
-  domain = "k8s.local"
+  domain = "carbon.local"
 
   #  list of subnets the addresses allowed for domains connected
   # also derived to define the host addresses
   # also derived to define the addresses served by the DHCP server
-  addresses = ["10.17.3.0/24", "2001:db8:ca2:2::1/64"]
+  addresses = ["10.17.3.0/24"]
 
   # (optional) the bridge device defines the name of a bridge device
   # which will be used to construct the virtual network.
@@ -97,4 +85,99 @@ resource "libvirt_network" "kube_network" {
     #
   }
 
+}
+
+# Base OS image to use to create a cluster of different
+# nodes
+resource "libvirt_volume" "os_image" {
+  name   = "carbon-ubuntu-desktop"
+  source = pathexpand(var.disk_source)
+  pool   = "default"
+  format = "qcow2"
+}
+
+# resource libvirt_pool carbon {
+#   name = "carbon"
+#   type = "dir"
+#   path = "${path.module}/../../qemu-pool"
+# }
+
+resource libvirt_domain vms {
+  for_each = { for machine in var.machines : machine.name => machine if machine.provider == "qemu"}
+  name = each.value.name
+
+  memory = 4096 #var.memory_mb
+  vcpu   = 2 #var.cpu
+
+#   cpu = {
+#     mode = "host-passthrough"
+#   }
+
+  disk { volume_id = libvirt_volume.os_image.id }
+  boot_device { dev = ["cdrom", "hd", "network"] }
+
+  # filesystem {
+  #   source   = pathexpand("~/")
+  #   target   = "mnt"
+  #   readonly = false
+  # }
+
+  # uses static  IP
+  network_interface {
+    network_name   = libvirt_network.carbon_net.name
+    hostname       = each.value.name
+    # addresses      = ["192.168.122.241"]
+    # mac            = "AA:BB:CC:11:24:23"
+    wait_for_lease = true
+  }
+
+  #  network_interface {
+  #    bridge  = var.macvtap_iface
+  #    hostname = var.hostname
+  #  }
+
+
+  # IMPORTANT
+  # Ubuntu can hang is a isa-serial is not present at boot time.
+  # If you find your CPU 100% and never is available this is why
+  console {
+    type        = "pty"
+    target_port = "0"
+    target_type = "serial"
+  }
+  # IMPORTANT
+  # it will show no console otherwise
+  video {
+    type = "qxl"
+  }
+
+  graphics {
+    type        = "spice"
+    listen_type = "address"
+    autoport    = "true"
+  }
+
+#   connection {
+#     type             = "ssh"
+#     host             = self.network_interface[0].addresses[0]
+#     user             = "root"
+#     password         = "root"
+#     bastion_host     = "10.90.20.21"
+#     bastion_port     = "22"
+#     bastion_user     = "root"
+#     bastion_password = "password"
+#   }
+
+  # Hostdev passtrought
+  # provisioner "local-exec" {
+  #   command = "virsh --connect ${var.provider_uri} attach-device ${var.hostname} --file passtrought-host.xml --live --persistent"
+  # }
+
+  # provisioner "remote-exec" {
+  #   inline = ["echo first", "echo first second"]
+  # }
+
+  # provisioner "remote-exec" {
+  #   inline = ["nmcli con mod \"$(nmcli -t -f NAME c s  | grep -v eth0)\" ipv4.addresses 10.0.0.60/24 ipv4.dns 10.0.0.1"]
+  # }
 }
