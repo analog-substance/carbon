@@ -30,6 +30,7 @@ type VM interface {
 	Profile() Profile
 	Provider() Provider
 
+	Destroy() error
 	Start() error
 	Stop() error
 	Restart() error

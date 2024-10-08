@@ -1,4 +1,4 @@
-package virtualbox
+package api
 
 import (
 	"github.com/analog-substance/carbon/pkg/common"
@@ -8,5 +8,5 @@ import (
 var log *slog.Logger
 
 func init() {
-	log = common.WithGroup("providers.virtualbox")
+	log = common.WithGroup("qemu.api")
 }

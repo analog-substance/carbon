@@ -6,7 +6,7 @@ import (
 	"github.com/spf13/cobra"
 	"gopkg.in/yaml.v3"
 	"os"
-	"path"
+	"path/filepath"
 	"strings"
 )
 
@@ -27,7 +27,7 @@ var devCloud = &cobra.Command{
 		endResult := &cloud_init.CloudConfig{}
 		for _, d := range listing {
 			if strings.HasSuffix(d.Name(), ".yaml") {
-				filebytes, err := os.ReadFile(path.Join(baseDir, d.Name()))
+				filebytes, err := os.ReadFile(filepath.Join(baseDir, d.Name()))
 				if err != nil {
 					log.Error("failed to read file", err)
 					continue

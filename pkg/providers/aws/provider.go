@@ -11,19 +11,19 @@ import (
 
 const providerName = "AWS"
 
-type provider struct {
+type Provider struct {
 	types.Provider
 	profiles []string
 }
 
 func New() types.Provider {
-	return &provider{
+	return &Provider{
 		base.NewWithName(providerName),
 		[]string{},
 	}
 }
 
-func (p *provider) AWSProfiles() []string {
+func (p *Provider) AWSProfiles() []string {
 	if len(p.profiles) > 0 {
 		return p.profiles
 	}
@@ -35,7 +35,7 @@ func (p *provider) AWSProfiles() []string {
 
 	for _, s := range sections.SectionStrings() {
 		sl := strings.ToLower(s)
-		if sl == "default" || strings.HasPrefix(sl, "profile") {
+		if sl == "default" || strings.HasPrefix(sl, "Profile") {
 			sec, err := sections.GetSection(s)
 			if err != nil {
 				log.Debug("error getting config section:", "section", s)
@@ -43,7 +43,7 @@ func (p *provider) AWSProfiles() []string {
 			}
 
 			if len(sec.Keys()) > 1 {
-				name, _ := strings.CutPrefix(s, "profile ")
+				name, _ := strings.CutPrefix(s, "Profile ")
 				p.profiles = append(p.profiles, name)
 			}
 		}
@@ -52,12 +52,12 @@ func (p *provider) AWSProfiles() []string {
 	return p.profiles
 }
 
-func (p *provider) IsAvailable() bool {
+func (p *Provider) IsAvailable() bool {
 	return len(p.AWSProfiles()) > 0
 }
 
-func (p *provider) Profiles() []types.Profile {
-	profiles := []types.Profile{}
+func (p *Provider) Profiles() []types.Profile {
+	var profiles []types.Profile
 	for _, profileName := range p.AWSProfiles() {
 
 		profileConfig, ok := p.Provider.GetConfig().Profiles[profileName]
@@ -67,7 +67,7 @@ func (p *provider) Profiles() []types.Profile {
 			}
 		}
 
-		log.Debug("aws profile", "profile", profileName, "enabled", profileConfig.Enabled, "ok", ok)
+		log.Debug("aws Profile", "Profile", profileName, "enabled", profileConfig.Enabled, "ok", ok)
 		if profileConfig.Enabled {
 			profiles = append(profiles, NewProfile(profileName, p, profileConfig))
 		}

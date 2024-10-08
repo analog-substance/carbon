@@ -1,10 +1,9 @@
 package types
 
-import "github.com/aws/aws-sdk-go-v2/service/ec2/types"
-
 type MachineLaunchOptions struct {
-	CloudInitTpl string      `json:"cloud-init"`
-	Image        types.Image `json:"image"`
+	CloudInitTpl string `json:"cloud-init"`
+	Image        Image  `json:"image"`
+	Name         string `json:"name"`
 }
 
 type Environment interface {
@@ -18,4 +17,5 @@ type Environment interface {
 	Images() ([]Image, error)
 	CreateVM(MachineLaunchOptions) error
 	DestroyVM(string) error
+	DestroyImage(string) error
 }

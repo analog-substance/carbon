@@ -23,14 +23,16 @@ It uses:
 It is aimed at supporting various services to ensure it can scale with you as
 your operations become more complex.
 
-| Feature                 | AWS ✅ | QEMU ✅ | VirtualBox ✅ | vSphere ❌ | Multipass ✅ | Azure ❌ | GCP ❌ |
-|-------------------------|-------|--------|--------------|-----------|-------------|---------|-------|
-| Image build templates   | ✅     | ✅      | ✅            | ✅         | ❌ N/A       | ❌       | ❌     |
-| Build Images            | ✅     | ✅      | ✅            | ✅         | ❌ N/A       | ❌       | ❌     |
-| VM Management           | ✅     | ✅      | ✅            | ❌         | ✅           | ❌       | ❌     |
-| Infrastructure Creation | ❌     | ❌      | ❌            | ❌         | ❌ N/A       | ❌       | ❌     |
+| Feature                       | AWS ✅ | QEMU ✅ | VirtualBox ✅ | vSphere ❌ | Multipass ✅ | Azure ❌ | GCP ❌ |
+|-------------------------------|-------|--------|--------------|-----------|-------------|---------|-------|
+| Image build templates         | ✅     | ✅      | ✅            | ✅         | ❌ N/A       | ❌       | ❌     |
+| Build images                  | ✅     | ✅      | ✅            | ✅         | ❌ N/A       | ❌       | ❌     |
+| Launch one off VM from images | ❌     | ✅      | ❌            | ❌         | ❌           | ❌       | ❌     |
+| Destroy VMs                   | ✅     | ✅      | ✅            | ✅         | ❌ N/A       | ❌       | ❌     |
+| VM Start/Stop/SSH/VNC         | ✅     | ✅      | ✅            | ❌         | ✅           | ❌       | ❌     |
+| Infrastructure Creation       | ❌     | ❌      | ❌            | ❌         | ❌ N/A       | ❌       | ❌     |
 
-❌ = Not Right Now, but soon  
+❌ = Not Right Now, but planned  
 ✅ = Supported
 
 
@@ -43,7 +45,14 @@ Or use `go install`.
 go install github.com/analog-substance/carbon@latest
 ```
 
-Carbon expects Packer, Terraform, and an SSH client to be installed and accessible in your `$PATH`.
+## Requirements
+
+Carbon expects the following to be installed and accessible in your `$PATH`.
+
+- Packer
+- Terraform
+- SSH Client
+- vncviewer (TigerVNC) 
 
 ## Usage
 ***

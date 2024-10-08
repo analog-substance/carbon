@@ -10,7 +10,7 @@ import (
 	"github.com/spf13/viper"
 	"os"
 	"os/exec"
-	"path"
+	"path/filepath"
 	"runtime"
 	"strings"
 	"syscall"
@@ -31,7 +31,7 @@ func NewImageBuild(buildPath, provider, provisioner string) *ImageBuild {
 }
 
 func (b *ImageBuild) Name() string {
-	return path.Base(path.Dir(b.buildPath))
+	return filepath.Base(filepath.Dir(b.buildPath))
 }
 
 func (b *ImageBuild) ProviderType() string {
@@ -54,13 +54,11 @@ func (b *ImageBuild) Build() error {
 	}
 
 	var packerConfig PackerConfig
-
 	err = hclsimple.DecodeFile(b.buildPath, nil, &packerConfig)
 	if err != nil {
 		return err
 	}
-
-	args = append(args, "-only", fmt.Sprintf("%s.%s", packerConfig.Source.Type, packerConfig.Source.Name), path.Dir(b.buildPath))
+	args = append(args, "-only", fmt.Sprintf("%s.%s", packerConfig.Source.Type, packerConfig.Source.Name), filepath.Dir(b.buildPath))
 	if //goland:noinspection GoBoolExpressions
 	runtime.GOOS == "windows" {
 		return builder.Cmd(args[0], args[1:]...).Interactive().Run()
@@ -112,7 +110,7 @@ func getImageBuilds() ([]types.ImageBuild, error) {
 			continue
 		}
 
-		buildFiles, err := os.ReadDir(path.Join(packerDir, dirEntry.Name()))
+		buildFiles, err := os.ReadDir(filepath.Join(packerDir, dirEntry.Name()))
 		if err != nil {
 			return ret, err
 		}
@@ -129,7 +127,7 @@ func getImageBuilds() ([]types.ImageBuild, error) {
 				continue
 			}
 			ret = append(ret, NewImageBuild(
-				path.Join(packerDir, dirEntry.Name(), buildFile.Name()),
+				filepath.Join(packerDir, dirEntry.Name(), buildFile.Name()),
 				provider,
 				provisioner))
 		}

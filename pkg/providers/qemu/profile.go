@@ -3,32 +3,32 @@ package qemu
 import (
 	"github.com/analog-substance/carbon/pkg/common"
 	"github.com/analog-substance/carbon/pkg/providers/base"
+	"github.com/analog-substance/carbon/pkg/providers/qemu/api"
 	"github.com/analog-substance/carbon/pkg/types"
-	"github.com/digitalocean/go-libvirt"
-	"net/url"
 )
 
-type profile struct {
+type Profile struct {
 	types.Profile
 }
 
-func NewProfile(name string, providerInstance *provider, config common.ProfileConfig) *profile {
-	return &profile{
+func NewProfile(name string, providerInstance *Provider, config common.ProfileConfig) *Profile {
+	return &Profile{
 		base.NewProfile(name, providerInstance, config),
 	}
 }
 
-func (p profile) Environments() []types.Environment {
+func (p *Profile) Environments() []types.Environment {
 	enabled, ok := p.Profile.GetConfig().Environments[environmentName]
 	if !ok || enabled {
-		uri, _ := url.Parse(p.GetConfig().URL)
-		conn, err := libvirt.ConnectToURI(uri)
+		qemu, err := api.Connect(p.GetConfig().URL)
 		if err == nil {
-			return []types.Environment{environment{
+			return []types.Environment{&Environment{
 				environmentName,
 				p,
-				conn,
+				qemu,
 			}}
+		} else {
+			log.Debug("Failed to connect to QEMU", "err", err, "environmentName", environmentName)
 		}
 	}
 

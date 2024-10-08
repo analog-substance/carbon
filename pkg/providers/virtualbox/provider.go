@@ -12,19 +12,19 @@ const providerName = "VirtualBox"
 const profileName = "default"
 const environmentName = "local"
 
-type provider struct {
+type Provider struct {
 	types.Provider
 	vboxmanageExecutablePath string
 }
 
 func New() types.Provider {
-	return &provider{
+	return &Provider{
 		base.NewWithName(providerName),
 		"",
 	}
 }
 
-func (p *provider) vboxPath() string {
+func (p *Provider) vboxPath() string {
 	if p.vboxmanageExecutablePath == "" {
 		virtualBox, err := exec.LookPath("vboxmanage")
 		if err == nil {
@@ -34,12 +34,12 @@ func (p *provider) vboxPath() string {
 	return p.vboxmanageExecutablePath
 }
 
-func (p *provider) IsAvailable() bool {
+func (p *Provider) IsAvailable() bool {
 	return p.vboxPath() != ""
 }
 
-func (p *provider) Profiles() []types.Profile {
-	profiles := []types.Profile{}
+func (p *Provider) Profiles() []types.Profile {
+	var profiles []types.Profile
 	if p.IsAvailable() {
 		config, ok := p.Provider.GetConfig().Profiles[profileName]
 		if !ok {

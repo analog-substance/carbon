@@ -10,7 +10,7 @@ import (
 	"github.com/mitchellh/go-homedir"
 	"os"
 	"os/exec"
-	"path"
+	"path/filepath"
 	"regexp"
 	"runtime"
 	"strconv"
@@ -69,6 +69,10 @@ func (m *Machine) Type() string {
 	return m.InstanceType
 }
 
+func (m *Machine) Destroy() error {
+	return m.Env.DestroyVM(m.InstanceID)
+}
+
 func (m *Machine) Start() error {
 	return m.Env.StartVM(m.InstanceID)
 }
@@ -114,7 +118,7 @@ func (m *Machine) StartVNC(user string, killVNC bool) error {
 		vncCmd = append(vncCmd, "killall vncserver > /dev/null 2>&1;")
 	}
 
-	vncCmd = append(vncCmd, "if [ ! -f ~/.vnc/passwd ]; then mkdir -p ~/.vnc; echo -n carbon | vncpasswd -f > ~/.vnc/passwd; fi ; cat ~/.vnc/passwd | base64 -w0; echo; if ! ps aux | grep -v grep | grep -i vnc 2>&1 >/dev/null  ; then vncserver -localhost -PasswordFile ~/.vnc/passwd -xstartup xfce4-session 2>&1 >/dev/null; fi; lsof -i -n -o -P | grep -i vnc | grep 127 | cut -d : -f2 | awk '{print $1}'")
+	vncCmd = append(vncCmd, "if ! ps aux | grep -v grep | grep -i vnc 2>&1 >/dev/null  ; then if [ ! -f ~/.vnc/passwd ]; then mkdir -p ~/.vnc; echo -n carbon | vncpasswd -f > ~/.vnc/passwd; fi ; vncserver -localhost -PasswordFile ~/.vnc/passwd -xstartup xfce4-session 2>&1 >/dev/null; fi; cat ~/.vnc/passwd | base64 -w0; echo ; lsof -i -n -o -P | grep -i vnc | grep 127 | cut -d : -f2 | awk '{print $1}' ; ")
 
 	sshSession.Session.Stdout = nil
 	vncConfig, err := sshSession.Output(strings.Join(vncCmd, " "))
@@ -224,12 +228,12 @@ func (m *Machine) setVNCPasswd(vncPasswordB64 string) (string, error) {
 		return "", err
 	}
 
-	err = os.MkdirAll(path.Join(home, ".vnc"), 0700)
+	err = os.MkdirAll(filepath.Join(home, ".vnc"), 0700)
 	if err != nil {
 		return "", err
 	}
 
-	vncPasswdPath := path.Join(home, ".vnc", "carbon-passwd")
+	vncPasswdPath := filepath.Join(home, ".vnc", "carbon-passwd")
 	err = os.WriteFile(vncPasswdPath, passwdBytes, 0600)
 	if err != nil {
 		return "", err
@@ -243,7 +247,7 @@ func getAuthSockFromConfig() string {
 	if err != nil {
 		return ""
 	}
-	fileContents, err := os.ReadFile(path.Join(home, ".ssh", "config"))
+	fileContents, err := os.ReadFile(filepath.Join(home, ".ssh", "config"))
 	if err != nil {
 		return ""
 	}

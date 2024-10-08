@@ -28,6 +28,22 @@ func init() {
 	vmCmd.PersistentFlags().StringP("id", "i", "", "ID of machine to start.")
 	vmCmd.PersistentFlags().StringP("user", "u", "ubuntu", "SSH Username.")
 	vmCmd.PersistentFlags().StringSlice("host", []string{}, "Hostname or IP Address.")
+
+	err := vmCmd.RegisterFlagCompletionFunc("name", func(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
+		names := getVMNames()
+		return names, cobra.ShellCompDirectiveDefault
+	})
+	if err != nil {
+		fmt.Println(err)
+	}
+
+	err = vmCmd.RegisterFlagCompletionFunc("id", func(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
+		names := getVMIDs()
+		return names, cobra.ShellCompDirectiveDefault
+	})
+	if err != nil {
+		fmt.Println(err)
+	}
 }
 
 func getVMsFromArgs(cmd *cobra.Command, args []string) []types.VM {
@@ -98,4 +114,20 @@ func vmTable(vms []types.VM) {
 
 	t.Render()
 
+}
+
+func getVMNames() (vmNames []string) {
+	vms := carbonObj.GetVMs()
+	for _, vm := range vms {
+		vmNames = append(vmNames, vm.Name())
+	}
+	return vmNames
+}
+
+func getVMIDs() (vmIDs []string) {
+	vms := carbonObj.GetVMs()
+	for _, vm := range vms {
+		vmIDs = append(vmIDs, vm.ID())
+	}
+	return vmIDs
 }
