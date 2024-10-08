@@ -32,7 +32,7 @@ resource "aws_instance" "carbon_vm" {
   availability_zone                    = var.availability_zone
   subnet_id                            = var.operations_subnet_cidr[0]
   instance_initiated_shutdown_behavior = "stop"
-  hibernation                          = each.value.type == "g4dn.xlarge" ? false : true
+  hibernation                          = true
   root_block_device {
     volume_size = each.value.volume_size
     encrypted   = true
