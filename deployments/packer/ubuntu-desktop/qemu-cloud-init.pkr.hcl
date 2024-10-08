@@ -1,4 +1,4 @@
-source "qemu" "carbon-vm-ubuntu" {
+source "qemu" "carbon-ubuntu-desktop" {
 
   iso_url      = var.iso_url
   iso_checksum = var.iso_checksum
@@ -14,16 +14,16 @@ source "qemu" "carbon-vm-ubuntu" {
   accelerator      = "kvm"
   http_directory = "${path.root}/cloud-init/autoinstall/"
   ssh_timeout      = "20m"
-  vm_name          = "carbon-ubuntu-vm-${local.timestamp}"
+  vm_name          = "carbon-ubuntu-desktop-${local.timestamp}"
   disk_interface   = "virtio"
   boot_wait        = "5s"
   boot_command = [var.boot_command]
-  output_directory = "deployments/images/qemu/carbon-ubuntu-vm-${local.timestamp}"
+  output_directory = "deployments/images/qemu/carbon-ubuntu-desktop-${local.timestamp}"
 
 }
 
 build {
-  sources = ["source.qemu.carbon-vm-ubuntu"]
+  sources = ["source.qemu.carbon-ubuntu-desktop"]
 
   provisioner "shell" {
     inline = [

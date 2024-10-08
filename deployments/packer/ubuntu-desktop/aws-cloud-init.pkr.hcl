@@ -1,16 +1,17 @@
 
-source "amazon-ebs" "carbon-vm-ubuntu-ansible" {
+
+source "amazon-ebs" "carbon-ubuntu-desktop" {
   profile = var.aws_profile
   region  = var.aws_build_region
 
-  ami_name                    = "carbon-vm-ami-${local.timestamp}"
+  ami_name                    = "carbon-ubuntu-desktop-${local.timestamp}"
   instance_type               = "t3.medium"
   ssh_username                = "ubuntu"
   ssh_interface               = "public_ip"
   ssh_timeout                 = "10m"
   encrypt_boot                = true
   associate_public_ip_address = true
-  user_data_file              = "${path.root}/cloud-init/default-ansible/user-data"
+  user_data_file              = "${path.root}/cloud-init/default/user-data"
 
   temporary_key_pair_type = "ed25519"
 
@@ -33,7 +34,7 @@ source "amazon-ebs" "carbon-vm-ubuntu-ansible" {
       virtualization-type = "hvm"
     }
     most_recent = true
-    owners      = ["099720109477"]
+    owners = ["099720109477"]
   }
 
   subnet_filter {
@@ -47,19 +48,14 @@ source "amazon-ebs" "carbon-vm-ubuntu-ansible" {
   }
 }
 
-
 build {
   sources = [
-    "sources.amazon-ebs.carbon-vm-ubuntu-ansible",
+    "sources.amazon-ebs.carbon-ubuntu-desktop",
   ]
-
-  provisioner "ansible" {
-    playbook_file = "../../ansible/ubuntu-desktop.yaml"
-  }
 
   provisioner "shell" {
     inline = [
-      "find /home/ -maxdepth 2 -type d -name '~*' -exec rm -rf {} \\;",
+      "/usr/bin/cloud-init status --wait",
     ]
   }
 }

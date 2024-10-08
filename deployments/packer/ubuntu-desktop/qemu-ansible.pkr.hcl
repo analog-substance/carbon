@@ -2,7 +2,7 @@
 
 
 
-source "qemu" "carbon-vm-ubuntu-ansible" {
+source "qemu" "carbon-ubuntu-desktop-ansible" {
 
   iso_url      = var.iso_url
   iso_checksum = var.iso_checksum
@@ -15,15 +15,15 @@ source "qemu" "carbon-vm-ubuntu-ansible" {
   accelerator    = "kvm"
   http_directory = "${path.root}/cloud-init/autoinstall-ansible/"
   ssh_timeout    = "20m"
-  vm_name        = "carbon-ubuntu-vm-${local.timestamp}"
+  vm_name        = "carbon-ubuntu-desktop-ansible-${local.timestamp}"
   disk_interface = "virtio"
   boot_wait      = "5s"
   boot_command = [var.boot_command]
-  output_directory = "deployments/images/qemu/carbon-ubuntu-vm-ansible-${local.timestamp}"
+  output_directory = "deployments/images/qemu/carbon-ubuntu-desktop-${local.timestamp}"
 }
 
 build {
-  sources = ["source.qemu.carbon-vm-ubuntu-ansible"]
+  sources = ["source.qemu.carbon-ubuntu-desktop-ansible"]
 
   provisioner "ansible" {
     playbook_file = "../../ansible/ubuntu-desktop.yaml"

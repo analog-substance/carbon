@@ -1,9 +1,12 @@
 #! /bin/bash
 
-VM_DIR="carbon-vm-ubuntu-$(date +'%y%m%d_%H%M')"
+echo "to be replaced, here for reference"
+exit
+
+VM_DIR="carbon-ubuntu-desktop-$(date +'%y%m%d_%H%M')"
 mkdir "$VM_DIR"
 VBoxManage createvm --name $VM_DIR --ostype "Ubuntu_64" --register --basefolder `pwd`/$VM_DIR/
-mv output-carbon-vm-ubuntu/*-disk001.vmdk $VM_DIR/${VM_DIR}_disk01.vmdk
+mv carbon-ubuntu-desktop/*-disk001.vmdk $VM_DIR/${VM_DIR}_disk01.vmdk
 VBoxManage storagectl  $VM_DIR --name "SATA Controller" --add sata --controller IntelAhci
 VBoxManage storageattach $VM_DIR --storagectl "SATA Controller" --port 0 --device 0 --type hdd --medium `pwd`/$VM_DIR/${VM_DIR}_disk01.vmdk
 VBoxManage modifyvm $VM_DIR --ioapic on
