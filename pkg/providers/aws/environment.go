@@ -11,23 +11,23 @@ import (
 	"time"
 )
 
-type environment struct {
+type Environment struct {
 	name         string
-	profile      *profile
+	profile      *Profile
 	ec2Client    *ec2.Client
 	vpcId        string
 	awsAccountId string
 }
 
-func (e *environment) Name() string {
+func (e *Environment) Name() string {
 	return e.name
 }
 
-func (e *environment) Profile() types.Profile {
+func (e *Environment) Profile() types.Profile {
 	return e.profile
 }
 
-func (e *environment) VMs() []types.VM {
+func (e *Environment) VMs() []types.VM {
 	var vms []types.VM
 	ec2Results, err := e.ec2Client.DescribeInstances(context.Background(), &ec2.DescribeInstancesInput{
 		Filters: []ec2Types.Filter{
@@ -38,7 +38,7 @@ func (e *environment) VMs() []types.VM {
 		},
 	})
 	if err != nil {
-		log.Debug("Error get instances", "profile", e.Name(), "err", err)
+		log.Debug("Error get instances", "Profile", e.Name(), "err", err)
 		return vms
 	}
 
@@ -53,14 +53,14 @@ func (e *environment) VMs() []types.VM {
 	return vms
 }
 
-func (e *environment) StartVM(id string) error {
+func (e *Environment) StartVM(id string) error {
 	_, err := e.ec2Client.StartInstances(context.Background(), &ec2.StartInstancesInput{
 		InstanceIds: []string{id},
 	})
 	return err
 }
 
-func (e *environment) StopVM(id string) error {
+func (e *Environment) StopVM(id string) error {
 	hibernate := true
 	_, err := e.ec2Client.StopInstances(context.Background(), &ec2.StopInstancesInput{
 		InstanceIds: []string{id},
@@ -69,26 +69,34 @@ func (e *environment) StopVM(id string) error {
 	return err
 }
 
-func (e *environment) RestartVM(id string) error {
+func (e *Environment) RestartVM(id string) error {
 	_, err := e.ec2Client.RebootInstances(context.Background(), &ec2.RebootInstancesInput{
 		InstanceIds: []string{id},
 	})
 	return err
 }
 
-func (e *environment) DestroyVM(id string) error {
+func (e *Environment) DestroyVM(id string) error {
+	_, err := e.ec2Client.TerminateInstances(context.Background(), &ec2.TerminateInstancesInput{
+		InstanceIds: []string{id},
+	})
+	return err
+}
+
+func (e *Environment) CreateVM(options types.MachineLaunchOptions) error {
+
+	//_, err := e.ec2Client.RunInstances(context.Background(), &ec2.RunInstancesInput{
+	//
+	//})
+	//return err
 	return nil
 }
 
-func (e *environment) CreateVM(options types.MachineLaunchOptions) error {
-	return nil
-}
-
-func (e *environment) ImageBuilds() ([]types.ImageBuild, error) {
+func (e *Environment) ImageBuilds() ([]types.ImageBuild, error) {
 	return models.GetImageBuildsForProvider(e.profile.Provider().Type())
 }
-func (e *environment) Images() ([]types.Image, error) {
-	log.Debug("getting images", "env", e.Name(), "profile", e.profile.Name(), "provider", e.profile.Provider().Name())
+func (e *Environment) Images() ([]types.Image, error) {
+	log.Debug("getting images", "env", e.Name(), "Profile", e.profile.Name(), "Provider", e.profile.Provider().Name())
 	amis, err := e.ec2Client.DescribeImages(context.Background(), &ec2.DescribeImagesInput{
 		Filters: []ec2Types.Filter{
 			ec2Types.Filter{
@@ -174,4 +182,8 @@ func stateFromEC2(state ec2Types.InstanceStateName) types.MachineState {
 
 	log.Debug("unknown state for vm", "state", state)
 	return types.StateUnknown
+}
+
+func (e *Environment) DestroyImage(imageID string) error {
+	return nil
 }

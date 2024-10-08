@@ -6,20 +6,20 @@ import (
 	"github.com/analog-substance/carbon/pkg/types"
 )
 
-type profile struct {
+type Profile struct {
 	types.Profile
 }
 
-func NewProfile(name string, providerInstance *provider, config common.ProfileConfig) *profile {
-	return &profile{
+func NewProfile(name string, providerInstance *Provider, config common.ProfileConfig) *Profile {
+	return &Profile{
 		base.NewProfile(name, providerInstance, config),
 	}
 }
 
-func (p profile) Environments() []types.Environment {
+func (p *Profile) Environments() []types.Environment {
 	enabled, ok := p.Profile.GetConfig().Environments[environmentName]
 	if !ok || enabled {
-		return []types.Environment{environment{
+		return []types.Environment{&Environment{
 			environmentName,
 			p,
 		}}

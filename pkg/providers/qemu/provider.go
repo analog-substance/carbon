@@ -7,7 +7,7 @@ import (
 	"github.com/digitalocean/go-libvirt"
 )
 
-type provider struct {
+type Provider struct {
 	types.Provider
 	path string
 }
@@ -17,30 +17,37 @@ const profileName = "default"
 const environmentName = "local"
 
 func New() types.Provider {
-	return &provider{
+	return &Provider{
 		base.NewWithName(providerName),
 		"",
 	}
 }
 
-func (p *provider) IsAvailable() bool {
+func (p *Provider) IsAvailable() bool {
 
 	return true
 }
 
-func (p *provider) Profiles() []types.Profile {
-	profiles := []types.Profile{}
+func (p *Provider) Profiles() []types.Profile {
+	var profiles []types.Profile
 
 	if p.IsAvailable() {
 		config, ok := p.Provider.GetConfig().Profiles[profileName]
 		if !ok {
+			log.Debug("no config found", "environmentName", profileName, "config", config)
+
 			config = common.ProfileConfig{
 				Enabled: true,
 				URL:     string(libvirt.QEMUSystem),
 			}
+		} else {
+			if config.URL == "" {
+				config.URL = string(libvirt.QEMUSystem)
+			}
 		}
 		if config.Enabled {
-			profiles = append(profiles, NewProfile(profileName, p, config))
+			log.Debug("adding default profile", "environmentName", environmentName, "config", config)
+			profiles = append(profiles, NewProfile(environmentName, p, config))
 		}
 	}
 	return profiles

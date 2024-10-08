@@ -1,4 +1,7 @@
 package common
 
-const ViperPrefix = "carbon."
-const ViperPackerDir = ViperPrefix + "packer.dir"
+const DefaultDeploymentsDirName = "deployments"
+const DefaultPackerDirName = "packer"
+const DefaultImagesDirName = "images"
+const DefaultTerraformDirName = "terraform"
+const DefaultProjectsDirName = "projects"

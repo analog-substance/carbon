@@ -8,5 +8,5 @@ import (
 var log *slog.Logger
 
 func init() {
-	log = common.WithGroup("providers.qemu")
+	log = common.WithGroup("providers.virtualbox")
 }

@@ -2,7 +2,7 @@
 output-*
 
 # Ignore 
-carbon-vm-*-2*
+carbon-*-*-2*
 private.auto.pkrvars.hcl
 .private.auto.pkrvars.hcl
 
@@ -18,8 +18,8 @@ test/
 *.terraform
 *.terraform.lock.hcl
 
-!terraform/deployments/_remote-state/terraform.tfstate
-!terraform/deployments/_remote-state/terraform.tfstate.backup
+!_remote-state/terraform.tfstate
+!_remote-state/terraform.tfstate.backup
 
 .hugo/public
 .hugo/resources/
@@ -30,3 +30,4 @@ carbon.yaml
 /carbon
 deployments/images/
 !deployments/images/README.md
+.terraform.tfstate.lock.info

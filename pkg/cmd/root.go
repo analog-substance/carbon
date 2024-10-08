@@ -8,6 +8,7 @@ import (
 	"github.com/spf13/viper"
 	"log/slog"
 	"os"
+	"path/filepath"
 )
 
 var cfgFile string
@@ -69,7 +70,11 @@ func init() {
 func initConfig() {
 	viper.AutomaticEnv() // read in environment variables that match
 
-	viper.SetDefault(common.ViperPackerDir, "deployments/packer")
+	viper.SetDefault(common.ViperDeploymentsDir, common.DefaultDeploymentsDirName)
+	viper.SetDefault(common.ViperPackerDir, filepath.Join(common.DefaultDeploymentsDirName, common.DefaultPackerDirName))
+	viper.SetDefault(common.ViperImagesDir, filepath.Join(common.DefaultDeploymentsDirName, common.DefaultImagesDirName))
+	viper.SetDefault(common.ViperTerraformDir, filepath.Join(common.DefaultDeploymentsDirName, common.DefaultTerraformDirName))
+	viper.SetDefault(common.ViperTerraformProjectDir, filepath.Join(common.DefaultDeploymentsDirName, common.DefaultProjectsDirName))
 
 	viper.SetDefault("carbon.providers.aws.enabled", true)
 	viper.SetDefault("carbon.providers.aws.profiles.default.enabled", true)

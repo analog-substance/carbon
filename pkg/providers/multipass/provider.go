@@ -9,7 +9,7 @@ import (
 	"path/filepath"
 )
 
-type provider struct {
+type Provider struct {
 	types.Provider
 	path string
 }
@@ -19,13 +19,13 @@ const profileName = "default"
 const environmentName = "local"
 
 func New() types.Provider {
-	return &provider{
+	return &Provider{
 		base.NewWithName(providerName),
 		"",
 	}
 }
 
-func (p *provider) appPath() string {
+func (p *Provider) appPath() string {
 	if p.path == "" {
 		multipassPath, err := exec.LookPath("multipass")
 		if err == nil {
@@ -35,12 +35,12 @@ func (p *provider) appPath() string {
 	return p.path
 }
 
-func (p *provider) IsAvailable() bool {
+func (p *Provider) IsAvailable() bool {
 	return api.AppPath() != ""
 }
 
-func (p *provider) Profiles() []types.Profile {
-	profiles := []types.Profile{}
+func (p *Provider) Profiles() []types.Profile {
+	var profiles []types.Profile
 	if p.IsAvailable() {
 		config, ok := p.Provider.GetConfig().Profiles[profileName]
 		if !ok {

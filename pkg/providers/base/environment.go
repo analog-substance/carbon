@@ -52,3 +52,7 @@ func (e *Environment) ImageBuilds() ([]types.ImageBuild, error) {
 func (e *Environment) Images() ([]types.Image, error) {
 	return []types.Image{}, nil
 }
+
+func (e *Environment) DestroyImage(imageID string) error {
+	return nil
+}

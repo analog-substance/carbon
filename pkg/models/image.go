@@ -33,10 +33,28 @@ func (i *Image) CreatedAt() string {
 	return i.createdAt.Format(time.RFC3339Nano)
 }
 
-func (i *Image) Launch() error {
-	return nil
+func (i *Image) Launch(imageLaunchOptions types.ImageLaunchOptions) error {
+	launchOptions := types.MachineLaunchOptions{
+		CloudInitTpl: "",
+		Image:        i,
+		Name:         imageLaunchOptions.Name,
+	}
+
+	return i.env.CreateVM(launchOptions)
+}
+
+func (i *Image) Destroy() error {
+	return i.env.DestroyImage(i.imageID)
 }
 
 func (i *Image) Environment() types.Environment {
 	return i.env
+}
+
+func (i *Image) Provider() types.Provider {
+	return i.env.Profile().Provider()
+}
+
+func (i *Image) Profile() types.Profile {
+	return i.env.Profile()
 }

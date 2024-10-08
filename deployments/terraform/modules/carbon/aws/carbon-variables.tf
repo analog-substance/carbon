@@ -1,0 +1,1 @@
+../common/carbon-variables.tf
