@@ -90,8 +90,8 @@ resource "libvirt_network" "carbon_net" {
 # nodes
 resource "libvirt_volume" "os_image" {
   for_each = {for qimg in local.qemu_images : basename(qimg) => qimg}
-  name = each.key
-  source = "${path.module}/${each.value}"
+  name     = each.key
+  source   = "${path.module}/${each.value}"
   pool     = libvirt_pool.carbon.name
   format   = "qcow2"
 }
@@ -111,7 +111,7 @@ resource libvirt_pool carbon {
 
 # volume to attach to the "master" domain as main disk
 resource "libvirt_volume" "vm_vols" {
-  for_each = {for machine in var.machines : machine.name => machine if machine.provider == "qemu"}
+  for_each       = {for machine in var.machines : machine.name => machine if machine.provider == "qemu"}
   name           = "${each.value.name}.qcow2"
   base_volume_id = libvirt_volume.os_image[each.value.image].id
 }

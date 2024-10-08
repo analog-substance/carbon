@@ -5,12 +5,12 @@ variable "environment" {
 
 variable "vpc_cidr" {
   description = "CIDR range for whole VPC"
-  default = "10.42.0.0/16"
+  default     = "10.42.0.0/16"
 }
 
 variable "availability_zone" {
   description = "availability zone for subnets"
-  default =  "us-east-1a"
+  default     = "us-east-1a"
 }
 
 variable "bastion_subnet_cidr" {
@@ -26,7 +26,9 @@ variable "operations_subnet_cidr" {
 }
 
 resource "aws_instance" "carbon_vm" {
-  for_each                              = { for machine in var.machines:machine.name => machine if machine.provider == "aws" }
+  for_each                             = {
+    for machine in var.machines :machine.name => machineif machine.provider == "aws"
+  }
   ami                                  = local.amis[each.value.image]
   instance_type                        = each.value.type
   availability_zone                    = var.availability_zone
@@ -39,13 +41,13 @@ resource "aws_instance" "carbon_vm" {
 
     tags = {
       "user:environment" = var.environment
-      "user:purpose" = each.value.purpose
+      "user:purpose"     = each.value.purpose
     }
   }
 
-#   vpc_security_group_ids = [
-#     aws_security_group.
-#   ]
+  #   vpc_security_group_ids = [
+  #     aws_security_group.
+  #   ]
   associate_public_ip_address = true
 
   lifecycle {
@@ -53,8 +55,8 @@ resource "aws_instance" "carbon_vm" {
   }
 
   tags = {
-    Name              = "${each.value.purpose}-${each.value.name}"
+    Name               = "${each.value.purpose}-${each.value.name}"
     "user:environment" = var.environment
-    "user:purpose" = each.value.purpose
+    "user:purpose"     = each.value.purpose
   }
 }
