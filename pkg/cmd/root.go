@@ -74,7 +74,7 @@ func initConfig() {
 	viper.SetDefault(common.ViperPackerDir, filepath.Join(common.DefaultDeploymentsDirName, common.DefaultPackerDirName))
 	viper.SetDefault(common.ViperImagesDir, filepath.Join(common.DefaultDeploymentsDirName, common.DefaultImagesDirName))
 	viper.SetDefault(common.ViperTerraformDir, filepath.Join(common.DefaultDeploymentsDirName, common.DefaultTerraformDirName))
-	viper.SetDefault(common.ViperTerraformDeploymentsDir, filepath.Join(common.DefaultDeploymentsDirName, common.DefaultTerraformDirName, common.DefaultTerraformDeploymentsDirName))
+	viper.SetDefault(common.ViperTerraformProjectDir, filepath.Join(common.DefaultDeploymentsDirName, common.DefaultProjectsDirName))
 
 	viper.SetDefault("carbon.providers.aws.enabled", true)
 	viper.SetDefault("carbon.providers.aws.profiles.default.enabled", true)

@@ -34,7 +34,7 @@ type Carbon struct {
 	machines     []types.VM
 	imageBuilds  []types.ImageBuild
 	images       []types.Image
-	deployments  []types.Deployment
+	projects     []types.Project
 }
 
 var log *slog.Logger
@@ -321,22 +321,35 @@ func (c *Carbon) GetImages() ([]types.Image, error) {
 	return c.images, nil
 }
 
-func (c *Carbon) GetDeployments() ([]types.Deployment, error) {
-	if len(c.deployments) == 0 {
-		deploymentsDir := viper.GetString(common.ViperTerraformDeploymentsDir)
-		dirListing, err := os.ReadDir(deploymentsDir)
+func (c *Carbon) GetProjects() ([]types.Project, error) {
+	if len(c.projects) == 0 {
+		projectsBaseDir := viper.GetString(common.ViperTerraformProjectDir)
+		dirListing, err := os.ReadDir(projectsBaseDir)
 		if err != nil {
 			return nil, err
 		}
-		c.deployments = []types.Deployment{}
-		for _, deploymentDir := range dirListing {
-			if deploymentDir.IsDir() {
-				c.deployments = append(c.deployments, models.NewDeployment(filepath.Join(deploymentsDir, deploymentDir.Name())))
+		c.projects = []types.Project{}
+		for _, projectDir := range dirListing {
+			if projectDir.IsDir() {
+				c.projects = append(c.projects, models.NewProject(filepath.Join(projectsBaseDir, projectDir.Name())))
 			}
 		}
 	}
 
-	return c.deployments, nil
+	return c.projects, nil
+}
+
+func (c *Carbon) GetProject(name string) (types.Project, error) {
+	projects, err := c.GetProjects()
+	if err != nil {
+		return nil, err
+	}
+	for _, project := range projects {
+		if project.Name() == name {
+			return project, nil
+		}
+	}
+	return nil, fmt.Errorf("project not found")
 }
 
 /*

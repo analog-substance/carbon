@@ -6,15 +6,15 @@ import (
 	"os"
 )
 
-// deploymentListCmd represents the config command
-var deploymentListCmd = &cobra.Command{
+// projectListCmd represents the config command
+var projectListCmd = &cobra.Command{
 	Use:   "list",
-	Short: "Manage and interact with deployments",
+	Short: "Manage and interact with projects",
 	Long: `Basically lazy wrappers around tedious things.
 
 So you type less and be more productive!`,
 	Run: func(cmd *cobra.Command, args []string) {
-		deployments, err := carbonObj.GetDeployments()
+		deployments, err := carbonObj.GetProjects()
 		if err != nil {
 			fmt.Printf("Error getting deployments: %v\n", err)
 			os.Exit(1)
@@ -27,6 +27,6 @@ So you type less and be more productive!`,
 }
 
 func init() {
-	deploymentCmd.AddCommand(deploymentListCmd)
+	projectCmd.AddCommand(projectListCmd)
 
 }

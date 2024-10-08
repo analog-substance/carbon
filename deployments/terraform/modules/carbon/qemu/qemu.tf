@@ -1,4 +1,3 @@
-
 # Create a new domain
 resource "libvirt_network" "carbon_net" {
   # the name used by libvirt
@@ -29,7 +28,7 @@ resource "libvirt_network" "carbon_net" {
     # (Optional, default false)
     # Set to true, if no other option is specified and you still want to
     # enable dns.
-    enabled = true
+    enabled    = true
     # (Optional, default false)
     # true: DNS requests under this domain will only be resolved by the
     # virtual network's cd own DNS server
@@ -90,30 +89,45 @@ resource "libvirt_network" "carbon_net" {
 # Base OS image to use to create a cluster of different
 # nodes
 resource "libvirt_volume" "os_image" {
-  name   = "carbon-ubuntu-desktop"
-  source = pathexpand(var.disk_source)
-  pool   = "default"
-  format = "qcow2"
+  for_each = {for qimg in local.qemu_images : basename(qimg) => qimg}
+  name = each.key
+  source = "${path.module}/${each.value}"
+  pool     = libvirt_pool.carbon.name
+  format   = "qcow2"
 }
 
-# resource libvirt_pool carbon {
-#   name = "carbon"
-#   type = "dir"
-#   path = "${path.module}/../../qemu-pool"
+resource libvirt_pool carbon {
+  name = "carbon"
+  type = "dir"
+  path = pathexpand("~/.carbon/qemu-pool")
+}
+
+# data "libvirt_volume" "os_image" {
+#   name   = "carbon-ubuntu-desktop"
+#   source = pathexpand(var.disk_source)
+#   pool   = "default"
+#   format = "qcow2"
 # }
 
+# volume to attach to the "master" domain as main disk
+resource "libvirt_volume" "vm_vols" {
+  for_each = {for machine in var.machines : machine.name => machine if machine.provider == "qemu"}
+  name           = "${each.value.name}.qcow2"
+  base_volume_id = libvirt_volume.os_image[each.value.image].id
+}
+
 resource libvirt_domain vms {
-  for_each = { for machine in var.machines : machine.name => machine if machine.provider == "qemu"}
-  name = each.value.name
+  for_each = {for machine in var.machines : machine.name => machine if machine.provider == "qemu"}
+  name     = each.value.name
 
   memory = 4096 #var.memory_mb
-  vcpu   = 2 #var.cpu
+  vcpu = 2 #var.cpu
 
-#   cpu = {
-#     mode = "host-passthrough"
-#   }
+  #   cpu = {
+  #     mode = "host-passthrough"
+  #   }
 
-  disk { volume_id = libvirt_volume.os_image.id }
+  disk { volume_id = libvirt_volume.vm_vols[each.value.name].id }
   boot_device { dev = ["cdrom", "hd", "network"] }
 
   # filesystem {
@@ -157,18 +171,18 @@ resource libvirt_domain vms {
     autoport    = "true"
   }
 
-#   connection {
-#     type             = "ssh"
-#     host             = self.network_interface[0].addresses[0]
-#     user             = "root"
-#     password         = "root"
-#     bastion_host     = "10.90.20.21"
-#     bastion_port     = "22"
-#     bastion_user     = "root"
-#     bastion_password = "password"
-#   }
+  #   connection {
+  #     type             = "ssh"
+  #     host             = self.network_interface[0].addresses[0]
+  #     user             = "root"
+  #     password         = "root"
+  #     bastion_host     = "10.90.20.21"
+  #     bastion_port     = "22"
+  #     bastion_user     = "root"
+  #     bastion_password = "password"
+  #   }
 
-  # Hostdev passtrought
+  # Hostdev passtrough
   # provisioner "local-exec" {
   #   command = "virsh --connect ${var.provider_uri} attach-device ${var.hostname} --file passtrought-host.xml --live --persistent"
   # }

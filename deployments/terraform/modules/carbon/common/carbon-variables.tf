@@ -11,8 +11,3 @@ variable "machines" {
   }))
   default = []
 }
-
-variable "disk_source" {
-  type = string
-  default = "../../../images/qemu/carbon-ubuntu-vm-20241004162421/carbon-ubuntu-vm-20241004162421"
-}

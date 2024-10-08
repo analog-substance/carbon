@@ -40,3 +40,17 @@ type VM interface {
 	Cmd(string, ...string) (string, error)
 	NewSSHSession(string) (*ssh_util.Session, error)
 }
+
+type ProjectMachine struct {
+	Name       string `yaml:"name"`
+	Image      string `yaml:"image,omitempty"`
+	Type       string `yaml:"type,omitempty"`
+	Profile    string `yaml:"profile,omitempty"`
+	Purpose    string `yaml:"purpose,omitempty"`
+	VolumeSize int    `yaml:"volume_size,omitempty"`
+	Provider   string `yaml:"provider,omitempty"`
+}
+
+type ProjectConfig struct {
+	Machines []*ProjectMachine `yaml:"machines"`
+}

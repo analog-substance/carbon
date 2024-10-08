@@ -30,3 +30,4 @@ carbon.yaml
 /carbon
 deployments/images/
 !deployments/images/README.md
+.terraform.tfstate.lock.info
