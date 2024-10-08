@@ -1,0 +1,344 @@
+#! /bin/bash
+#############################################################################################################
+##x```
+##|                               █████                                     ███              ███   █████
+##|                              ░░███                                     ░░░              ░░░   ░░███
+##|   ██████   ██████   ████████  ░███████   ██████  ████████              ████  ████████   ████  ███████
+##|  ███░░███ ░░░░░███ ░░███░░███ ░███░░███ ███░░███░░███░░███  ██████████░░███ ░░███░░███ ░░███ ░░░███░
+##| ░███ ░░░   ███████  ░███ ░░░  ░███ ░███░███ ░███ ░███ ░███ ░░░░░░░░░░  ░███  ░███ ░███  ░███   ░███
+##| ░███  ███ ███░░███  ░███      ░███ ░███░███ ░███ ░███ ░███             ░███  ░███ ░███  ░███   ░███ ███
+##| ░░██████ ░░████████ █████     ████████ ░░██████  ████ █████            █████ ████ █████ █████  ░░█████
+##|  ░░░░░░   ░░░░░░░░ ░░░░░     ░░░░░░░░   ░░░░░░  ░░░░ ░░░░░            ░░░░░ ░░░░ ░░░░░ ░░░░░    ░░░░░
+##|
+##|
+##x```
+##x-----------------------------------------------------------------------------------------------------------
+##x## What is carbon-init?
+##x
+##x carbon-init is a tool to assist in bootstrapping virtual machines.
+##x
+##|-----------------------------------------------------------------------------------------------------------
+##|## Actions
+##-----------------------------------------------------------------------------------------------------------
+
+TMP_DIR_PREFIX="/run/carbon"
+TARGET_USER=$(id -nu 1000)
+TARGET_HOME=$(bash -c "cd ~$(printf %q "$TARGET_USER") && pwd")
+
+##
+##|### init_machine
+##-----------------------------------------------------------------------------------------------------------
+##|  |#|carbon-init init_machine|#|
+##| Runs allthethings :D
+##x
+function init_machine_action () {
+    set -e
+    install_go_action
+    setup_opt_action
+    init_user_action
+    install_aws_cli_action
+    install_arsenic_action
+    install_go_tools_action
+    install_github_releases_action
+    install_git_repos_action
+    clean_up_action
+}
+
+##
+##|### init_user
+##-----------------------------------------------------------------------------------------------------------
+##|  |#|carbon-init init_user|#|
+##| Runs the following sub-commands:
+##|    - install_ohmyzsh
+##|    - set_nmap_privileges
+##|    - bootstrap_user
+##x
+function init_user_action () {
+    install_ohmyzsh_action
+    nmap_privileges_action
+    bootstrap_user_action
+}
+
+##
+##|### install_ohmyzsh
+##-----------------------------------------------------------------------------------------------------------
+##|  |#|carbon-init install_ohymzsh|#|
+##| Installs oh-my-zsh to the /etc/skel directory. Future users will automatically ave it setup
+##x
+function install_ohmyzsh_action () {
+    echo "[*] Installing oh-my-zsh: started"
+    if [ ! -d /etc/skel/.oh-my-zsh ]; then
+        git clone -c core.autocrlf=input --depth=1 https://github.com/robbyrussell/oh-my-zsh.git /etc/skel/.oh-my-zsh
+    fi
+    echo "[*] Installing oh-my-zsh: completed"
+}
+
+##
+##|### nmap_privileges
+##-----------------------------------------------------------------------------------------------------------
+##|  |#|carbon-init nmap_privileges|#|
+##| Runs:
+##|     setcap cap_net_raw,cap_net_admin,cap_net_bind_service+eip /usr/bin/nmap
+##|
+##| also adds an NMAP_PRIVILEGED entry to zshrc for /etc/skel
+##x
+function nmap_privileges_action () {
+    echo "[*] nmap privs: started"
+    setcap cap_net_raw,cap_net_admin,cap_net_bind_service+eip /usr/bin/nmap
+    echo "export NMAP_PRIVILEGED=1" > /etc/skel/.zshrc.d/nmap_privs.zshrc
+    echo "[*] nmap privs: completed"
+}
+
+
+##
+##|### bootstrap_user
+##-----------------------------------------------------------------------------------------------------------
+##|  |#|carbon-init bootstrap_user|#|
+##| Copies /etc/skel to user 1000's home dir
+##x
+function bootstrap_user_action () {
+    echo "[*] bootstrap user: started"
+    rsync -a /etc/skel/ $TARGET_HOME --exclude .vnc
+    chown -R $TARGET_USER:$TARGET_USER $TARGET_HOME
+    chsh -s /usr/bin/zsh $TARGET_USER
+    echo "[*] bootstrap user: completed"
+}
+
+##
+##|### install_go
+##-----------------------------------------------------------------------------------------------------------
+##|  |#|carbon-init install_go|#|
+##| Installs the latest go version
+##x
+function install_go_action () {
+    echo "[*] Installing go: started"
+    temp_dir_init $FUNCNAME
+    go_url="https://golang.org/dl/$(curl -s 'https://go.dev/dl/?mode=json' | jq -r '.[0].version').linux-amd64.tar.gz"
+    echo "[*] Installing go: go_url=$go_url"
+    curl -o go.linux-amd64.tar.gz -Ls "$go_url"
+    rm -rf /usr/local/go
+    tar -C /usr/local -xzf go.linux-amd64.tar.gz
+    echo "[*] Installing go: complete"
+    temp_dir_clean $FUNCNAME
+}
+
+##
+##|### setup_opt
+##-----------------------------------------------------------------------------------------------------------
+##|  |#|carbon-init setup_opt|#|
+##| Adjust perms on /opt/ to be multi-user friendly
+##x
+function setup_opt_action () {
+    echo "[*] Configuring /opt: started"
+    mkdir -p /opt/go
+    chown -R $TARGET_USER:sudo /opt
+    chmod -R 775 /opt
+    setfacl -R -m g:sudo:rwX /opt; find /opt -type d -exec setfacl -R -m d:g:sudo:rwX "{}" \;
+    echo "[*] Configuring /opt: completed"
+
+}
+
+##
+##|### install_arsenic
+##-----------------------------------------------------------------------------------------------------------
+##|  |#|carbon-init install_arsenic|#|
+##| checks out arsenic and runs a go install
+##x
+function install_arsenic_action () {
+    echo "[*] Installing arsenic: started"
+    git clone --depth 1 https://github.com/analog-substance/arsenic.git /opt/arsenic
+    cd /opt/arsenic
+    GOCACHE=/opt/go/.cache GOPATH=/opt/go /usr/local/go/bin/go install
+    cd -
+    echo "[*] Installing arsenic: completed"
+}
+
+##
+##|### install_go_tools
+##-----------------------------------------------------------------------------------------------------------
+##|  |#|carbon-init install_go_tools|#|
+##| Runs `go install` on items listed in /etc/carbon/go-installs
+##x
+function install_go_tools_action () {
+    echo "[*] Installing go tools: started"
+    for tool in $(cat /etc/carbon/go-installs); do
+        go_install "$tool"
+    done
+    echo "[*] Installing go tools: completed"
+
+}
+
+##
+##|### install_github_releases
+##-----------------------------------------------------------------------------------------------------------
+##|  |#|carbon-init install_github_releases|#|
+##| Downloads and installs GitHub releases listed in /etc/carbon/github-releases
+##x
+function install_github_releases_action () {
+    echo "[*] Installing github releases: started"
+    cat /etc/carbon/github-releases | while read line; do
+        tool=$(echo $line | awk '{print $1}')
+        search=$(echo $line | awk '{print $2}')
+        install_github_release "$tool" "$search"
+    done
+    echo "[*] Installing github releases: completed"
+}
+
+##
+##|### install_git_repos
+##-----------------------------------------------------------------------------------------------------------
+##|  |#|carbon-init install_git_repos|#|
+##| checks out git repos listed in /etc/carbon/git-repos
+##x
+function install_git_repos_action () {
+    cd /opt
+    for repo in $(cat /etc/carbon/git-repos); do
+        clone_repo "$repo"
+    done
+    cd -
+}
+
+##
+##|### install_aws_cli
+##-----------------------------------------------------------------------------------------------------------
+##|  |#|carbon-init install_aws_cli|#|
+##| Installs the latest AWS cli version
+##x
+function install_aws_cli_action () {
+    echo "[*] Installing AWS CLI: started"
+    wget https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip
+    unzip awscli-exe-linux-x86_64.zip > /dev/null
+    chmod +x aws/install
+    aws/install
+    rm -rf aws*
+    echo "[*] Installing AWS CLI: completed"
+}
+
+##
+##|### clean_up
+##-----------------------------------------------------------------------------------------------------------
+##|  |#|carbon-init clean_up|#|
+##| Cleans up tmp files
+##x
+function clean_up_action () {
+    rm -rf $TMP_DIR_PREFIX
+    rm -rf /opt/go/.cache
+}
+##
+##|### help
+##-----------------------------------------------------------------------------------------------------------
+##|  |#|carbon-init help|#|
+##| Shows the pretty stuff you are already reading.
+##x
+function help_action {
+  if [ -z $MARKDOWN ]; then
+    cat $0 | grep -v "##x" | sed 's/##|[#]\+\?/##/g' \
+    | grep -aE --color=always '^##[\*#\|-]+?' \
+    | GREP_COLORS='1;34' grep -a --color=always '|#|.*|#|$\|$' \
+    | sed 's/|#|//g'
+    exit 1
+  fi
+
+  cat $0 | grep -aE '^##[x\|]' | sed 's/##[x|]//g;s/|#|//g'
+  exit 1
+}
+
+ACTION="help_action"
+  ##
+  ##|--------------------------------------------------------------------
+  ##|## Options
+  ##--------------------------------------------------------------------
+while [[ $# -gt 0 ]] ; do
+  key="$1"
+  case $key in
+    init_machine|init_user|install_ohmyzsh|install_go|setup_opt|install_arsenic|install_go_tools|install_github_releases|install_git_repos|install_aws_cli|clean_up|help)
+      ACTION="${1}_action"
+      ;;
+    -h)
+      ACTION='help_action'
+      ;;
+    ##
+    ##|### -m | --markdown
+    ##x
+    ##|  generate markdown (only used on the help action)
+    -m | --markdown)
+      MARKDOWN=1
+      ;;
+  esac
+  shift # past argument or value
+done
+
+#------
+# private methods
+
+
+function temp_dir_init () {
+    mkdir -p $TMP_DIR_PREFIX/$1
+    cd $TMP_DIR_PREFIX/$1
+}
+function temp_dir_clean () {
+    cd - 2>&1 > /dev/null
+    rm -rf $TMP_DIR_PREFIX/$1
+}
+function clone_repo () {
+    git clone --depth 1 $1
+}
+function go_install () {
+    name=$(basename $1 | cut -d '@' -f1)
+    GOCACHE=/opt/go/.cache GOPATH=/opt/go /usr/local/go/bin/go install -v $1 2>&1 | sed 's/^/['"$name"'] /'
+}
+function install_github_release () {
+    temp_dir_init $FUNCNAME
+    set +e
+    repo=$1
+    search=$2
+
+    os='linux'
+    initial_filter=".[0].assets[]"
+    initial_filter="$initial_filter | select((.name | ascii_downcase | contains(\"$os\")))"
+
+    if [[ "$(uname -m)" == "x86_64" ]]; then
+        initial_filter="$initial_filter | select((.name | ascii_downcase | contains(\"amd64\")))" # or (.name | ascii_downcase | contains(\"64bit\")))"
+    fi
+
+    if [ ! -z "$search" ]; then
+        echo "appending filter for $search"
+        initial_filter="$initial_filter | select((.name | ascii_downcase | contains(\"$search\")))"
+    fi
+
+    res=$(curl -s "https://api.github.com/repos/$repo/releases" | jq -r "$initial_filter | .browser_download_url")
+    zip=$(echo "$res" | grep \.zip)
+    tar=$(echo "$res" | grep -P "\.tar\.gz|\.tgz")
+    deb=$(echo "$res" | grep \.deb)
+
+    mkdir -p "$repo"
+    cd "$repo"
+    set -e
+
+    if [ ! -z "$zip" ]; then
+	echo "installing zip ($zip)"
+        curl -o install.zip -Ls "$zip"
+        unzip install.zip
+
+        find . -type f -executable -exec mv {} /usr/local/bin/ \;
+    elif [ ! -z "$tar" ]; then
+	echo "installing tar ($tar)"
+        curl -o install.tgz -Ls "$tar"
+        tar -xzvf install.tgz
+
+        find . -type f -executable -exec mv {} /usr/local/bin/ \;
+    elif [ ! -z "$tar" ]; then
+	echo "installing deb ($deb)"
+        curl -o install.deb -Ls "$deb"
+        dpkg -i install.deb
+    fi
+
+    cd -
+    temp_dir_clean $FUNCNAME
+}
+
+type "$ACTION" 1>/dev/null || exit 1
+$ACTION
+exit
+##-----------------------------------------------------------------------------------------------------------
+#############################################################################################################

@@ -2,7 +2,7 @@
 output-*
 
 # Ignore 
-carbon-vm-*-2*
+carbon-*-*-2*
 private.auto.pkrvars.hcl
 .private.auto.pkrvars.hcl
 
