@@ -1,4 +1,3 @@
-
 variable "vsphere_endpoint" {
   type        = string
   description = "vSphere URL."

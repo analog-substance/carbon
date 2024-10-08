@@ -1,7 +1,3 @@
-
-
-
-
 source "qemu" "carbon-ubuntu-desktop-ansible" {
 
   iso_url      = var.iso_url
@@ -10,14 +6,14 @@ source "qemu" "carbon-ubuntu-desktop-ansible" {
   ssh_password = var.ssh_password
 
   shutdown_command = "echo '${var.ssh_password}' | sudo -S shutdown -P now"
-  disk_size      = "50G"
-  format         = "qcow2"
-  accelerator    = "kvm"
-  http_directory = "${path.root}/cloud-init/autoinstall-ansible/"
-  ssh_timeout    = "20m"
-  vm_name        = "carbon-ubuntu-desktop-ansible-${local.timestamp}"
-  disk_interface = "virtio"
-  boot_wait      = "5s"
+  disk_size        = "50G"
+  format           = "qcow2"
+  accelerator      = "kvm"
+  http_directory   = "${path.root}/cloud-init/autoinstall-ansible/"
+  ssh_timeout      = "20m"
+  vm_name          = "carbon-ubuntu-desktop-ansible-${local.timestamp}"
+  disk_interface   = "virtio"
+  boot_wait        = "5s"
   boot_command = [var.boot_command]
   output_directory = "deployments/images/qemu/carbon-ubuntu-desktop-${local.timestamp}"
 }

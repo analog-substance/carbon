@@ -1,5 +1,3 @@
-
-
 source "amazon-ebs" "carbon-ubuntu-desktop" {
   profile = var.aws_profile
   region  = var.aws_build_region

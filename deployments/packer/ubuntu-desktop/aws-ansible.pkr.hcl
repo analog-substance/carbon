@@ -1,4 +1,3 @@
-
 source "amazon-ebs" "carbon-ubuntu-desktop-ansible" {
   profile = var.aws_profile
   region  = var.aws_build_region
@@ -33,7 +32,7 @@ source "amazon-ebs" "carbon-ubuntu-desktop-ansible" {
       virtualization-type = "hvm"
     }
     most_recent = true
-    owners      = ["099720109477"]
+    owners = ["099720109477"]
   }
 
   subnet_filter {

@@ -1,4 +1,3 @@
-
 variable "aws_profile" {
   default     = "default"
   description = "The aws credentials profile to use."

@@ -1,4 +1,3 @@
-
 source "virtualbox-iso" "carbon-ubuntu-desktop-ansible" {
   guest_os_type    = "Ubuntu_64"
   vm_name          = "carbon-ubuntu-desktop-${local.timestamp}"
@@ -11,9 +10,9 @@ source "virtualbox-iso" "carbon-ubuntu-desktop-ansible" {
   shutdown_command = "echo '${var.ssh_password}' | sudo -S shutdown -P now"
   headless         = false
   firmware         = "efi"
-  http_directory = "${path.root}/cloud-init/autoinstall-ansible/"
+  http_directory   = "${path.root}/cloud-init/autoinstall-ansible/"
   output_directory = "deployments/images/virtualbox/carbon-ubuntu-desktop-ansible-${local.timestamp}"
-  boot_command     = [var.boot_command]
+  boot_command = [var.boot_command]
   boot_wait        = "5s"
   vboxmanage = [
     [

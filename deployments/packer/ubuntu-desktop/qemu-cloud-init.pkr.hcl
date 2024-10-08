@@ -6,13 +6,13 @@ source "qemu" "carbon-ubuntu-desktop" {
   ssh_password = var.ssh_password
 
   shutdown_command = "echo '${var.ssh_password}' | sudo -S shutdown -P now"
-  disk_size        = "50G"
-#   efi_boot         = true
+  disk_size = "50G"
+  #   efi_boot         = true
   cpus             = 4
   memory           = 8128
   format           = "qcow2"
   accelerator      = "kvm"
-  http_directory = "${path.root}/cloud-init/autoinstall/"
+  http_directory   = "${path.root}/cloud-init/autoinstall/"
   ssh_timeout      = "20m"
   vm_name          = "carbon-ubuntu-desktop-${local.timestamp}"
   disk_interface   = "virtio"

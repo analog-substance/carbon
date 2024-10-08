@@ -1,4 +1,3 @@
-
 source "vsphere-iso" "carbon-ubuntu-desktop-ansible" {
   vcenter_server      = var.vsphere_endpoint
   username            = var.vsphere_username
@@ -27,10 +26,10 @@ source "vsphere-iso" "carbon-ubuntu-desktop-ansible" {
   }
 
   shutdown_command = "echo '${var.ssh_password}' | sudo -S systemctl poweroff"
-  http_directory = "${path.root}/cloud-init/autoinstall-ansible/"
-  boot_command   = [var.boot_command]
-  boot_wait      = "5s"
-  vm_name = "carbon-ubuntu-desktop-ansible-${local.timestamp}"
+  http_directory   = "${path.root}/cloud-init/autoinstall-ansible/"
+  boot_command = [var.boot_command]
+  boot_wait        = "5s"
+  vm_name          = "carbon-ubuntu-desktop-ansible-${local.timestamp}"
 }
 
 build {

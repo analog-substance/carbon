@@ -1,4 +1,3 @@
-
 source "vsphere-iso" "carbon-ubuntu-desktop" {
   vcenter_server      = var.vsphere_endpoint
   username            = var.vsphere_username
@@ -27,9 +26,9 @@ source "vsphere-iso" "carbon-ubuntu-desktop" {
   }
 
   shutdown_command = "echo '${var.ssh_password}' | sudo -S systemctl poweroff"
-  http_directory = "${path.root}/cloud-init/autoinstall/"
-  boot_command   = [var.boot_command]
-  boot_wait      = "5s"
+  http_directory   = "${path.root}/cloud-init/autoinstall/"
+  boot_command = [var.boot_command]
+  boot_wait        = "5s"
 
   vm_name = "carbon-ubuntu-desktop-${local.timestamp}"
 
