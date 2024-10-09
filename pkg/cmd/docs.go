@@ -12,9 +12,10 @@ import (
 
 // docsCmd represents the completion command
 var docsCmd = &cobra.Command{
-	Use:   "docs",
-	Short: "Generate docs ",
-	Long:  `Generate documentation markdown files from the source code.`,
+	Use:    "docs",
+	Short:  "Generate docs ",
+	Long:   `Generate documentation markdown files from the source code.`,
+	Hidden: true,
 	Run: func(cmd *cobra.Command, args []string) {
 
 		identity := func(s string) string { return s }
