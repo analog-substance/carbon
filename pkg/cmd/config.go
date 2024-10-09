@@ -27,6 +27,10 @@ Set vSphere credentials
 	carbon config carbon.credentials.vsphere_server.password_command 'op read op://Private/vSphere Creds/password'
 
 `,
+	ValidArgsFunction: func(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
+		keys := getKeys(viper.AllSettings(), "")
+		return keys, cobra.ShellCompDirectiveNoFileComp
+	},
 	Args: cobra.RangeArgs(0, 3),
 	Run: func(cmd *cobra.Command, args []string) {
 		count := len(args)
@@ -216,4 +220,15 @@ func init() {
 	configCmd.Flags().BoolP("save", "s", false, "save the current configuration")
 	configCmd.Flags().BoolP("sub-keys", "k", false, "display only the sub-keys")
 	configCmd.Flags().BoolP("remove-reset", "r", false, "remove key from the config or reset to default")
+}
+
+func getKeys(config map[string]any, prefix string) []string {
+	var keys []string
+	for k, val := range config {
+		keys = append(keys, fmt.Sprintf("%s%s", prefix, k))
+		if mapVal, ok := val.(map[string]interface{}); ok {
+			keys = append(keys, getKeys(mapVal, fmt.Sprintf("%s%s.", prefix, k))...)
+		}
+	}
+	return keys
 }
