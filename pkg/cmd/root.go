@@ -70,6 +70,7 @@ func init() {
 func initConfig() {
 	viper.AutomaticEnv() // read in environment variables that match
 
+	viper.SetDefault(common.ViperDefaultInstanceDir, common.DefaultInstanceDir)
 	viper.SetDefault(common.ViperDeploymentsDir, common.DefaultDeploymentsDirName)
 	viper.SetDefault(common.ViperPackerDir, filepath.Join(common.DefaultDeploymentsDirName, common.DefaultPackerDirName))
 	viper.SetDefault(common.ViperImagesDir, filepath.Join(common.DefaultDeploymentsDirName, common.DefaultImagesDirName))

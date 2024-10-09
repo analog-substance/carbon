@@ -7,7 +7,6 @@ import (
 	"github.com/analog-substance/carbon/pkg/types"
 	"github.com/hashicorp/hcl/v2"
 	"github.com/hashicorp/hcl/v2/hclsimple"
-	"github.com/spf13/viper"
 	"os"
 	"os/exec"
 	"path/filepath"
@@ -100,7 +99,7 @@ func GetImageBuildsForProvider(provider string) ([]types.ImageBuild, error) {
 
 func getImageBuilds() ([]types.ImageBuild, error) {
 	ret := []types.ImageBuild{}
-	packerDir := viper.GetString(common.ViperPackerDir)
+	packerDir := common.PackerDir()
 	listing, err := os.ReadDir(packerDir)
 	if err != nil {
 		return ret, err

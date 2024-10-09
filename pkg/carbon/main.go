@@ -13,7 +13,6 @@ import (
 	"github.com/analog-substance/carbon/pkg/providers/qemu"
 	"github.com/analog-substance/carbon/pkg/providers/virtualbox"
 	"github.com/analog-substance/carbon/pkg/types"
-	"github.com/spf13/viper"
 	"log/slog"
 	"os"
 	"path/filepath"
@@ -137,7 +136,6 @@ func (c *Carbon) VMsFromHosts(hostnames []string) []types.VM {
 }
 
 const CloudInitDir = "cloud-init"
-const PackerDir = "deployments/packer"
 const PackerFileSuffixCloudInit = "-cloud-init.pkr.hcl"
 const PackerFileSuffixAnsible = "-ansible.pkr.hcl"
 const PackerFileSuffixVariables = "-variables.pkr.hcl"
@@ -147,20 +145,32 @@ const PackerFileLocalVars = "local-variables.pkr.hcl"
 const PackerFilePacker = "packer.pkr.hcl"
 const ISOVarUsage = "var.iso_url"
 
+func (c *Carbon) GetImageBuildTemplates() []string {
+	var templates []string
+	dirList, err := deployments.Files.ReadDir(common.DefaultPackerDirName)
+	if err != nil {
+		log.Debug("error getting packer templates", "err", err)
+	}
+	for _, dir := range dirList {
+		templates = append(templates, dir.Name())
+	}
+	return templates
+}
+
 func (c *Carbon) CreateImageBuild(name, tplDir, service string) error {
 	autoInstall := false
 	cloudInitDir := ""
 	userDataFile := ""
 
 	// mkdir for new image build
-	bootstrappedDir := filepath.Join(PackerDir, name)
+	bootstrappedDir := filepath.Join(common.PackerDir(), name)
 	err := os.MkdirAll(bootstrappedDir, 0755)
 	if err != nil {
 		log.Debug("failed to create new packer build dir", "dir", bootstrappedDir, "err", err)
 		return err
 	}
 	embeddedFS := deployments.Files
-	tplPackerDir := filepath.Join("packer", tplDir)
+	tplPackerDir := filepath.Join(common.DefaultPackerDirName, tplDir)
 
 	// copy packer file
 	packerFilename := fmt.Sprintf("%s%s", service, PackerFileSuffixCloudInit)
@@ -323,7 +333,7 @@ func (c *Carbon) GetImages() ([]types.Image, error) {
 
 func (c *Carbon) GetProjects() ([]types.Project, error) {
 	if len(c.projects) == 0 {
-		projectsBaseDir := viper.GetString(common.ViperTerraformProjectDir)
+		projectsBaseDir := common.ProjectsDir()
 		dirListing, err := os.ReadDir(projectsBaseDir)
 		if err != nil {
 			return nil, err

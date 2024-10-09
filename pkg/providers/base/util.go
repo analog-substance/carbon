@@ -4,7 +4,6 @@ import (
 	"github.com/analog-substance/carbon/pkg/common"
 	"github.com/analog-substance/carbon/pkg/models"
 	"github.com/analog-substance/carbon/pkg/types"
-	"github.com/spf13/viper"
 	"os"
 	"path/filepath"
 	"time"
@@ -12,8 +11,7 @@ import (
 
 func GetImagesForFileBasedProvider(providerType string, e types.Environment) ([]types.Image, error) {
 	var ret []types.Image
-	imagesDir := viper.GetString(common.ViperImagesDir)
-	listing, _ := os.ReadDir(filepath.Join(imagesDir, providerType))
+	listing, _ := os.ReadDir(filepath.Join(common.ImagesDir(), providerType))
 	for _, dirEntry := range listing {
 		ret = append(ret, models.NewImage(filepath.Join(providerType, dirEntry.Name()), dirEntry.Name(), time.Now(), e))
 	}
@@ -21,9 +19,6 @@ func GetImagesForFileBasedProvider(providerType string, e types.Environment) ([]
 }
 
 func DestroyImageForFileBasedProvider(imageID string) error {
-	imagesDir := viper.GetString(common.ViperImagesDir)
-
-	imagePath := filepath.Join(imagesDir, imageID)
+	imagePath := filepath.Join(common.ImagesDir(), imageID)
 	return os.RemoveAll(imagePath)
-
 }

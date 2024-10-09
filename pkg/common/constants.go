@@ -1,5 +1,6 @@
 package common
 
+const DefaultInstanceDir = "."
 const DefaultDeploymentsDirName = "deployments"
 const DefaultPackerDirName = "packer"
 const DefaultImagesDirName = "images"

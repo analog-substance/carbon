@@ -7,8 +7,6 @@ import (
 	"github.com/analog-substance/carbon/pkg/providers/qemu/api"
 	"github.com/analog-substance/carbon/pkg/types"
 	"github.com/digitalocean/go-libvirt"
-	"github.com/spf13/viper"
-	"os"
 	"path/filepath"
 )
 
@@ -91,11 +89,7 @@ func (e *Environment) CreateVM(options types.MachineLaunchOptions) error {
 	if err != nil {
 		return err
 	}
-	cwd, err := os.Getwd()
-	if err != nil {
-		return err
-	}
-	imagePath := filepath.Join(cwd, viper.GetString(common.ViperImagesDir), options.Image.ID(), options.Image.Name())
+	imagePath := filepath.Join(common.ImagesDir(), options.Image.ID(), options.Image.Name())
 	newVol, err := defaultStoragePool.ImportImage(options.Name, imagePath)
 	if err != nil {
 		return err
