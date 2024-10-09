@@ -38,7 +38,7 @@ func (e *Environment) VMs() []types.VM {
 		},
 	})
 	if err != nil {
-		log.Debug("Error get instances", "Profile", e.Name(), "err", err)
+		log.Debug("Error get instances", "profile", e.Name(), "err", err)
 		return vms
 	}
 
@@ -96,7 +96,7 @@ func (e *Environment) ImageBuilds() ([]types.ImageBuild, error) {
 	return models.GetImageBuildsForProvider(e.profile.Provider().Type())
 }
 func (e *Environment) Images() ([]types.Image, error) {
-	log.Debug("getting images", "env", e.Name(), "Profile", e.profile.Name(), "Provider", e.profile.Provider().Name())
+	log.Debug("getting images", "env", e.Name(), "profile", e.profile.Name(), "provider", e.profile.Provider().Name())
 	amis, err := e.ec2Client.DescribeImages(context.Background(), &ec2.DescribeImagesInput{
 		Filters: []ec2Types.Filter{
 			ec2Types.Filter{

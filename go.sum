@@ -7,8 +7,8 @@ github.com/NoF0rte/cmd-builder v0.0.0-20220305223538-e35bfeabbbff h1:GQV4BEXtKM7
 github.com/NoF0rte/cmd-builder v0.0.0-20220305223538-e35bfeabbbff/go.mod h1:BW980ODOiAtIbHttRfkCrP+zdJAXjE5uEwzT73Xu98k=
 github.com/agext/levenshtein v1.2.3 h1:YB2fHEn0UJagG8T1rrWknE3ZQzWM06O8AMAatNn7lmo=
 github.com/agext/levenshtein v1.2.3/go.mod h1:JEDfjyjHDjOF/1e4FlBE/PkbqA9OfWu2ki2W0IB5558=
-github.com/analog-substance/util v0.2.5 h1:nS6seqxqiEpz3bUbFss06yIzBYBATFjrp5eapbC0I3w=
-github.com/analog-substance/util v0.2.5/go.mod h1:kkbr2dmWJHSGwImyQTGVOl29RSy3OBGunkAjs7JPcb4=
+github.com/analog-substance/util v1.0.0 h1:LhatTKnW2vtWh/fNU0rh1lPSr4ANCWvfnHb8NZeHchY=
+github.com/analog-substance/util v1.0.0/go.mod h1:MQ2aobwi8Lk3hr8AEpmkgr/X6P6RqZs0/IQ75ETKmeA=
 github.com/apparentlymart/go-textseg/v15 v15.0.0 h1:uYvfpb3DyLSCGWnctWKGj857c6ew1u1fNQOlOtuGxQY=
 github.com/apparentlymart/go-textseg/v15 v15.0.0/go.mod h1:K8XmNZdhEBkdlyDdvbmmsvpAG721bKi0joRfFdHIWJ4=
 github.com/atotto/clipboard v0.1.4 h1:EH0zSVneZPSuFR11BlR9YppQTVDbh5+16AmcJi4g1z4=

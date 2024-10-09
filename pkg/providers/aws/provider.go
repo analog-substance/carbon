@@ -35,7 +35,9 @@ func (p *Provider) AWSProfiles() []string {
 
 	for _, s := range sections.SectionStrings() {
 		sl := strings.ToLower(s)
-		if sl == "default" || strings.HasPrefix(sl, "Profile") {
+
+		log.Debug("checking config section for profile", "section_name", sl)
+		if sl == "default" || strings.HasPrefix(sl, "profile") {
 			sec, err := sections.GetSection(s)
 			if err != nil {
 				log.Debug("error getting config section:", "section", s)
@@ -43,7 +45,7 @@ func (p *Provider) AWSProfiles() []string {
 			}
 
 			if len(sec.Keys()) > 1 {
-				name, _ := strings.CutPrefix(s, "Profile ")
+				name, _ := strings.CutPrefix(s, "profile ")
 				p.profiles = append(p.profiles, name)
 			}
 		}
@@ -67,7 +69,7 @@ func (p *Provider) Profiles() []types.Profile {
 			}
 		}
 
-		log.Debug("aws Profile", "Profile", profileName, "enabled", profileConfig.Enabled, "ok", ok)
+		log.Debug("aws profile", "profile", profileName, "enabled", profileConfig.Enabled, "ok", ok)
 		if profileConfig.Enabled {
 			profiles = append(profiles, NewProfile(profileName, p, profileConfig))
 		}
