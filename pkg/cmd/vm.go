@@ -13,12 +13,20 @@ import (
 var vmCmd = &cobra.Command{
 	Use:   "vm",
 	Short: "Manage and interact with VMs",
-	Long: `Basically lazy wrappers around tedious things.
+	Long: `Manage and interact with VMs.
 
-So you type less and be more productive!`,
-	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Println("vm called")
-	},
+Management functions include
+
+- Starting VMs
+- Stopping VMs
+- Rebooting VMs
+- Launching VMs from images
+- Destroying VMs from images
+
+`,
+	//Run: func(cmd *cobra.Command, args []string) {
+	//	fmt.Println("vm called")
+	//},
 }
 
 func init() {

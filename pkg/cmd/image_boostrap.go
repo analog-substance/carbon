@@ -9,7 +9,12 @@ import (
 var imageBootstrapCmd = &cobra.Command{
 	Use:   "bootstrap",
 	Short: "create image build configs",
-	Long:  `create image build configs`,
+	Long: `create image build configs.
+Example
+
+	carbon image bootstrap -n operator-desktop-aws -s aws -t ubuntu-desktop
+
+`,
 	Run: func(cmd *cobra.Command, args []string) {
 		name, _ := cmd.Flags().GetString("name")
 		osDir, _ := cmd.Flags().GetString("template")

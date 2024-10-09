@@ -8,8 +8,22 @@ import (
 // vmVNCCmd represents the config command
 var vmVNCCmd = &cobra.Command{
 	Use:   "vnc",
-	Short: "vnc to a vm",
-	Long:  `vnc to a vm`,
+	Short: "VNC to a VM",
+	Long: `VNC to a VM.
+
+Example:
+
+	carbon vm vnc -n vm-name
+
+This will:
+- SSH to the target VM.
+- Check to see if vncserver is running.
+- If not, start vncserver on the remote machine
+- If a vnc passwd file does not exist one will be created
+- Copy the password file to the local machine
+- Setup a tunnel to access vnc
+- start vncviewer
+`,
 	Run: func(cmd *cobra.Command, args []string) {
 		user, _ := cmd.Flags().GetString("user")
 		killVNC, _ := cmd.Flags().GetBool("kill-vnc")

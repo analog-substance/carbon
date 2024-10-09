@@ -9,7 +9,12 @@ import (
 var imageBuildCmd = &cobra.Command{
 	Use:   "build",
 	Short: "build an image",
-	Long:  `build an image`,
+	Long: `build an image.
+Example
+
+	carbon image build -m ubuntu-desktop -t qemu
+
+`,
 	Run: func(cmd *cobra.Command, args []string) {
 		name, _ := cmd.Flags().GetString("name")
 		provider, _ := cmd.Flags().GetString("provider-type")

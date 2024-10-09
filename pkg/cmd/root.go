@@ -24,8 +24,21 @@ var log *slog.Logger
 // RootCmd represents the base command when called without any subcommands
 var RootCmd = &cobra.Command{
 	Use:   "carbon",
-	Short: "Infrastructure ops simplified",
-	Long:  `Manage and use infrastructure with a consistent interface, regardless of where it lives.`,
+	Short: "Infrastructure Ops simplified",
+	Long: `Manage and use infrastructure with a consistent interface, regardless of where it lives.
+
+Simple things like SSH and VNC.
+
+	carbon vm ssh -n vm-name
+	carbon vm vnc -n vm-name
+
+Starting and stopping VMs
+
+	carbon vm start -n vm-name
+	carbon vm stop -n vm-name
+
+Carbon supports AWS, QEMU, VirtualBox, and vSphere.
+`,
 	PersistentPreRunE: func(cmd *cobra.Command, args []string) error {
 
 		if debug {

@@ -171,7 +171,7 @@ func (m *Machine) StartVNC(user string, killVNC bool) error {
 
 func (m *Machine) NewSSHSession(user string) (*ssh_util.Session, error) {
 	// Get SSH_AUTH_SOCK
-	// if its not set, look at .ssh/config for IdentityAgent
+	// if it is not set, look at .ssh/config for IdentityAgent
 	// use that value
 	sshAuthSock := os.Getenv("SSH_AUTH_SOCK")
 	if sshAuthSock == "" {

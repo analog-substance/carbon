@@ -10,9 +10,13 @@ import (
 var projectListCmd = &cobra.Command{
 	Use:   "list",
 	Short: "Manage and interact with projects",
-	Long: `Basically lazy wrappers around tedious things.
+	Long: `List projects.
 
-So you type less and be more productive!`,
+Example:
+
+	carbon project list
+
+`,
 	Run: func(cmd *cobra.Command, args []string) {
 		deployments, err := carbonObj.GetProjects()
 		if err != nil {

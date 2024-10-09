@@ -8,11 +8,15 @@ import (
 
 // projectAddCmd represents the config command
 var projectAddCmd = &cobra.Command{
-	Use:   "add",
+	Use:   "add-machine",
 	Short: "Add resources to a project",
-	Long: `Basically lazy wrappers around tedious things.
+	Long: `Add a new machine to the project.
 
-So you type less and be more productive!`,
+Example:
+
+	carbon project add -p example-qemu-carbon -n testbrad2 -P qemu -i carbon-ubuntu-desktop-20241008201758
+
+`,
 	Run: func(cmd *cobra.Command, args []string) {
 		projectName, _ := cmd.Flags().GetString("project")
 		vmName, _ := cmd.Flags().GetString("name")

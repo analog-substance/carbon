@@ -10,9 +10,13 @@ import (
 var projectApplyCmd = &cobra.Command{
 	Use:   "apply",
 	Short: "Run terraform apply",
-	Long: `Basically lazy wrappers around tedious things.
+	Long: `Apply terraform.
 
-So you type less and be more productive!`,
+Example:
+
+	carbon project apply -p project-name
+
+`,
 	Run: func(cmd *cobra.Command, args []string) {
 		name, _ := cmd.Flags().GetString("project")
 

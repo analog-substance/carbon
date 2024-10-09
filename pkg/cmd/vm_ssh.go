@@ -8,8 +8,16 @@ import (
 // vmSSH represents the config command
 var vmSSH = &cobra.Command{
 	Use:   "ssh",
-	Short: "ssh to a vm",
-	Long:  `ssh to a vm`,
+	Short: "SSH to a VM",
+	Long: `SSH to a VM.
+
+Example:
+
+	carbon vm ssh -n vm-name
+
+Carbon will call exec on the ssh binary. This means the SSH process takes
+over the carbon process. So SSH agents should just work. 
+`,
 	Run: func(cmd *cobra.Command, args []string) {
 		user, _ := cmd.Flags().GetString("user")
 

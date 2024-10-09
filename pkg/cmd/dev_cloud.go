@@ -27,7 +27,7 @@ var devCloud = &cobra.Command{
 		endResult := &cloud_init.CloudConfig{}
 		for _, d := range listing {
 			if strings.HasSuffix(d.Name(), ".yaml") {
-				filebytes, err := os.ReadFile(filepath.Join(baseDir, d.Name()))
+				fileBytes, err := os.ReadFile(filepath.Join(baseDir, d.Name()))
 				if err != nil {
 					log.Error("failed to read file", err)
 					continue
@@ -35,7 +35,7 @@ var devCloud = &cobra.Command{
 
 				tpls[d.Name()] = &cloud_init.CloudConfig{}
 
-				err = yaml.Unmarshal(filebytes, tpls[d.Name()])
+				err = yaml.Unmarshal(fileBytes, tpls[d.Name()])
 				if err != nil {
 					log.Error("failed to unmarshal file", err)
 					continue

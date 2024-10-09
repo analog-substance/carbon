@@ -9,7 +9,13 @@ import (
 var vmDestroyCmd = &cobra.Command{
 	Use:   "destroy",
 	Short: "destroy VM",
-	Long:  `destroy VM`,
+	Long: `Destroy a VM.
+
+Example:
+
+	carbon vm destroy -n vm-name
+
+`,
 	Run: func(cmd *cobra.Command, args []string) {
 		vms := getVMsFromArgs(cmd, args)
 		if len(vms) > 0 {

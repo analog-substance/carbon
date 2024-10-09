@@ -12,7 +12,13 @@ import (
 var imageListCmd = &cobra.Command{
 	Use:   "list",
 	Short: "list images",
-	Long:  `list images`,
+	Long: `list images and image builds.
+Example
+
+	carbon image list
+	carbon image list -b
+
+`,
 	Run: func(cmd *cobra.Command, args []string) {
 		listBuilds, _ := cmd.Flags().GetBool("builds")
 

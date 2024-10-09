@@ -9,7 +9,13 @@ import (
 var vmStart = &cobra.Command{
 	Use:   "start",
 	Short: "Start VMs",
-	Long:  `start VMs`,
+	Long: `start VMs.
+
+Example:
+
+	carbon vm start -n vm-name
+
+`,
 	Run: func(cmd *cobra.Command, args []string) {
 		vms := getVMsFromArgs(cmd, args)
 		if len(vms) > 0 {

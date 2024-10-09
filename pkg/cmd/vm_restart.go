@@ -9,7 +9,13 @@ import (
 var vmRestart = &cobra.Command{
 	Use:   "restart",
 	Short: "Restart VM(s)",
-	Long:  `Restart VM(s)`,
+	Long: `Restart VM(s).
+
+Example:
+
+	carbon vm restart -n vm-name
+
+`,
 	Run: func(cmd *cobra.Command, args []string) {
 		vms := getVMsFromArgs(cmd, args)
 		if len(vms) > 0 {

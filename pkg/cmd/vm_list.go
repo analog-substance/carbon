@@ -10,7 +10,19 @@ import (
 var vmList = &cobra.Command{
 	Use:   "list",
 	Short: "List VMs",
-	Long:  `List VMs`,
+	Long: `List VMs.
+
+Example:
+
+	carbon vm list
+
+You can also supply a name search:
+
+	carbon vm list -n vm-
+
+This will list VMs with vm- in their name.
+
+`,
 	Run: func(cmd *cobra.Command, args []string) {
 
 		vms := getVMsFromArgs(cmd, args)

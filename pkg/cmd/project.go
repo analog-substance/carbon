@@ -8,13 +8,13 @@ import (
 // projectCmd represents the config command
 var projectCmd = &cobra.Command{
 	Use:   "project",
-	Short: "Manage and interact with deployments",
-	Long: `Basically lazy wrappers around tedious things.
-
-So you type less and be more productive!`,
-	Run: func(cmd *cobra.Command, args []string) {
-
-	},
+	Short: "Manage and interact with projects",
+	Long: `Manage projects.
+Projects are directories with terraform code to manage resources for the project.
+`,
+	//Run: func(cmd *cobra.Command, args []string) {
+	//
+	//},
 }
 
 func init() {
