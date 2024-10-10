@@ -8,15 +8,10 @@ import (
 
 // projectListCmd represents the config command
 var projectListCmd = &cobra.Command{
-	Use:   "list",
-	Short: "Manage and interact with projects",
-	Long: `List projects.
-
-Example:
-
-	carbon project list
-
-`,
+	Use:     "list",
+	Short:   "Manage and interact with projects",
+	Long:    `List projects.`,
+	Example: `carbon project list`,
 	Run: func(cmd *cobra.Command, args []string) {
 		deployments, err := carbonObj.GetProjects()
 		if err != nil {

@@ -7,15 +7,10 @@ import (
 
 // vmRestart represents the config command
 var vmRestart = &cobra.Command{
-	Use:   "restart",
-	Short: "Restart VM(s)",
-	Long: `Restart VM(s).
-
-Example:
-
-	carbon vm restart -n vm-name
-
-`,
+	Use:     "restart",
+	Short:   "Restart VM(s)",
+	Long:    `Restart VM(s).`,
+	Example: `carbon vm restart -n vm-name`,
 	Run: func(cmd *cobra.Command, args []string) {
 		vms := getVMsFromArgs(cmd, args)
 		if len(vms) > 0 {

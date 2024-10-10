@@ -12,25 +12,12 @@ import (
 // vmCmd represents the config command
 var vmCmd = &cobra.Command{
 	Use:   "vm",
-	Short: "Manage and interact with VMs",
-	Long: `Manage and interact with VMs.
-
-Management functions include
-
-- Starting VMs
-- Stopping VMs
-- Rebooting VMs
-- Launching VMs from images
-- Destroying VMs from images
-
-`,
-	//Run: func(cmd *cobra.Command, args []string) {
-	//	fmt.Println("vm called")
-	//},
+	Short: "Manage and interact with VMs.",
+	Long:  `Manage and interact with VMs.`,
 }
 
 func init() {
-	RootCmd.AddCommand(vmCmd)
+	CarbonCmd.AddCommand(vmCmd)
 
 	vmCmd.PersistentFlags().StringP("name", "n", "", "Name of the VM.")
 	vmCmd.PersistentFlags().StringP("id", "i", "", "ID of machine to start.")

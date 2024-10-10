@@ -13,7 +13,6 @@ type QEMU struct {
 	libVirtURL string
 	conn       *libvirt.Libvirt
 
-	leaseMap     map[string][]string
 	allNets      []libvirt.Network
 	domains      []*Domain
 	storagePools []*StoragePool

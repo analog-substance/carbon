@@ -7,14 +7,10 @@ import (
 
 // imageDestroyCmd represents the image command
 var imageDestroyCmd = &cobra.Command{
-	Use:   "destroy",
-	Short: "destroy/delete images",
-	Long: `destroy/delete images.
-Example
-
-	carbon image destroy -i qemu/some-image-123123123
-
-`,
+	Use:     "destroy",
+	Short:   "Delete images.",
+	Long:    `Delete images.`,
+	Example: `carbon image destroy -i qemu/some-image-123123123`,
 	Run: func(cmd *cobra.Command, args []string) {
 		imageID, _ := cmd.Flags().GetString("image-id")
 
