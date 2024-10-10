@@ -63,35 +63,6 @@ func (q *QEMU) AllNetworks() ([]libvirt.Network, error) {
 
 }
 
-func (q *QEMU) AllNetworksMap() (map[string][]string, error) {
-	if q.leaseMap == nil {
-		q.leaseMap = make(map[string][]string)
-
-		allNets, err := q.AllNetworks()
-		if err != nil {
-			return nil, err
-		}
-		for _, net := range allNets {
-			leases, _, err := q.conn.NetworkGetDhcpLeases(net, libvirt.OptString{}, 1, 0)
-			if err != nil {
-				log.Debug("error getting leases domain info", "err", err)
-				continue
-			}
-			for _, lease := range leases {
-				for _, hostname := range lease.Hostname {
-					_, ok := q.leaseMap[hostname]
-					if !ok {
-						q.leaseMap[hostname] = []string{}
-					}
-					q.leaseMap[hostname] = append(q.leaseMap[hostname], lease.Ipaddr)
-				}
-			}
-		}
-	}
-
-	return q.leaseMap, nil
-}
-
 func (q *QEMU) GetDomains() ([]*Domain, error) {
 
 	if q.domains == nil {
@@ -118,27 +89,20 @@ func (q *QEMU) GetDomains() ([]*Domain, error) {
 			publicIPs := []string{}
 			privateIPs := []string{}
 
-			if domainState == libvirt.DomainRunning {
-				ipAddresses, err := q.conn.DomainInterfaceAddresses(dom, 0, 0)
-				if err != nil {
-					log.Debug("error getting libvirt domain interfaces", "err", err)
-					continue
-				}
+			sources := []libvirt.DomainInterfaceAddressesSource{
+				libvirt.DomainInterfaceAddressesSrcLease,
+				libvirt.DomainInterfaceAddressesSrcAgent,
+				libvirt.DomainInterfaceAddressesSrcArp,
+			}
 
-				if len(ipAddresses) > 0 {
-					for _, ifaceAddr := range ipAddresses {
-						for _, addr := range ifaceAddr.Addrs {
-							publicIPs = append(publicIPs, addr.Addr)
-						}
-					}
-				} else {
-					// fallback to look up in default dhcp lease
-					leaseMap, err := q.AllNetworksMap()
-					if err == nil {
-						_, ok := leaseMap[name]
-						if ok {
-							publicIPs = leaseMap[name]
-						}
+			for _, source := range sources {
+				ipAddresses, err := q.conn.DomainInterfaceAddresses(dom, uint32(source), 0)
+				if err != nil {
+					log.Debug("error getting libvirt domain interface addresses", "source", source, "err", err)
+				}
+				for _, ifaceAddr := range ipAddresses {
+					for _, addr := range ifaceAddr.Addrs {
+						publicIPs = append(publicIPs, addr.Addr)
 					}
 				}
 			}

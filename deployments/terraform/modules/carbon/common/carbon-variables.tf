@@ -10,3 +10,8 @@ variable "machines" {
   }))
   default = []
 }
+
+variable "project" {
+  type = string
+  default = "carbon"
+}

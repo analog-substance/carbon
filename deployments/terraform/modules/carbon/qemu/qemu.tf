@@ -1,13 +1,15 @@
 # Create a new domain
 resource "libvirt_network" "carbon_net" {
   # the name used by libvirt
-  name = "carbon-net"
+  name = "${var.project}-net"
 
   # mode can be: "nat" (default), "none", "route", "open", "bridge"
   mode = "nat"
 
+  autostart = true
+
   #  the domain used by the DNS server in this network
-  domain = "carbon.local"
+  domain = "${var.project}.carbon.local"
 
   #  list of subnets the addresses allowed for domains connected
   # also derived to define the host addresses
@@ -97,17 +99,10 @@ resource "libvirt_volume" "os_image" {
 }
 
 resource libvirt_pool carbon {
-  name = "carbon"
+  name = var.project
   type = "dir"
-  path = pathexpand("~/.carbon/qemu-pool")
+  path = pathexpand("~/.carbon/${var.project}-pool")
 }
-
-# data "libvirt_volume" "os_image" {
-#   name   = "carbon-ubuntu-desktop"
-#   source = pathexpand(var.disk_source)
-#   pool   = "default"
-#   format = "qcow2"
-# }
 
 # volume to attach to the "master" domain as main disk
 resource "libvirt_volume" "vm_vols" {
