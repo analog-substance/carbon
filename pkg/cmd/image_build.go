@@ -21,7 +21,7 @@ Example
 		provisioner, _ := cmd.Flags().GetString("provisioner")
 		err := carbonObj.BuildImage(name, provider, provisioner)
 		if err != nil {
-			log.Error("failed to packer build", err)
+			log.Error("failed to packer build", "err", err)
 		}
 	},
 }
@@ -52,7 +52,7 @@ func init() {
 func getImageBuildNames() (imageBuildNames []string) {
 	imageBuilds, err := carbonObj.GetImageBuilds()
 	if err != nil {
-		log.Error("failed to get image builds", err)
+		log.Error("failed to get image builds", "err", err)
 	}
 
 	for _, imageBuild := range imageBuilds {
@@ -64,7 +64,7 @@ func getImageBuildNames() (imageBuildNames []string) {
 func getImageBuildProviders() (imageBuildProviders []string) {
 	imageBuilds, err := carbonObj.GetImageBuilds()
 	if err != nil {
-		log.Error("failed to get image builds", err)
+		log.Error("failed to get image builds", "err", err)
 	}
 
 	providers := make(map[string]bool)

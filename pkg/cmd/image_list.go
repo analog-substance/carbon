@@ -26,13 +26,13 @@ Example
 			if listBuilds {
 				imagesBuilds, err := carbonObj.GetImageBuilds()
 				if err != nil {
-					log.Info("failed to list image builds", err)
+					log.Info("failed to list image builds", "err", err)
 					os.Exit(2)
 				}
 
 				out, err := json.MarshalIndent(imagesBuilds, "", "  ")
 				if err != nil {
-					log.Error("error marshalling JSON", err)
+					log.Error("error marshalling JSON", "err", err)
 				}
 				fmt.Println(string(out))
 
@@ -40,12 +40,12 @@ Example
 
 				images, err := carbonObj.GetImages()
 				if err != nil {
-					log.Info("failed to list images", err)
+					log.Info("failed to list images", "err", err)
 					os.Exit(2)
 				}
 				out, err := json.MarshalIndent(images, "", "  ")
 				if err != nil {
-					log.Error("error marshalling JSON", err)
+					log.Error("error marshalling JSON", "err", err)
 				}
 				fmt.Println(string(out))
 
@@ -59,7 +59,7 @@ Example
 			if listBuilds {
 				imagesBuilds, err := carbonObj.GetImageBuilds()
 				if err != nil {
-					log.Info("failed to list image builds", err)
+					log.Info("failed to list image builds", "err", err)
 					os.Exit(2)
 				}
 				t.AppendHeader(table.Row{"Name", "Provisioner", "Provider"})
@@ -77,7 +77,7 @@ Example
 
 				images, err := carbonObj.GetImages()
 				if err != nil {
-					log.Info("failed to list images", err)
+					log.Info("failed to list images", "err", err)
 					os.Exit(2)
 				}
 				t.AppendHeader(table.Row{"Name", "Created", "Env", "Profile", "Provider", "ID"})

@@ -21,7 +21,7 @@ Example
 		serviceProvider, _ := cmd.Flags().GetString("service")
 		err := carbonObj.CreateImageBuild(name, osDir, serviceProvider)
 		if err != nil {
-			log.Error("failed to bootstrap packer build", err)
+			log.Error("failed to bootstrap packer build", "err", err)
 		}
 	},
 }

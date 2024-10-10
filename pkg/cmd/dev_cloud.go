@@ -19,7 +19,7 @@ var devCloud = &cobra.Command{
 		baseDir := "var/cloud-init/ubuntu-24.04"
 		listing, err := os.ReadDir(baseDir)
 		if err != nil {
-			log.Error("failed to get cloud init files", err)
+			log.Error("failed to get cloud init files", "err", err)
 		}
 
 		tpls := map[string]*cloud_init.CloudConfig{}
@@ -29,7 +29,7 @@ var devCloud = &cobra.Command{
 			if strings.HasSuffix(d.Name(), ".yaml") {
 				fileBytes, err := os.ReadFile(filepath.Join(baseDir, d.Name()))
 				if err != nil {
-					log.Error("failed to read file", err)
+					log.Error("failed to read file", "err", err)
 					continue
 				}
 
@@ -37,7 +37,7 @@ var devCloud = &cobra.Command{
 
 				err = yaml.Unmarshal(fileBytes, tpls[d.Name()])
 				if err != nil {
-					log.Error("failed to unmarshal file", err)
+					log.Error("failed to unmarshal file", "err", err)
 					continue
 				}
 
@@ -46,7 +46,7 @@ var devCloud = &cobra.Command{
 		}
 		d, err := yaml.Marshal(&endResult)
 		if err != nil {
-			log.Error("failed to marshal data", err)
+			log.Error("failed to marshal data", "err", err)
 			os.Exit(2)
 		}
 		fmt.Println(string(d))

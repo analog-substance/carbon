@@ -25,7 +25,7 @@ func init() {
 func ListingDir(dir string) {
 	listing, err := deployments.Files.ReadDir(dir)
 	if err != nil {
-		log.Error("failed to read embedded fs", err)
+		log.Error("failed to read embedded fs", "err", err)
 		os.Exit(2)
 	}
 	for _, file := range listing {

@@ -29,7 +29,7 @@ This will list VMs with vm- in their name.
 		if jsonOutput {
 			out, err := json.MarshalIndent(vms, "", "  ")
 			if err != nil {
-				log.Error("error marshalling JSON", err)
+				log.Error("error marshalling JSON", "err", err)
 			}
 			fmt.Println(string(out))
 		} else {
