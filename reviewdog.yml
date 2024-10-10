@@ -1,4 +1,9 @@
 runner:
+  staticcheck:
+    cmd: staticcheck ./...
+    errorformat:
+      - "%f:%l:%c: %m"
+    level: warning
   govet:
     cmd: go vet ./...
     format: govet
