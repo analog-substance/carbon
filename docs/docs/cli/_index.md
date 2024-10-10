@@ -7,11 +7,12 @@ weight: 1
 ## Synopsis
 
 Infrastructure automation for offensive operations.
-> Checkout the latest docs [here](https://analog-substance.github.io/carbon/)
-> Have a problem? [Create an Issue](https://github.com/analog-substance/carbon/issues/new?title=Something%20is%20broken)
+ℹ️ Checkout the latest docs [here](https://analog-substance.github.io/carbon/)
+😢 Have a problem? [Create an Issue](https://github.com/analog-substance/carbon/issues/new?title=Something%20is%20broken)
+❤️ Enjoying Carbon? [Star the Repo](https://github.com/analog-substance/carbon)
+
 
 ## Purpose
-***
 
 Carbon's primary purpose is to provide a consistent execution environment to
 facilitate offensive security assessments.
