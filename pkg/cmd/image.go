@@ -7,10 +7,10 @@ import (
 // imageCmd represents the image command
 var imageCmd = &cobra.Command{
 	Use:   "image",
-	Short: "manage images and image builds",
-	Long:  `manage images and image builds`,
+	Short: "View or manage images and image builds.",
+	Long:  `View or manage images and image builds.`,
 }
 
 func init() {
-	RootCmd.AddCommand(imageCmd)
+	CarbonCmd.AddCommand(imageCmd)
 }

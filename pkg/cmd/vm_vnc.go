@@ -10,12 +10,8 @@ var vmVNCCmd = &cobra.Command{
 	Use:   "vnc",
 	Short: "VNC to a VM",
 	Long: `VNC to a VM.
-
-Example:
-
-	carbon vm vnc -n vm-name
-
 This will:
+
 - SSH to the target VM.
 - Check to see if vncserver is running.
 - If not, start vncserver on the remote machine
@@ -24,6 +20,7 @@ This will:
 - Setup a tunnel to access vnc
 - start vncviewer
 `,
+	Example: `carbon vnc start -n vm-name`,
 	Run: func(cmd *cobra.Command, args []string) {
 		user, _ := cmd.Flags().GetString("user")
 		killVNC, _ := cmd.Flags().GetBool("kill-vnc")

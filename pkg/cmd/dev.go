@@ -16,5 +16,5 @@ var devCmd = &cobra.Command{
 }
 
 func init() {
-	RootCmd.AddCommand(devCmd)
+	CarbonCmd.AddCommand(devCmd)
 }

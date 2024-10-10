@@ -8,15 +8,10 @@ import (
 
 // projectApplyCmd represents the config command
 var projectApplyCmd = &cobra.Command{
-	Use:   "apply",
-	Short: "Run terraform apply",
-	Long: `Apply terraform.
-
-Example:
-
-	carbon project apply -p project-name
-
-`,
+	Use:     "apply",
+	Short:   "Run terraform apply",
+	Long:    `Apply terraform. No need to change dirs.`,
+	Example: `carbon project apply -p project-name`,
 	Run: func(cmd *cobra.Command, args []string) {
 		name, _ := cmd.Flags().GetString("project")
 

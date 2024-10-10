@@ -11,12 +11,9 @@ var vmStop = &cobra.Command{
 	Short: "Stop VM(s)",
 	Long: `Stop VM(s).
 
-Example:
-
-	carbon vm stop -n vm-name
-
 By default, carbon will attempt to hibernate the machine rather than power it off.
 `,
+	Example: `carbon vm start -n vm-name`,
 	Run: func(cmd *cobra.Command, args []string) {
 		vms := getVMsFromArgs(cmd, args)
 		if len(vms) > 0 {

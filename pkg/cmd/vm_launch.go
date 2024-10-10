@@ -7,15 +7,10 @@ import (
 
 // vmLaunchCmd represents the image command
 var vmLaunchCmd = &cobra.Command{
-	Use:   "launch",
-	Short: "launch a new vm from an image",
-	Long: `launch a new vm from an image.
-
-Example:
-
-	carbon vm launch -I qemu/carbon-ubuntu-desktop-20241007212910 -n vm-name
-
-`,
+	Use:     "launch",
+	Short:   "launch a new vm from an image",
+	Long:    `launch a new vm from an image.`,
+	Example: `carbon vm launch -I qemu/carbon-ubuntu-desktop-20241007212910 -n vm-name`,
 	Run: func(cmd *cobra.Command, args []string) {
 		name, _ := cmd.Flags().GetString("name")
 		imageID, _ := cmd.Flags().GetString("image-id")

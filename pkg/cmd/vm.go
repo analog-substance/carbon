@@ -4,33 +4,22 @@ import (
 	"fmt"
 	"github.com/analog-substance/carbon/pkg/types"
 	"github.com/charmbracelet/huh"
-	"github.com/jedib0t/go-pretty/v6/table"
+	"github.com/charmbracelet/lipgloss"
+	"github.com/charmbracelet/lipgloss/table"
 	"github.com/spf13/cobra"
 	"os"
+	"strings"
 )
 
 // vmCmd represents the config command
 var vmCmd = &cobra.Command{
 	Use:   "vm",
-	Short: "Manage and interact with VMs",
-	Long: `Manage and interact with VMs.
-
-Management functions include
-
-- Starting VMs
-- Stopping VMs
-- Rebooting VMs
-- Launching VMs from images
-- Destroying VMs from images
-
-`,
-	//Run: func(cmd *cobra.Command, args []string) {
-	//	fmt.Println("vm called")
-	//},
+	Short: "Manage and interact with VMs.",
+	Long:  `Manage and interact with VMs.`,
 }
 
 func init() {
-	RootCmd.AddCommand(vmCmd)
+	CarbonCmd.AddCommand(vmCmd)
 
 	vmCmd.PersistentFlags().StringP("name", "n", "", "Name of the VM.")
 	vmCmd.PersistentFlags().StringP("id", "i", "", "ID of machine to start.")
@@ -95,10 +84,33 @@ func AskIfSure(msg string) bool {
 }
 
 func vmTable(vms []types.VM) {
-	t := table.NewWriter()
-	t.SetOutputMirror(os.Stdout)
-	t.AppendHeader(table.Row{"Name", "IP", "State", "Up Time", "Type", "Environment", "Profile", "Provider"})
 
+	re := lipgloss.NewRenderer(os.Stdout)
+	baseStyle := re.NewStyle().Padding(0, 1)
+	headerStyle := baseStyle.Foreground(lipgloss.Color("252")).Bold(true)
+	typeColors := map[string]lipgloss.Color{
+		"Running":    lipgloss.Color("#D7FF87"),
+		"QEMU":       lipgloss.Color("#FDFF90"),
+		"AWS":        lipgloss.Color("#FF875F"),
+		"VirtualBox": lipgloss.Color("#FF87D7"),
+	}
+	dimTypeColors := map[string]lipgloss.Color{
+		"Running":    lipgloss.Color("#97AD64"),
+		"QEMU":       lipgloss.Color("#FCFF5F"),
+		"AWS":        lipgloss.Color("#C77252"),
+		"VirtualBox": lipgloss.Color("#C97AB2"),
+	}
+
+	headers := []string{"Name", "IP", "State", "Up Time", "Type", "Environment", "Profile", "Provider"}
+
+	CapitalizeHeaders := func(data []string) []string {
+		for i := range data {
+			data[i] = strings.ToUpper(data[i])
+		}
+		return data
+	}
+
+	data := [][]string{}
 	for _, vm := range vms {
 		var name string
 		if vm.ID() == vm.Name() {
@@ -106,21 +118,47 @@ func vmTable(vms []types.VM) {
 		} else {
 			name = fmt.Sprintf("%s (%s)", vm.Name(), vm.ID())
 		}
-		t.AppendRows([]table.Row{
-			{
-				name,
-				vm.IPAddress(),
-				vm.State(),
-				vm.UpTime(),
-				vm.Type(),
-				vm.Environment().Name(),
-				vm.Profile().Name(),
-				vm.Provider().Name(),
-			},
+		data = append(data, []string{
+			name,
+			vm.IPAddress(),
+			vm.State(),
+			vm.UpTime().String(),
+			vm.Type(),
+			vm.Environment().Name(),
+			vm.Profile().Name(),
+			vm.Provider().Name(),
 		})
 	}
 
-	t.Render()
+	ct := table.New().
+		Border(lipgloss.NormalBorder()).
+		BorderStyle(re.NewStyle().Foreground(lipgloss.Color("238"))).
+		Headers(CapitalizeHeaders(headers)...).
+		Rows(data...).
+		StyleFunc(func(row, col int) lipgloss.Style {
+			if row == 0 {
+				return headerStyle
+			}
+
+			even := row%2 == 0
+
+			switch col {
+			case 2, 7: // Type 1 + 2
+				c := typeColors
+				if even {
+					c = dimTypeColors
+				}
+
+				color := c[fmt.Sprint(data[row-1][col])]
+				return baseStyle.Foreground(color)
+			}
+
+			if even {
+				return baseStyle.Foreground(lipgloss.Color("245"))
+			}
+			return baseStyle.Foreground(lipgloss.Color("252"))
+		})
+	fmt.Println(ct)
 
 }
 

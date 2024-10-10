@@ -12,13 +12,10 @@ var projectCmd = &cobra.Command{
 	Long: `Manage projects.
 Projects are directories with terraform code to manage resources for the project.
 `,
-	//Run: func(cmd *cobra.Command, args []string) {
-	//
-	//},
 }
 
 func init() {
-	RootCmd.AddCommand(projectCmd)
+	CarbonCmd.AddCommand(projectCmd)
 
 	projectCmd.PersistentFlags().StringP("project", "p", "", "Name of the project.")
 

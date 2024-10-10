@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"gopkg.in/yaml.v3"
 	"reflect"
+	"sort"
 	"strconv"
 	"strings"
 
@@ -17,18 +18,24 @@ const defaultConfigFile = "carbon.yaml"
 // configCmd represents the config command
 var configCmd = &cobra.Command{
 	Use:   "config",
-	Short: "Get/Set config information",
-	Long: `Get/Set config information.
+	Short: "View and manage configuration values.",
+	Long: `View and manage configuration values.
 
-Set vSphere credentials
+Carbon loads configuration files from your home directory, then merges it with
+a configuration file in the current directory (if it exists). This should allow
+you the flexibility you need.
+`,
+	Example: `# Configure vSphere credentials
+carbon config carbon.credentials.vsphere_server.provider vsphere
+carbon config carbon.credentials.vsphere_server.username vsphere_user@vsphere.example
+carbon config carbon.credentials.vsphere_server.password_command 'op read op://Private/vSphere Creds/password'
 
-	carbon config carbon.credentials.vsphere_server.provider vsphere
-	carbon config carbon.credentials.vsphere_server.username vsphere_user@vsphere.example
-	carbon config carbon.credentials.vsphere_server.password_command 'op read op://Private/vSphere Creds/password'
 
+# Set a default project directory
+carbon config carbon.default.dir ~/my/path/haxors
 `,
 	ValidArgsFunction: func(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
-		keys := getKeys(viper.AllSettings(), "")
+		keys := getConfigKeys()
 		return keys, cobra.ShellCompDirectiveNoFileComp
 	},
 	Args: cobra.RangeArgs(0, 3),
@@ -216,7 +223,7 @@ func splitIntoParentChild(key string) (string, string) {
 }
 
 func init() {
-	RootCmd.AddCommand(configCmd)
+	CarbonCmd.AddCommand(configCmd)
 	configCmd.Flags().BoolP("save", "s", false, "save the current configuration")
 	configCmd.Flags().BoolP("sub-keys", "k", false, "display only the sub-keys")
 	configCmd.Flags().BoolP("remove-reset", "r", false, "remove key from the config or reset to default")
@@ -225,10 +232,25 @@ func init() {
 func getKeys(config map[string]any, prefix string) []string {
 	var keys []string
 	for k, val := range config {
-		keys = append(keys, fmt.Sprintf("%s%s", prefix, k))
 		if mapVal, ok := val.(map[string]interface{}); ok {
 			keys = append(keys, getKeys(mapVal, fmt.Sprintf("%s%s.", prefix, k))...)
+		} else {
+			keys = append(keys, fmt.Sprintf("%s%s", prefix, k))
 		}
 	}
 	return keys
+}
+
+var configKeys []string
+
+func getConfigKeys() []string {
+	if len(configKeys) == 0 {
+		configKeys = getKeys(viper.AllSettings(), "")
+		sort.Strings(configKeys)
+	}
+	return configKeys
+}
+
+func updateConfigHelp() {
+	configCmd.Long += fmt.Sprintf("## Configuration keys\n- %s", strings.Join(getConfigKeys(), "\n - "))
 }

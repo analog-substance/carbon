@@ -84,7 +84,7 @@ markup:
     style: monokai
     noClasses: false
     # Uncomment if you want your chosen highlight style used for code blocks without a specified language
-    # guessSyntax: true
+    guessSyntax: true
 
 # Everything below this are Site Params
 

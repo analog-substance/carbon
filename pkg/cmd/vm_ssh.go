@@ -12,13 +12,27 @@ var vmSSH = &cobra.Command{
 	Use:   "ssh",
 	Short: "SSH to a VM",
 	Long: `SSH to a VM.
-
-Example:
-
-	carbon vm ssh -n vm-name
-
 Carbon will call exec on the ssh binary. This means the SSH process takes
 over the carbon process. So SSH agents should just work. 
+`,
+	Example: `# SSH to a VM
+carbon vm ssh -n vm-name
+
+
+# execute one off command on a VM
+carbon vm ssh -n vm-name -- cat /etc/passwd
+
+
+# proxy through a bastion
+carbon vm ssh -n vm-name -- -oProxyCommand="carbon vm ssh -n bastion -- -W %h:%p"
+
+
+# forward ssh agent
+carbon vm ssh -n vm-name -- -A
+
+
+# open socks proxy
+carbon vm ssh -n vm-name -- -D 1080
 `,
 	Run: func(cmd *cobra.Command, args []string) {
 		user, _ := cmd.Flags().GetString("user")

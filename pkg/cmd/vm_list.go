@@ -9,19 +9,14 @@ import (
 // vmList represents the config command
 var vmList = &cobra.Command{
 	Use:   "list",
-	Short: "List VMs",
-	Long: `List VMs.
+	Short: "List VMs across all available providers, profiles, and environments.",
+	Long:  `List VMs across all available providers, profiles, and environments.`,
+	Example: `# list all virtual machines
+carbon vm list
 
-Example:
 
-	carbon vm list
-
-You can also supply a name search:
-
-	carbon vm list -n vm-
-
-This will list VMs with vm- in their name.
-
+# You can also supply a name search, this wil return VMs with names containing 'vm-'
+carbon vm list -n vm-
 `,
 	Run: func(cmd *cobra.Command, args []string) {
 
