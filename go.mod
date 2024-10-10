@@ -10,9 +10,9 @@ require (
 	github.com/aws/aws-sdk-go-v2/service/ec2 v1.181.2
 	github.com/aws/aws-sdk-go-v2/service/sts v1.32.2
 	github.com/charmbracelet/huh v0.6.0
+	github.com/charmbracelet/lipgloss v0.13.0
 	github.com/digitalocean/go-libvirt v0.0.0-20241007203800-ad92148935b6
 	github.com/hashicorp/hcl/v2 v2.22.0
-	github.com/jedib0t/go-pretty/v6 v6.6.0
 	github.com/mitchellh/go-homedir v1.1.0
 	github.com/spf13/cobra v1.8.1
 	github.com/spf13/viper v1.19.0
@@ -45,7 +45,6 @@ require (
 	github.com/charmbracelet/bubbles v0.20.0 // indirect
 	github.com/charmbracelet/bubbletea v1.1.1 // indirect
 	github.com/charmbracelet/glamour v0.8.0 // indirect
-	github.com/charmbracelet/lipgloss v0.13.0 // indirect
 	github.com/charmbracelet/x/ansi v0.3.2 // indirect
 	github.com/charmbracelet/x/exp/strings v0.0.0-20241007193646-7cc13b2883e3 // indirect
 	github.com/charmbracelet/x/term v0.2.0 // indirect

@@ -3,9 +3,11 @@ package cmd
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/jedib0t/go-pretty/v6/table"
+	"github.com/charmbracelet/lipgloss"
+	"github.com/charmbracelet/lipgloss/table"
 	"github.com/spf13/cobra"
 	"os"
+	"strings"
 )
 
 // imageListCmd represents the image command
@@ -54,8 +56,20 @@ carbon image list -b
 
 		} else {
 
-			t := table.NewWriter()
-			t.SetOutputMirror(os.Stdout)
+			re := lipgloss.NewRenderer(os.Stdout)
+			baseStyle := re.NewStyle().Padding(0, 1)
+			headerStyle := baseStyle.Foreground(lipgloss.Color("252")).Bold(true)
+
+			CapitalizeHeaders := func(data []string) []string {
+				for i := range data {
+					data[i] = strings.ToUpper(data[i])
+				}
+				return data
+			}
+
+			data := [][]string{}
+
+			var headers []string
 
 			if listBuilds {
 				imagesBuilds, err := carbonObj.GetImageBuilds()
@@ -63,15 +77,12 @@ carbon image list -b
 					log.Info("failed to list image builds", "err", err)
 					os.Exit(2)
 				}
-				t.AppendHeader(table.Row{"Name", "Provisioner", "Provider"})
-
+				headers = []string{"Name", "Provisioner", "Provider"}
 				for _, imageBuild := range imagesBuilds {
-					t.AppendRows([]table.Row{
-						{
-							imageBuild.Name(),
-							imageBuild.Provisioner(),
-							imageBuild.ProviderType(),
-						},
+					data = append(data, []string{
+						imageBuild.Name(),
+						imageBuild.Provisioner(),
+						imageBuild.ProviderType(),
 					})
 				}
 			} else {
@@ -81,23 +92,41 @@ carbon image list -b
 					log.Info("failed to list images", "err", err)
 					os.Exit(2)
 				}
-				t.AppendHeader(table.Row{"Name", "Created", "Env", "Profile", "Provider", "ID"})
+
+				headers = []string{"Name", "Created", "Env", "Profile", "Provider", "ID"}
 
 				for _, image := range images {
 
-					t.AppendRows([]table.Row{
-						{
-							image.Name(),
-							image.CreatedAt(),
-							image.Environment().Name(),
-							image.Environment().Profile().Name(),
-							image.Environment().Profile().Provider().Name(),
-							image.ID(),
-						},
+					data = append(data, []string{
+						image.Name(),
+						image.CreatedAt(),
+						image.Environment().Name(),
+						image.Environment().Profile().Name(),
+						image.Environment().Profile().Provider().Name(),
+						image.ID(),
 					})
 				}
 			}
-			t.Render()
+
+			ct := table.New().
+				Border(lipgloss.NormalBorder()).
+				BorderStyle(re.NewStyle().Foreground(lipgloss.Color("238"))).
+				Headers(CapitalizeHeaders(headers)...).
+				Rows(data...).
+				StyleFunc(func(row, col int) lipgloss.Style {
+					if row == 0 {
+						return headerStyle
+					}
+
+					even := row%2 == 0
+
+					if even {
+						return baseStyle.Foreground(lipgloss.Color("245"))
+					}
+					return baseStyle.Foreground(lipgloss.Color("252"))
+				})
+			fmt.Println(ct)
+
 		}
 	},
 }
