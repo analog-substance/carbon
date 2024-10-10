@@ -5,8 +5,6 @@ import (
 	"github.com/analog-substance/carbon/pkg/providers/base"
 	"github.com/analog-substance/carbon/pkg/providers/multipass/api"
 	"github.com/analog-substance/carbon/pkg/types"
-	"os/exec"
-	"path/filepath"
 )
 
 type Provider struct {
@@ -23,16 +21,6 @@ func New() types.Provider {
 		base.NewWithName(providerName),
 		"",
 	}
-}
-
-func (p *Provider) appPath() string {
-	if p.path == "" {
-		multipassPath, err := exec.LookPath("multipass")
-		if err == nil {
-			p.path, err = filepath.Abs(multipassPath)
-		}
-	}
-	return p.path
 }
 
 func (p *Provider) IsAvailable() bool {

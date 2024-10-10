@@ -62,9 +62,7 @@ func (c *CloudConfig) MergeWith(otherConfig *CloudConfig) {
 		c.Packages = uniqStringSlice(append(c.Packages, otherConfig.Packages...)...)
 	}
 	if otherConfig.Runcmd != nil {
-		for _, command := range otherConfig.Runcmd {
-			c.Runcmd = append(c.Runcmd, command)
-		}
+		c.Runcmd = append(c.Runcmd, otherConfig.Runcmd...)
 	}
 
 }
@@ -75,7 +73,7 @@ func uniqStringSlice(s ...string) []string {
 		m[v] = true
 	}
 	r := []string{}
-	for s, _ := range m {
+	for s := range m {
 		r = append(r, s)
 	}
 	return r

@@ -10,9 +10,9 @@ import (
 const providerName = "Base"
 
 type Provider struct {
-	name     string
-	profiles []string
-	config   common.ProviderConfig
+	name string
+	//profiles []string
+	config common.ProviderConfig
 }
 
 func New() types.Provider {

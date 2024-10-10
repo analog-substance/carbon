@@ -147,7 +147,7 @@ func (q *QEMU) GetDomains() ([]*Domain, error) {
 				LVDomain:           &dom,
 				LVDomainState:      &domainState,
 				Name:               name,
-				ID:                 fmt.Sprintf("%s", id),
+				ID:                 id,
 				PublicIPAddresses:  publicIPs,
 				PrivateIPAddresses: privateIPs,
 				CurrentUpTime:      time.Duration(cpuTime),

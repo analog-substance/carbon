@@ -29,6 +29,9 @@ func (p *Provider) vboxPath() string {
 		virtualBox, err := exec.LookPath("vboxmanage")
 		if err == nil {
 			p.vboxmanageExecutablePath, err = filepath.Abs(virtualBox)
+			if err != nil {
+				log.Debug("err getting absolute path", "virtualBox", virtualBox, "err", err)
+			}
 		}
 	}
 	return p.vboxmanageExecutablePath
