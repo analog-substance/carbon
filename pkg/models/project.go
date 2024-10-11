@@ -1,6 +1,7 @@
 package models
 
 import (
+	"encoding/json"
 	"fmt"
 	builder "github.com/NoF0rte/cmd-builder"
 	"github.com/analog-substance/carbon/pkg/types"
@@ -21,6 +22,14 @@ func NewProject(buildPath string) *Project {
 	return &Project{
 		buildPath: buildPath,
 	}
+}
+
+func (d *Project) MarshalJSON() ([]byte, error) {
+	return json.Marshal(&struct {
+		Name string `json:"name"`
+	}{
+		Name: d.Name(),
+	})
 }
 
 func (d *Project) Name() string {

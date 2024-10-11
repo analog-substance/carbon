@@ -1,6 +1,7 @@
 package cmd
 
 import (
+	"fmt"
 	"github.com/analog-substance/carbon/pkg/carbon"
 	"github.com/analog-substance/carbon/pkg/common"
 	"github.com/mitchellh/go-homedir"
@@ -26,9 +27,9 @@ var CarbonCmd = &cobra.Command{
 	Use:   "carbon",
 	Short: "Carbon - Infrastructure automation for offensive operations.",
 	Long: `Infrastructure automation for offensive operations.
-ℹ️ Checkout the latest docs [here](https://analog-substance.github.io/carbon/)
-😢 Have a problem? [Create an Issue](https://github.com/analog-substance/carbon/issues/new?title=Something%20is%20broken)
-❤️ Enjoying Carbon? [Star the Repo](https://github.com/analog-substance/carbon)
+- ℹ️ Checkout the latest docs [here](https://analog-substance.github.io/carbon/)
+- 😢 Have a problem? [Create an Issue](https://github.com/analog-substance/carbon/issues/new?title=Something%20is%20broken)
+- ❤️ Enjoying Carbon? [Star the Repo](https://github.com/analog-substance/carbon)
 
 
 ## Purpose
@@ -122,6 +123,8 @@ func initConfig() {
 	if cfgFile != "" {
 		viper.SetConfigFile(cfgFile)
 	} else {
+		viper.AddConfigPath(".")
+
 		home, err := homedir.Dir()
 		cobra.CheckErr(err)
 
@@ -129,8 +132,27 @@ func initConfig() {
 		viper.SetConfigName("carbon")
 	}
 
-	viper.AddConfigPath(".")
-
 	// do not need to handle err here. since an error will occur if the config file doesn't exist
 	_ = viper.MergeInConfig()
+}
+
+func addServiceProviderFlag(c *cobra.Command) {
+	c.Flags().StringP("service", "S", "", "Service provider (aws, virtualbox, qemu, multipass)")
+
+	err := c.RegisterFlagCompletionFunc("service", func(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
+		names := getServiceProviders()
+		return names, cobra.ShellCompDirectiveDefault
+	})
+	if err != nil {
+		fmt.Println(err)
+	}
+}
+
+func getServiceProviders() []string {
+	var serviceProviderNames []string
+	serviceProviders := carbonObj.Providers()
+	for _, provider := range serviceProviders {
+		serviceProviderNames = append(serviceProviderNames, provider.Name())
+	}
+	return serviceProviderNames
 }

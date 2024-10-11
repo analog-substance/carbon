@@ -1,6 +1,7 @@
 package models
 
 import (
+	"encoding/json"
 	"github.com/analog-substance/carbon/pkg/types"
 	"time"
 )
@@ -19,6 +20,18 @@ func NewImage(imageID string, imageName string, createdAt time.Time, env types.E
 		createdAt: createdAt,
 		env:       env,
 	}
+}
+
+func (i *Image) MarshalJSON() ([]byte, error) {
+	return json.Marshal(&struct {
+		ID        string `json:"id"`
+		Name      string `json:"name"`
+		CreatedAt string `json:"created_at"`
+	}{
+		ID:        i.ID(),
+		Name:      i.Name(),
+		CreatedAt: i.CreatedAt(),
+	})
 }
 
 func (i *Image) ID() string {

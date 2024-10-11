@@ -15,7 +15,7 @@ var projectAddCmd = &cobra.Command{
 	Run: func(cmd *cobra.Command, args []string) {
 		projectName, _ := cmd.Flags().GetString("project")
 		vmName, _ := cmd.Flags().GetString("name")
-		vmProvider, _ := cmd.Flags().GetString("provider-type")
+		serviceProvider, _ := cmd.Flags().GetString("service")
 		vmImage, _ := cmd.Flags().GetString("image")
 
 		project, err := carbonObj.GetProject(projectName)
@@ -25,7 +25,7 @@ var projectAddCmd = &cobra.Command{
 
 		err = project.AddMachine(&types.ProjectMachine{
 			Name:     vmName,
-			Provider: vmProvider,
+			Provider: serviceProvider,
 			Image:    vmImage,
 		})
 		if err != nil {
@@ -37,18 +37,11 @@ var projectAddCmd = &cobra.Command{
 func init() {
 	projectCmd.AddCommand(projectAddCmd)
 	projectAddCmd.PersistentFlags().StringP("name", "n", "", "Name of the VM to add.")
-	projectAddCmd.PersistentFlags().StringP("image", "i", "", "Name of the VM to add.")
-	projectAddCmd.PersistentFlags().StringP("provider-type", "P", "", "Provider for the new machine")
+	projectAddCmd.PersistentFlags().StringP("image", "i", "", "Name of the image to use.")
 
-	err := projectAddCmd.RegisterFlagCompletionFunc("provider-type", func(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
-		names := getImageBuildProviders()
-		return names, cobra.ShellCompDirectiveDefault
-	})
-	if err != nil {
-		fmt.Println(err)
-	}
+	addServiceProviderFlag(projectAddCmd)
 
-	err = projectAddCmd.RegisterFlagCompletionFunc("image", func(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
+	err := projectAddCmd.RegisterFlagCompletionFunc("image", func(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
 		names := getImageIDs()
 		return names, cobra.ShellCompDirectiveDefault
 	})

@@ -2,7 +2,9 @@ package cmd
 
 import (
 	"fmt"
+	"github.com/analog-substance/carbon/pkg/types"
 	"github.com/spf13/cobra"
+	"os"
 )
 
 // vmLaunchCmd represents the image command
@@ -14,9 +16,16 @@ var vmLaunchCmd = &cobra.Command{
 	Run: func(cmd *cobra.Command, args []string) {
 		name, _ := cmd.Flags().GetString("name")
 		imageID, _ := cmd.Flags().GetString("image-id")
-		err := carbonObj.LaunchImage(name, imageID)
+		image, err := carbonObj.GetImage(imageID)
 		if err != nil {
-			log.Error("failed to launch VM", "err", err)
+			log.Error("failed to find image", "err", err)
+			os.Exit(1)
+		}
+
+		err = image.Launch(types.ImageLaunchOptions{Name: name})
+		if err != nil {
+			log.Error("failed to launch vm", "err", err)
+			os.Exit(1)
 		}
 	},
 }

@@ -1,7 +1,0 @@
-machines:
-    - name: brad-test
-      image: carbon-ubuntu-desktop-20241008201758
-      provider: qemu
-    - name: other-test
-      image: carbon-ubuntu-desktop-20241008201758
-      provider: qemu
