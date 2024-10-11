@@ -49,11 +49,18 @@ func (d *Project) TerraformApply() error {
 	return builder.Cmd(terraformPath, args...).Dir(d.buildPath).Interactive().Run()
 }
 
-func (d *Project) AddMachine(machine *types.ProjectMachine) error {
+func (d *Project) AddMachine(machine *types.ProjectMachine, noApply bool) error {
 	_, err := d.GetConfig()
 	if err != nil {
 		return err
 	}
+
+	for _, existingMachine := range d.config.Machines {
+		if existingMachine.Name == machine.Name {
+			return fmt.Errorf("machine '%s' already exists", machine.Name)
+		}
+	}
+
 	d.config.Machines = append(d.config.Machines, machine)
 	err = d.SaveConfig()
 	if err != nil {

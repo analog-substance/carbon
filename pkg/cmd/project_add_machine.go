@@ -17,6 +17,7 @@ var projectAddCmd = &cobra.Command{
 		vmName, _ := cmd.Flags().GetString("name")
 		serviceProvider, _ := cmd.Flags().GetString("service")
 		vmImage, _ := cmd.Flags().GetString("image")
+		noApply, _ := cmd.Flags().GetBool("no-apply")
 
 		project, err := carbonObj.GetProject(projectName)
 		if err != nil {
@@ -27,7 +28,7 @@ var projectAddCmd = &cobra.Command{
 			Name:     vmName,
 			Provider: serviceProvider,
 			Image:    vmImage,
-		})
+		}, noApply)
 		if err != nil {
 			fmt.Printf("Failed to save project: %s\n", err)
 		}
@@ -38,6 +39,7 @@ func init() {
 	projectCmd.AddCommand(projectAddCmd)
 	projectAddCmd.PersistentFlags().StringP("name", "n", "", "Name of the VM to add.")
 	projectAddCmd.PersistentFlags().StringP("image", "i", "", "Name of the image to use.")
+	projectAddCmd.PersistentFlags().BoolP("no-apply", "N", false, "Do not run terraform apply.")
 
 	addServiceProviderFlag(projectAddCmd)
 
