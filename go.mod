@@ -4,7 +4,7 @@ go 1.23.1
 
 require (
 	github.com/NoF0rte/cmd-builder v0.0.0-20220305223538-e35bfeabbbff
-	github.com/analog-substance/util v1.0.1
+	github.com/analog-substance/util v1.0.3
 	github.com/aws/aws-sdk-go-v2 v1.32.2
 	github.com/aws/aws-sdk-go-v2/config v1.27.43
 	github.com/aws/aws-sdk-go-v2/service/ec2 v1.181.2
@@ -93,3 +93,5 @@ require (
 	golang.org/x/tools v0.26.0 // indirect
 	gopkg.in/check.v1 v1.0.0-20201130134442-10cb98267c6c // indirect
 )
+
+replace github.com/analog-substance/util => /home/operator/codes/workspace/github.com/analog-substance/util

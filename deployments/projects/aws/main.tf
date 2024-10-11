@@ -2,8 +2,8 @@ locals {
   carbon_infra = yamldecode(file("${path.module}/carbon-config.yaml"))
 }
 
-module "carbon-qemu" {
-  source   = "../../terraform/modules/carbon/qemu"
+module "{{.Name}}" {
+  source   = "../../terraform/modules/carbon/aws"
   machines = local.carbon_infra["machines"]
-  project = "carbon-qemu"
+  project = "{{.Name}}"
 }

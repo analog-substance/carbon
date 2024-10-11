@@ -1,6 +1,7 @@
 package models
 
 import (
+	"encoding/json"
 	"fmt"
 	builder "github.com/NoF0rte/cmd-builder"
 	"github.com/analog-substance/carbon/pkg/common"
@@ -27,6 +28,18 @@ func NewImageBuild(buildPath, provider, provisioner string) *ImageBuild {
 		providerType: provider,
 		provisioner:  provisioner,
 	}
+}
+
+func (b *ImageBuild) MarshalJSON() ([]byte, error) {
+	return json.Marshal(&struct {
+		Name            string `json:"name"`
+		ServiceProvider string `json:"service_provider"`
+		Provisioner     string `json:"provisioner"`
+	}{
+		Name:            b.Name(),
+		ServiceProvider: b.providerType,
+		Provisioner:     b.provisioner,
+	})
 }
 
 func (b *ImageBuild) Name() string {

@@ -9,4 +9,6 @@ type Provider interface {
 	IsAvailable() bool
 	SetConfig(config common.ProviderConfig)
 	GetConfig() common.ProviderConfig
+	NewImageBuild(name string, tplDir string) (ImageBuild, error)
+	NewProject(name string, force bool) (Project, error)
 }
