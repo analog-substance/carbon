@@ -24,9 +24,9 @@ builds:
       - linux
       - windows
       - darwin
-    ldflags:
-      - -s -w
-      - ./usemsan=-msan
+#    ldflags:
+#      - -s -w
+#      - ./usemsan=-msan
 
 archives:
   - format: tar.gz
