@@ -38,7 +38,7 @@ func init() {
 func fsFiles(dir string) []string {
 	listing, err := deployments.Files.ReadDir(dir)
 	if err != nil {
-		log.Error("failed to read embedded fs", err)
+		log.Error("failed to read embedded fs", "err", err)
 		os.Exit(2)
 	}
 	files := []string{}
