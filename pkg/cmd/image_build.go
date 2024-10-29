@@ -11,7 +11,7 @@ var imageBuildCmd = &cobra.Command{
 	Use:     "build",
 	Short:   "Build an image.",
 	Long:    `build an image.`,
-	Example: `carbon image build -t aws -n operator-desktop-aws`,
+	Example: `carbon image build -S aws -n operator-desktop-aws`,
 	Run: func(cmd *cobra.Command, args []string) {
 		name, _ := cmd.Flags().GetString("name")
 		serviceProvider, _ := cmd.Flags().GetString("service")

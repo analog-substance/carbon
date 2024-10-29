@@ -9,8 +9,9 @@ type ProfileConfig struct {
 }
 
 type ProviderConfig struct {
-	Enabled  bool                     `yaml:"enabled"`
-	Profiles map[string]ProfileConfig `yaml:"profiles"`
+	Enabled      bool                     `yaml:"enabled"`
+	AutoDiscover bool                     `yaml:"auto_discover" mapstructure:"auto_discover"`
+	Profiles     map[string]ProfileConfig `yaml:"profiles"`
 }
 
 type CarbonConfig struct {

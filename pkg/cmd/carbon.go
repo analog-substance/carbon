@@ -65,8 +65,8 @@ There are plans to bring support to the following:
 		}
 		log.Debug("debug mode", "debug", debug)
 
-		carbonConfigFile := common.CarbonConfigFile{}
-		err := viper.Unmarshal(&carbonConfigFile)
+		carbonConfigFile := &common.CarbonConfigFile{}
+		err := viper.Unmarshal(carbonConfigFile)
 		if err != nil {
 			log.Debug("failed to unmarshal viper config to carbon config struct")
 		}
@@ -91,7 +91,7 @@ func init() {
 	log = common.WithGroup("cmd")
 
 	cobra.OnInitialize(initConfig)
-	CarbonCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is $HOME/.carbon.yaml)")
+	CarbonCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is $HOME/carbon.yaml)")
 	// need to rethink how I want this to work
 	//CarbonCmd.PersistentFlags().StringSliceP("provider", "P", []string{}, "Provider to use vbox, aws")
 	//CarbonCmd.PersistentFlags().StringSliceVarP(&profiles, "profile", "p", []string{}, "Profile to use. Like an instance of a provider. Used to specify aws profiles")
@@ -111,13 +111,20 @@ func initConfig() {
 	viper.SetDefault(common.ViperTerraformDir, filepath.Join(common.DefaultDeploymentsDirName, common.DefaultTerraformDirName))
 	viper.SetDefault(common.ViperTerraformProjectDir, filepath.Join(common.DefaultDeploymentsDirName, common.DefaultProjectsDirName))
 
+	viper.SetDefault("carbon.providers.aws.auto_discover", true)
 	viper.SetDefault("carbon.providers.aws.enabled", true)
 	viper.SetDefault("carbon.providers.aws.profiles.default.enabled", true)
+
 	viper.SetDefault("carbon.providers.virtualbox.enabled", true)
+	viper.SetDefault("carbon.providers.virtualbox.auto_discover", true)
 	viper.SetDefault("carbon.providers.virtualbox.profiles.default.enabled", true)
+
 	viper.SetDefault("carbon.providers.qemu.enabled", true)
+	viper.SetDefault("carbon.providers.qemu.auto_discover", true)
 	viper.SetDefault("carbon.providers.qemu.profiles.default.enabled", true)
+
 	viper.SetDefault("carbon.providers.multipass.enabled", true)
+	viper.SetDefault("carbon.providers.multipass.auto_discover", true)
 	viper.SetDefault("carbon.providers.multipass.profiles.default.enabled", true)
 
 	if cfgFile != "" {
@@ -134,6 +141,7 @@ func initConfig() {
 
 	// do not need to handle err here. since an error will occur if the config file doesn't exist
 	_ = viper.MergeInConfig()
+	log.Debug("carbon config loaded", "config_file", viper.ConfigFileUsed())
 }
 
 func addServiceProviderFlag(c *cobra.Command) {
@@ -152,7 +160,7 @@ func getServiceProviders() []string {
 	var serviceProviderNames []string
 	serviceProviders := carbonObj.Providers()
 	for _, provider := range serviceProviders {
-		serviceProviderNames = append(serviceProviderNames, provider.Name())
+		serviceProviderNames = append(serviceProviderNames, provider.Type())
 	}
 	return serviceProviderNames
 }

@@ -61,15 +61,15 @@ func (p *Provider) IsAvailable() bool {
 func (p *Provider) Profiles() []types.Profile {
 	var profiles []types.Profile
 	for _, profileName := range p.AWSProfiles() {
-
 		profileConfig, ok := p.Provider.GetConfig().Profiles[profileName]
+		enabled := p.Provider.GetConfig().AutoDiscover
 		if !ok {
 			profileConfig = common.ProfileConfig{
-				Enabled: true,
+				Enabled: enabled,
 			}
 		}
 
-		log.Debug("aws profile", "profile", profileName, "enabled", profileConfig.Enabled, "ok", ok)
+		log.Debug("aws profile", "profile", profileName, "enabled", profileConfig.Enabled, "ok", ok, "auto_discover", p.Provider.GetConfig().AutoDiscover)
 		if profileConfig.Enabled {
 			profiles = append(profiles, NewProfile(profileName, p, profileConfig))
 		}

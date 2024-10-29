@@ -32,15 +32,17 @@ func init() {
 func New(config common.CarbonConfig) *Carbon {
 	carbon := &Carbon{config: config, providers: []types.Provider{}, profiles: []types.Profile{}, environments: []types.Environment{}}
 
+	log.Debug("new carbon instance", "config", config)
 	for _, provider := range AvailableProviders() {
 		providerConfig, ok := config.Providers[provider.Type()]
 		if !ok {
 			providerConfig = common.ProviderConfig{
-				Enabled: true,
+				Enabled:      true,
+				AutoDiscover: true,
 			}
 		}
 
-		log.Debug("adding provider", "provider", provider.Type(), "config_exists", ok, "enabled", providerConfig.Enabled)
+		log.Debug("adding provider", "provider", provider.Type(), "config_exists", ok, "providerConfig", providerConfig)
 		if providerConfig.Enabled {
 			// no config, or explicitly enabled
 			carbon.providers = append(carbon.providers, provider)
