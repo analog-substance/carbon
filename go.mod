@@ -4,10 +4,10 @@ go 1.23.1
 
 require (
 	github.com/NoF0rte/cmd-builder v0.0.0-20220305223538-e35bfeabbbff
-	github.com/analog-substance/util v1.0.3
+	github.com/analog-substance/util v1.1.0
 	github.com/aws/aws-sdk-go-v2 v1.32.3
 	github.com/aws/aws-sdk-go-v2/config v1.28.1
-	github.com/aws/aws-sdk-go-v2/service/ec2 v1.186.0
+	github.com/aws/aws-sdk-go-v2/service/ec2 v1.186.1
 	github.com/aws/aws-sdk-go-v2/service/sts v1.32.3
 	github.com/charmbracelet/huh v0.6.0
 	github.com/charmbracelet/lipgloss v0.13.1
@@ -43,12 +43,12 @@ require (
 	github.com/aymerick/douceur v0.2.0 // indirect
 	github.com/catppuccin/go v0.2.0 // indirect
 	github.com/charmbracelet/bubbles v0.20.0 // indirect
-	github.com/charmbracelet/bubbletea v1.1.1 // indirect
+	github.com/charmbracelet/bubbletea v1.1.2 // indirect
 	github.com/charmbracelet/glamour v0.8.0 // indirect
-	github.com/charmbracelet/x/ansi v0.3.2 // indirect
-	github.com/charmbracelet/x/exp/strings v0.0.0-20241007193646-7cc13b2883e3 // indirect
+	github.com/charmbracelet/x/ansi v0.4.2 // indirect
+	github.com/charmbracelet/x/exp/strings v0.0.0-20241029165211-e01e068b21a3 // indirect
 	github.com/charmbracelet/x/term v0.2.0 // indirect
-	github.com/dlclark/regexp2 v1.11.0 // indirect
+	github.com/dlclark/regexp2 v1.11.4 // indirect
 	github.com/dustin/go-humanize v1.0.1 // indirect
 	github.com/erikgeiser/coninput v0.0.0-20211004153227-1c3628e74d0f // indirect
 	github.com/fsnotify/fsnotify v1.7.0 // indirect
@@ -79,11 +79,11 @@ require (
 	github.com/spf13/cast v1.7.0 // indirect
 	github.com/spf13/pflag v1.0.5 // indirect
 	github.com/subosito/gotenv v1.6.0 // indirect
-	github.com/yuin/goldmark v1.7.4 // indirect
-	github.com/yuin/goldmark-emoji v1.0.3 // indirect
+	github.com/yuin/goldmark v1.7.8 // indirect
+	github.com/yuin/goldmark-emoji v1.0.4 // indirect
 	github.com/zclconf/go-cty v1.15.0 // indirect
 	go.uber.org/multierr v1.11.0 // indirect
-	golang.org/x/exp v0.0.0-20241004190924-225e2abe05e6 // indirect
+	golang.org/x/exp v0.0.0-20241009180824-f66d83c29e7c // indirect
 	golang.org/x/mod v0.21.0 // indirect
 	golang.org/x/net v0.30.0 // indirect
 	golang.org/x/sync v0.8.0 // indirect
