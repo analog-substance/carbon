@@ -10,7 +10,7 @@ require (
 	github.com/aws/aws-sdk-go-v2/service/ec2 v1.186.0
 	github.com/aws/aws-sdk-go-v2/service/sts v1.32.2
 	github.com/charmbracelet/huh v0.6.0
-	github.com/charmbracelet/lipgloss v0.13.0
+	github.com/charmbracelet/lipgloss v0.13.1
 	github.com/digitalocean/go-libvirt v0.0.0-20241007203800-ad92148935b6
 	github.com/hashicorp/hcl/v2 v2.22.0
 	github.com/mitchellh/go-homedir v1.1.0
