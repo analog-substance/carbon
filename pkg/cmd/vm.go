@@ -136,7 +136,7 @@ func vmTable(vms []types.VM) {
 		Headers(CapitalizeHeaders(headers)...).
 		Rows(data...).
 		StyleFunc(func(row, col int) lipgloss.Style {
-			if row == 0 {
+			if row == table.HeaderRow {
 				return headerStyle
 			}
 
@@ -149,7 +149,7 @@ func vmTable(vms []types.VM) {
 					c = dimTypeColors
 				}
 
-				color := c[fmt.Sprint(data[row-1][col])]
+				color := c[fmt.Sprint(data[row][col])]
 				return baseStyle.Foreground(color)
 			}
 
