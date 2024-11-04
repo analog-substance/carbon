@@ -20,7 +20,7 @@ require (
 	golang.org/x/crypto v0.28.0
 	gopkg.in/ini.v1 v1.67.0
 	gopkg.in/yaml.v3 v3.0.1
-	libvirt.org/go/libvirtxml v1.10008.0
+	libvirt.org/go/libvirtxml v1.10009.0
 )
 
 require (
