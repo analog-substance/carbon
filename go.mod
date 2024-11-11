@@ -5,7 +5,7 @@ go 1.23.1
 require (
 	github.com/NoF0rte/cmd-builder v0.0.0-20220305223538-e35bfeabbbff
 	github.com/analog-substance/util v1.1.0
-	github.com/aws/aws-sdk-go-v2 v1.32.3
+	github.com/aws/aws-sdk-go-v2 v1.32.4
 	github.com/aws/aws-sdk-go-v2/config v1.28.1
 	github.com/aws/aws-sdk-go-v2/service/ec2 v1.187.0
 	github.com/aws/aws-sdk-go-v2/service/sts v1.32.3
