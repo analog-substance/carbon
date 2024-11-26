@@ -22,13 +22,14 @@ This will:
 `,
 	Example: `carbon vnc start -n vm-name`,
 	Run: func(cmd *cobra.Command, args []string) {
+		privateIP, _ := cmd.Flags().GetBool("private-ip")
 		user, _ := cmd.Flags().GetString("user")
 		killVNC, _ := cmd.Flags().GetBool("kill-vnc")
 		vms := getVMsFromArgs(cmd, args)
 		if len(vms) > 1 {
 			fmt.Println("Too many vms specified.")
 		} else if len(vms) == 1 {
-			err := vms[0].StartVNC(user, killVNC)
+			err := vms[0].StartVNC(user, privateIP, killVNC)
 			if err != nil {
 				log.Error("failed to vnc to vm", "name", vms[0].Name(), "err", err)
 			}
@@ -40,5 +41,6 @@ This will:
 
 func init() {
 	vmCmd.AddCommand(vmVNCCmd)
+	vmVNCCmd.Flags().BoolP("private-ip", "p", false, "Use private IP address")
 	vmVNCCmd.Flags().BoolP("kill-vnc", "k", false, "Kill VNC before starting")
 }

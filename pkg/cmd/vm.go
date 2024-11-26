@@ -83,7 +83,7 @@ func AskIfSure(msg string) bool {
 
 }
 
-func vmTable(vms []types.VM) {
+func vmTable(vms []types.VM, privateIPs bool) {
 
 	re := lipgloss.NewRenderer(os.Stdout)
 	baseStyle := re.NewStyle().Padding(0, 1)
@@ -118,9 +118,15 @@ func vmTable(vms []types.VM) {
 		} else {
 			name = fmt.Sprintf("%s (%s)", vm.Name(), vm.ID())
 		}
+
+		ipAddrs := vm.IPAddress()
+		if privateIPs {
+			ipAddrs = vm.PrivateIPAddress()
+		}
+
 		data = append(data, []string{
 			name,
-			vm.IPAddress(),
+			ipAddrs,
 			vm.State(),
 			vm.UpTime().String(),
 			vm.Type(),

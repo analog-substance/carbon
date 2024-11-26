@@ -22,6 +22,7 @@ type VM interface {
 	Name() string
 	ID() string
 	IPAddress() string
+	PrivateIPAddress() string
 	UpTime() time.Duration
 	State() string
 	Type() string
@@ -35,10 +36,10 @@ type VM interface {
 	Stop() error
 	Restart() error
 
-	ExecSSH(string, ...string) error
-	StartVNC(user string, killVNC bool) error
-	Cmd(string, ...string) (string, error)
-	NewSSHSession(string) (*ssh_util.Session, error)
+	ExecSSH(string, bool, ...string) error
+	StartVNC(user string, privateIP bool, killVNC bool) error
+	Cmd(string, bool, ...string) (string, error)
+	NewSSHSession(string, bool) (*ssh_util.Session, error)
 }
 
 type ProjectMachine struct {

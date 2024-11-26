@@ -57,6 +57,13 @@ func (m *Machine) IPAddress() string {
 	return "unknown"
 }
 
+func (m *Machine) PrivateIPAddress() string {
+	if len(m.PrivateIPAddresses) > 0 {
+		return m.PrivateIPAddresses[0]
+	}
+	return "unknown"
+}
+
 func (m *Machine) UpTime() time.Duration {
 	return m.CurrentUpTime
 }
@@ -85,9 +92,12 @@ func (m *Machine) Restart() error {
 	return m.Env.RestartVM(m.InstanceID)
 }
 
-func (m *Machine) ExecSSH(user string, cmdArgs ...string) error {
+func (m *Machine) ExecSSH(user string, privateIP bool, cmdArgs ...string) error {
 	sshPath, _ := exec.LookPath("ssh")
 	ip := m.IPAddress()
+	if privateIP {
+		ip = m.PrivateIPAddress()
+	}
 
 	args := []string{
 		"ssh",
@@ -106,8 +116,8 @@ func (m *Machine) ExecSSH(user string, cmdArgs ...string) error {
 	return syscall.Exec(sshPath, args, os.Environ())
 }
 
-func (m *Machine) StartVNC(user string, killVNC bool) error {
-	sshSession, err := m.NewSSHSession(user)
+func (m *Machine) StartVNC(user string, privateIP bool, killVNC bool) error {
+	sshSession, err := m.NewSSHSession(user, privateIP)
 	if err != nil {
 		return err
 	}
@@ -169,7 +179,7 @@ func (m *Machine) StartVNC(user string, killVNC bool) error {
 	return nil
 }
 
-func (m *Machine) NewSSHSession(user string) (*ssh_util.Session, error) {
+func (m *Machine) NewSSHSession(user string, privateIP bool) (*ssh_util.Session, error) {
 	// Get SSH_AUTH_SOCK
 	// if it is not set, look at .ssh/config for IdentityAgent
 	// use that value
@@ -197,7 +207,11 @@ func (m *Machine) NewSSHSession(user string) (*ssh_util.Session, error) {
 		}
 	}()
 
-	err = session.Connect(fmt.Sprintf("%s:%d", m.IPAddress(), 22), user)
+	ip := m.IPAddress()
+	if privateIP {
+		ip = m.PrivateIPAddress()
+	}
+	err = session.Connect(fmt.Sprintf("%s:%d", ip, 22), user)
 	if err != nil {
 		return nil, err
 	}
@@ -205,8 +219,8 @@ func (m *Machine) NewSSHSession(user string) (*ssh_util.Session, error) {
 	return session, nil
 }
 
-func (m *Machine) Cmd(user string, cmdArgs ...string) (string, error) {
-	sshSession, err := m.NewSSHSession(user)
+func (m *Machine) Cmd(user string, privateIP bool, cmdArgs ...string) (string, error) {
+	sshSession, err := m.NewSSHSession(user, privateIP)
 	if err != nil {
 		return "", err
 	}

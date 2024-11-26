@@ -19,6 +19,7 @@ carbon vm list
 carbon vm list -n vm-
 `,
 	Run: func(cmd *cobra.Command, args []string) {
+		privateIP, _ := cmd.Flags().GetBool("private-ip")
 
 		vms := getVMsFromArgs(cmd, args)
 		if jsonOutput {
@@ -28,11 +29,12 @@ carbon vm list -n vm-
 			}
 			fmt.Println(string(out))
 		} else {
-			vmTable(vms)
+			vmTable(vms, privateIP)
 		}
 	},
 }
 
 func init() {
+	vmList.Flags().BoolP("private-ip", "p", false, "Print private IP address")
 	vmCmd.AddCommand(vmList)
 }

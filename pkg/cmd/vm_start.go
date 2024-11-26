@@ -14,7 +14,7 @@ var vmStart = &cobra.Command{
 	Run: func(cmd *cobra.Command, args []string) {
 		vms := getVMsFromArgs(cmd, args)
 		if len(vms) > 0 {
-			vmTable(vms)
+			vmTable(vms, false)
 			if AskIfSure(fmt.Sprintf("Do you want to start %d machines?", len(vms))) {
 				for _, vm := range vms {
 					err := vm.Start()

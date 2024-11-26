@@ -35,6 +35,7 @@ carbon vm ssh -n vm-name -- -A
 carbon vm ssh -n vm-name -- -D 1080
 `,
 	Run: func(cmd *cobra.Command, args []string) {
+		privateIP, _ := cmd.Flags().GetBool("private-ip")
 		user, _ := cmd.Flags().GetString("user")
 
 		vms := getVMsFromArgs(cmd, args)
@@ -51,7 +52,7 @@ carbon vm ssh -n vm-name -- -D 1080
 				}
 			}
 
-			err := vms[0].ExecSSH(user, args...)
+			err := vms[0].ExecSSH(user, privateIP, args...)
 			if err != nil {
 				log.Error("failed to ssh to vm", "name", vms[0].Name(), "err", err)
 			}
@@ -63,4 +64,5 @@ carbon vm ssh -n vm-name -- -D 1080
 
 func init() {
 	vmCmd.AddCommand(vmSSH)
+	vmSSH.Flags().BoolP("private-ip", "p", false, "Use private IP address")
 }

@@ -17,7 +17,7 @@ By default, carbon will attempt to hibernate the machine rather than power it of
 	Run: func(cmd *cobra.Command, args []string) {
 		vms := getVMsFromArgs(cmd, args)
 		if len(vms) > 0 {
-			vmTable(vms)
+			vmTable(vms, false)
 			if AskIfSure(fmt.Sprintf("Do you want to stop %d machines?", len(vms))) {
 				for _, vm := range vms {
 					err := vm.Stop()
