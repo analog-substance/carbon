@@ -47,14 +47,16 @@ func ListVMs() []VBoxVM {
 
 	vms := []VBoxVM{}
 	for _, vmLine := range strings.Split(string(output), "\n") {
-		vmInfo := strings.Split(vmLine, " ")
-		vmID := strings.Trim(vmInfo[1], "{}")
-		vm := VBoxVM{ID: vmID}
-		err = vm.loadInfo()
-		if err != nil {
-			log.Debug("error loading VM", "err", err)
+		if strings.Contains(vmLine, " ") {
+			vmInfo := strings.Split(vmLine, " ")
+			vmID := strings.Trim(vmInfo[1], "{}")
+			vm := VBoxVM{ID: vmID}
+			err = vm.loadInfo()
+			if err != nil {
+				log.Debug("error loading VM", "err", err)
+			}
+			vms = append(vms, vm)
 		}
-		vms = append(vms, vm)
 	}
 
 	return vms
