@@ -17,7 +17,7 @@ require (
 	github.com/spf13/cobra v1.8.1
 	github.com/spf13/viper v1.19.0
 	github.com/xanzy/ssh-agent v0.3.3
-	golang.org/x/crypto v0.30.0
+	golang.org/x/crypto v0.31.0
 	gopkg.in/ini.v1 v1.67.0
 	gopkg.in/yaml.v3 v3.0.1
 	libvirt.org/go/libvirtxml v1.10009.0
