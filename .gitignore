@@ -31,3 +31,4 @@ carbon.yaml
 deployments/images/
 !deployments/images/README.md
 .terraform.tfstate.lock.info
+.idea
