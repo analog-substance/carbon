@@ -2,6 +2,10 @@ package api
 
 import (
 	builder "github.com/NoF0rte/cmd-builder"
+	"os"
+	"os/exec"
+	"path/filepath"
+	"runtime"
 	"strings"
 )
 
@@ -14,9 +18,50 @@ type VBoxVM struct {
 	vmInfo map[string]string
 }
 
+var appPath string
+
+func AppPath() string {
+	if appPath == "" {
+
+		vboxExecName := "vboxmanage"
+		if //goland:noinspection GoBoolExpressions
+		runtime.GOOS == "windows" {
+			vboxExecName = "VBoxManage.exe"
+		}
+
+		virtualBox, err := exec.LookPath(vboxExecName)
+		if err == nil {
+			appPath, err = filepath.Abs(virtualBox)
+			if err != nil {
+				log.Debug("err getting absolute path", "virtualBox", virtualBox, "err", err)
+			}
+		} else {
+			if //goland:noinspection GoBoolExpressions
+			runtime.GOOS == "windows" {
+				// not in path, lets look in program files
+				vBoxManage := `Oracle\VirtualBox\VBoxManage.exe`
+				vboxManagePaths := []string{
+					filepath.Join(os.Getenv("programfiles"), vBoxManage),
+					filepath.Join(os.Getenv("programfiles(x86)"), vBoxManage),
+				}
+
+				for _, vboxManagePath := range vboxManagePaths {
+					_, err := os.Stat(vboxManagePath)
+					if err == nil {
+						appPath = vboxManagePath
+						break
+					}
+				}
+			}
+		}
+	}
+
+	return appPath
+}
+
 func (v *VBoxVM) loadInfo() error {
 	vmInfo, err := builder.
-		Cmd("vboxmanage", "showvminfo", "--machinereadable", v.ID).
+		Cmd(AppPath(), "showvminfo", "--machinereadable", v.ID).
 		Output()
 
 	if err != nil {
@@ -24,6 +69,7 @@ func (v *VBoxVM) loadInfo() error {
 	}
 	v.vmInfo = map[string]string{}
 	for _, line := range strings.Split(vmInfo, "\n") {
+		line = strings.TrimSpace(line)
 		if strings.Contains(line, "=") {
 			parts := strings.Split(line, "=")
 			v.vmInfo[strings.ToLower(strings.Trim(parts[0], "\""))] = strings.Trim(parts[1], "\"")
@@ -38,7 +84,7 @@ func (v *VBoxVM) loadInfo() error {
 
 func ListVMs() []VBoxVM {
 	output, err := builder.
-		Cmd("vboxmanage", "list", "vms").
+		Cmd(AppPath(), "list", "vms").
 		Output()
 
 	if err != nil {
@@ -47,6 +93,7 @@ func ListVMs() []VBoxVM {
 
 	vms := []VBoxVM{}
 	for _, vmLine := range strings.Split(string(output), "\n") {
+		vmLine = strings.TrimSpace(vmLine)
 		if strings.Contains(vmLine, " ") {
 			vmInfo := strings.Split(vmLine, " ")
 			vmID := strings.Trim(vmInfo[1], "{}")
@@ -64,21 +111,21 @@ func ListVMs() []VBoxVM {
 
 func StartVM(id string) error {
 	_, err := builder.
-		Cmd("vboxmanage", "startvm", id).
+		Cmd(AppPath(), "startvm", id).
 		Output()
 	return err
 }
 
 func RestartVM(id string) error {
 	_, err := builder.
-		Cmd("vboxmanage", "controlvm", id, "reboot").
+		Cmd(AppPath(), "controlvm", id, "reboot").
 		Output()
 	return err
 }
 
 func SleepVM(id string) error {
 	_, err := builder.
-		Cmd("vboxmanage", "controlvm", id, "savestate").
+		Cmd(AppPath(), "controlvm", id, "savestate").
 		Output()
 	return err
 }

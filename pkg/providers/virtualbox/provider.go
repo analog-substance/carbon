@@ -3,9 +3,8 @@ package virtualbox
 import (
 	"github.com/analog-substance/carbon/pkg/common"
 	"github.com/analog-substance/carbon/pkg/providers/base"
+	"github.com/analog-substance/carbon/pkg/providers/virtualbox/api"
 	"github.com/analog-substance/carbon/pkg/types"
-	"os/exec"
-	"path/filepath"
 )
 
 const providerName = "VirtualBox"
@@ -24,21 +23,8 @@ func New() types.Provider {
 	}
 }
 
-func (p *Provider) vboxPath() string {
-	if p.vboxmanageExecutablePath == "" {
-		virtualBox, err := exec.LookPath("vboxmanage")
-		if err == nil {
-			p.vboxmanageExecutablePath, err = filepath.Abs(virtualBox)
-			if err != nil {
-				log.Debug("err getting absolute path", "virtualBox", virtualBox, "err", err)
-			}
-		}
-	}
-	return p.vboxmanageExecutablePath
-}
-
 func (p *Provider) IsAvailable() bool {
-	return p.vboxPath() != ""
+	return api.AppPath() != ""
 }
 
 func (p *Provider) Profiles() []types.Profile {
