@@ -5,7 +5,6 @@ package vnc_viewer
 import (
 	"fmt"
 	builder "github.com/NoF0rte/cmd-builder"
-	"os/exec"
 )
 
 func StartViewer(options Options) error {

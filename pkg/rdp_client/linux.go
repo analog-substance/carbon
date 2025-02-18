@@ -5,6 +5,7 @@ package rdp_client
 import (
 	"fmt"
 	builder "github.com/NoF0rte/cmd-builder"
+	"os/exec"
 )
 
 func StartRDPClient(options Options) error {
