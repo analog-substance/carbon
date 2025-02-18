@@ -194,8 +194,9 @@ func (m *Machine) StartRDPClient(user string, privateIP bool) error {
 		User: user,
 	})
 	if err != nil {
+		log.Error("error starting rdpclient", "error", err)
 		fmt.Println("unable start rdp. Is it installed?")
-		fmt.Println("install the windows app via the app store")
+		fmt.Println("	on mac: install the windows app via the app store")
 	}
 
 	return nil
