@@ -78,6 +78,9 @@ func stateFromVboxInfo(state string) types.MachineState {
 	if state == "aborted" {
 		return types.StateStopped
 	}
+	if state == "running" {
+		return types.StateRunning
+	}
 
 	log.Debug("unknown state for VM", "state", state)
 	return types.StateUnknown
