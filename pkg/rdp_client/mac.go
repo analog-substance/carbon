@@ -13,7 +13,7 @@ import (
 var fileContentTmpl = "full address:s:%s\n"
 
 func StartRDPClient(options Options) error {
-
+	log.Debug("attempting to start RDP Client", "os", "mac")
 	tmpDir, err := ioutil.TempDir("", "carbon")
 	if err != nil {
 		return err
@@ -26,6 +26,7 @@ func StartRDPClient(options Options) error {
 		return err
 	}
 	fmt.Fprintf(rdpFile, fileContentTmpl, options.Host)
+
 	log.Debug("attempting to open rdp file", "rdpFilePath", rdpFilePath)
 	return builder.Cmd("open", rdpFilePath).Stderr(nil).Start()
 
