@@ -4,30 +4,32 @@ package rdp_client
 
 import (
 	"fmt"
-	builder "github.com/NoF0rte/cmd-builder"
-	"io/ioutil"
 	"os"
-	"path/filepath"
+	"time"
+
+	builder "github.com/NoF0rte/cmd-builder"
 )
 
-var fileContentTmpl = "full address:s:%s\n"
+var fileContentTmpl = "full address:s:%s\nusername:s:%s\n"
 
 func StartRDPClient(options Options) error {
-	log.Debug("attempting to start RDP Client", "os", "mac")
-	tmpDir, err := ioutil.TempDir("", "carbon")
-	if err != nil {
-		return err
+	if options.User == "" {
+		options.User = "administrator"
 	}
-	//defer os.RemoveAll(tmpDir)
 
-	rdpFilePath := filepath.Join(tmpDir, "rdp_client.rb")
-	rdpFile, err := os.Open(rdpFilePath)
+	log.Debug("attempting to start RDP Client", "os", "mac")
+	tmpFile, err := os.CreateTemp("", "carbon_*.rdp")
 	if err != nil {
 		return err
 	}
-	fmt.Fprintf(rdpFile, fileContentTmpl, options.Host)
+	rdpFilePath := tmpFile.Name()
+	defer os.Remove(rdpFilePath)
+	fmt.Fprintf(tmpFile, fileContentTmpl, options.Host, options.User)
+	tmpFile.Close()
 
 	log.Debug("attempting to open rdp file", "rdpFilePath", rdpFilePath)
-	return builder.Cmd("open", rdpFilePath).Stderr(nil).Start()
+	cmdRes := builder.Cmd("/usr/bin/open", rdpFilePath).Stderr(nil).Start()
+	time.Sleep(500 * time.Millisecond)
 
+	return cmdRes
 }
