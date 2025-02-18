@@ -18,7 +18,7 @@ func StartRDPClient(options Options) error {
 	if err != nil {
 		return err
 	}
-	defer os.RemoveAll(tmpDir)
+	//defer os.RemoveAll(tmpDir)
 
 	rdpFilePath := filepath.Join(tmpDir, "rdp_client.rb")
 	rdpFile, err := os.Open(rdpFilePath)
