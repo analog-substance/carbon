@@ -38,6 +38,7 @@ type VM interface {
 
 	ExecSSH(string, bool, ...string) error
 	StartVNC(user string, privateIP bool, killVNC bool) error
+	StartRDPClient(user string, privateIP bool) error
 	Cmd(string, bool, ...string) (string, error)
 	NewSSHSession(string, bool) (*ssh_util.Session, error)
 }
