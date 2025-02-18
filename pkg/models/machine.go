@@ -4,6 +4,7 @@ import (
 	"encoding/base64"
 	"fmt"
 	"github.com/NoF0rte/cmd-builder"
+	"github.com/analog-substance/carbon/pkg/rdp_client"
 	"github.com/analog-substance/carbon/pkg/ssh_util"
 	"github.com/analog-substance/carbon/pkg/types"
 	"github.com/analog-substance/carbon/pkg/vnc_viewer"
@@ -174,6 +175,27 @@ func (m *Machine) StartVNC(user string, privateIP bool, killVNC bool) error {
 	err = sshSession.ForwardLocalPort(localPort, vncPort)
 	if err != nil {
 		return err
+	}
+
+	return nil
+}
+
+func (m *Machine) StartRDPClient(user string, privateIP bool) error {
+
+	log.Debug("start rdpclient", "machine", m.Name())
+
+	ip := m.IPAddress()
+	if privateIP {
+		ip = m.PrivateIPAddress()
+	}
+
+	err := rdp_client.Start(rdp_client.Options{
+		Host: ip,
+		User: user,
+	})
+	if err != nil {
+		fmt.Println("unable start rdp. Is it installed?")
+		fmt.Println("install the windows app via the app store")
 	}
 
 	return nil
