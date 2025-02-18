@@ -5,7 +5,7 @@ import (
 	"github.com/analog-substance/carbon/deployments"
 	"github.com/spf13/cobra"
 	"os"
-	"path/filepath"
+	"path"
 )
 
 // fsCmd represents the new command
@@ -29,9 +29,9 @@ func ListingDir(dir string) {
 		os.Exit(2)
 	}
 	for _, file := range listing {
-		fmt.Println(filepath.Join(dir, file.Name()))
+		fmt.Println(path.Join(dir, file.Name()))
 		if file.IsDir() {
-			ListingDir(filepath.Join(dir, file.Name()))
+			ListingDir(path.Join(dir, file.Name()))
 		}
 	}
 }

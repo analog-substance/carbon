@@ -8,6 +8,7 @@ import (
 	"path/filepath"
 	"runtime"
 	"strings"
+	"time"
 )
 
 type VBoxVM struct {
@@ -15,6 +16,7 @@ type VBoxVM struct {
 	ID                 string
 	State              string
 	GuestOS            string
+	UpTime             time.Duration
 	PrivateIPAddresses []string
 	vmInfo             map[string]string
 }
@@ -82,7 +84,15 @@ func (v *VBoxVM) loadInfo() error {
 	v.GuestOS = v.vmInfo["ostype"]
 	v.Name = v.vmInfo["name"]
 	v.State = v.vmInfo["vmstate"]
+	v.UpTime = time.Second * 0
 	v.PrivateIPAddresses = []string{}
+
+	changeTime, err := time.Parse("2006-01-02T15:04:05.999999999", v.vmInfo["vmstatechangetime"])
+	if err != nil {
+		log.Debug("err parsing vmstatechangetime", "err", err, "vmstatechangetime", v.vmInfo["vmstatechangetime"])
+	} else {
+		v.UpTime = time.Now().Sub(changeTime)
+	}
 
 	for i := 1; i < 8; i++ {
 		if n, ok := v.vmInfo[fmt.Sprintf("nic%d", i)]; ok {
@@ -91,7 +101,6 @@ func (v *VBoxVM) loadInfo() error {
 			}
 		}
 	}
-
 	return nil
 }
 

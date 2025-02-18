@@ -11,6 +11,7 @@ import (
 	"github.com/spf13/viper"
 	"html/template"
 	"os"
+	"path"
 	"path/filepath"
 	"strings"
 )
@@ -87,11 +88,11 @@ func (p *Provider) NewImageBuild(name, tplDir string) (types.ImageBuild, error) 
 		return nil, err
 	}
 	embeddedFS := deployments.Files
-	tplPackerDir := filepath.Join(common.DefaultPackerDirName, tplDir)
+	tplPackerDir := path.Join(common.DefaultPackerDirName, tplDir)
 
 	// copy packer file
 	packerFilename := fmt.Sprintf("%s%s", p.Type(), PackerFileSuffixCloudInit)
-	tplPackerFile := filepath.Join(tplPackerDir, packerFilename)
+	tplPackerFile := path.Join(tplPackerDir, packerFilename)
 	bootstrappedPackerFile := filepath.Join(bootstrappedDir, packerFilename)
 	err = copyFileFromEmbeddedFS(tplPackerFile, bootstrappedPackerFile, embeddedFS)
 	if err != nil {
@@ -102,12 +103,12 @@ func (p *Provider) NewImageBuild(name, tplDir string) (types.ImageBuild, error) 
 	// don't care if it fails. file may not exist
 	// copy packer vars
 	packerVarsFilename := fmt.Sprintf("%s%s", p.Type(), PackerFileSuffixVariables)
-	tplPackerVarsFile := filepath.Join(tplPackerDir, packerVarsFilename)
+	tplPackerVarsFile := path.Join(tplPackerDir, packerVarsFilename)
 	bootstrappedPackerVarsFile := filepath.Join(bootstrappedDir, packerVarsFilename)
 	_ = copyFileFromEmbeddedFS(tplPackerVarsFile, bootstrappedPackerVarsFile, embeddedFS)
 
 	// copy local vars
-	tplLocalVarsFile := filepath.Join(tplPackerDir, PackerFileLocalVars)
+	tplLocalVarsFile := path.Join(tplPackerDir, PackerFileLocalVars)
 	bootstrappedLocalVarsFile := filepath.Join(bootstrappedDir, PackerFileLocalVars)
 	err = copyFileFromEmbeddedFS(tplLocalVarsFile, bootstrappedLocalVarsFile, embeddedFS)
 	if err != nil {
@@ -115,7 +116,7 @@ func (p *Provider) NewImageBuild(name, tplDir string) (types.ImageBuild, error) 
 	}
 
 	// copy private vars example
-	tplPrivateVarsExampleFile := filepath.Join(tplPackerDir, PackerFilePrivateVarsExample)
+	tplPrivateVarsExampleFile := path.Join(tplPackerDir, PackerFilePrivateVarsExample)
 	bootstrappedPrivateVarsExampleFile := filepath.Join(bootstrappedDir, PackerFilePrivateVarsExample)
 	err = copyFileFromEmbeddedFS(tplPrivateVarsExampleFile, bootstrappedPrivateVarsExampleFile, embeddedFS)
 	if err != nil {
@@ -123,7 +124,7 @@ func (p *Provider) NewImageBuild(name, tplDir string) (types.ImageBuild, error) 
 	}
 
 	// copy private vars example
-	tplPackerFilePacker := filepath.Join(tplPackerDir, PackerFilePacker)
+	tplPackerFilePacker := path.Join(tplPackerDir, PackerFilePacker)
 	bootstrappedPackerFilePacker := filepath.Join(bootstrappedDir, PackerFilePacker)
 	err = copyFileFromEmbeddedFS(tplPackerFilePacker, bootstrappedPackerFilePacker, embeddedFS)
 	if err != nil {
@@ -136,7 +137,7 @@ func (p *Provider) NewImageBuild(name, tplDir string) (types.ImageBuild, error) 
 		return nil, err
 	}
 	if containsVars {
-		err = copyFileFromEmbeddedFS(filepath.Join(tplPackerDir, PackerFileIsoVars), filepath.Join(bootstrappedDir, PackerFileIsoVars), embeddedFS)
+		err = copyFileFromEmbeddedFS(path.Join(tplPackerDir, PackerFileIsoVars), filepath.Join(bootstrappedDir, PackerFileIsoVars), embeddedFS)
 		if err != nil {
 			return nil, err
 		}
@@ -148,10 +149,10 @@ func (p *Provider) NewImageBuild(name, tplDir string) (types.ImageBuild, error) 
 	// determine user-data type (autoinstall or native cloud init)
 	if autoInstall {
 		cloudInitDir = filepath.Join(bootstrappedDir, CloudInitDir, "autoinstall")
-		userDataFile = filepath.Join(tplPackerDir, CloudInitDir, "autoinstall", "user-data")
+		userDataFile = path.Join(tplPackerDir, CloudInitDir, "autoinstall", "user-data")
 	} else {
 		cloudInitDir = filepath.Join(bootstrappedDir, CloudInitDir, "default")
-		userDataFile = filepath.Join(tplPackerDir, CloudInitDir, "default", "user-data")
+		userDataFile = path.Join(tplPackerDir, CloudInitDir, "default", "user-data")
 	}
 
 	err = os.MkdirAll(cloudInitDir, 0755)
@@ -188,7 +189,7 @@ func (p *Provider) NewProject(name string, force bool) (types.Project, error) {
 		return nil, err
 	}
 
-	embeddedDir := filepath.Join(common.DefaultProjectsDirName, p.Type())
+	embeddedDir := path.Join(common.DefaultProjectsDirName, p.Type())
 	dirListing, err := deployments.Files.ReadDir(embeddedDir)
 	if err != nil {
 		log.Debug("failed to read embedded project dir", "dir", common.DefaultProjectsDirName, "service", p.Type(), "err", err)
@@ -197,7 +198,7 @@ func (p *Provider) NewProject(name string, force bool) (types.Project, error) {
 	for _, d := range dirListing {
 		if !d.IsDir() {
 			err = copyTemplateFromEmbeddedFS(
-				filepath.Join(embeddedDir, d.Name()),
+				path.Join(embeddedDir, d.Name()),
 				filepath.Join(projectDir, d.Name()),
 				deployments.Files,
 				ImageBuildDate{name},

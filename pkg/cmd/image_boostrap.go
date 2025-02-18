@@ -36,7 +36,7 @@ var imageBootstrapCmd = &cobra.Command{
 func init() {
 	imageCmd.AddCommand(imageBootstrapCmd)
 	imageBootstrapCmd.Flags().StringP("name", "n", "", "Name of image build")
-	imageBootstrapCmd.Flags().StringP("template", "t", "ubuntu-24.04", "Template to use")
+	imageBootstrapCmd.Flags().StringP("template", "t", "ubuntu-base", "Template to use")
 	addServiceProviderFlag(imageBootstrapCmd)
 
 	err := imageBootstrapCmd.RegisterFlagCompletionFunc("template", func(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
