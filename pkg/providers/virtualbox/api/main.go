@@ -91,7 +91,7 @@ func (v *VBoxVM) loadInfo() error {
 	if err != nil {
 		log.Debug("err parsing vmstatechangetime", "err", err, "vmstatechangetime", v.vmInfo["vmstatechangetime"])
 	} else {
-		v.UpTime = time.Now().Sub(changeTime)
+		v.UpTime = time.Since(changeTime)
 	}
 
 	for i := 1; i < 8; i++ {
