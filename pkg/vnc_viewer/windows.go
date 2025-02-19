@@ -16,7 +16,7 @@ const (
 func StartViewer(options Options) error {
 	vncViewerPath := findVNCViewerExecutable()
 	if vncViewerPath != "" {
-		return builder.Shell(fmt.Sprintf("& '%s' %s %s > $null 2>&1", options.Delay, vncViewerPath, options.PasswordFile, options.Host)).Start()
+		return builder.Shell(fmt.Sprintf("& '%s' %s %s > $null 2>&1", vncViewerPath, options.PasswordFile, options.Host)).Start()
 	}
 
 	return fmt.Errorf("unable to find vncviewer")

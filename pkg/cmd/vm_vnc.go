@@ -20,7 +20,7 @@ This will:
 - Setup a tunnel to access vnc
 - start vncviewer
 `,
-	Example: `carbon vnc start -n vm-name`,
+	Example: `carbon vm vnc -n vm-name`,
 	Run: func(cmd *cobra.Command, args []string) {
 		privateIP, _ := cmd.Flags().GetBool("private-ip")
 		user, _ := cmd.Flags().GetString("user")
