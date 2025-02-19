@@ -25,10 +25,11 @@ func (e *Environment) VMs() []types.VM {
 	for _, vboxVM := range api.ListVMs() {
 
 		vms = append(vms, &models.Machine{
-			InstanceName: vboxVM.Name,
-			CurrentState: stateFromVboxInfo(vboxVM.State),
-			InstanceID:   vboxVM.ID,
-			Env:          e,
+			InstanceName:       vboxVM.Name,
+			CurrentState:       stateFromVboxInfo(vboxVM.State),
+			InstanceID:         vboxVM.ID,
+			Env:                e,
+			PrivateIPAddresses: vboxVM.PrivateIPAddresses,
 		})
 	}
 	return vms

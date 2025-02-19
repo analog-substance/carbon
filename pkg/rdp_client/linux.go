@@ -13,7 +13,7 @@ func StartRDPClient(options Options) error {
 
 	rdpClientPath := getRDPClientPath()
 	if rdpClientPath != "" {
-		log.Debug("rdp client found in applications", "os", "linux", "rdpClientPath", rdpClientPath)
+		log.Debug("rdp client found in applications", "os", "linux", "rdpClientPath", rdpClientPath, "host", options.Host)
 		return builder.Cmd(rdpClientPath, options.Host).Start()
 	}
 

@@ -1,6 +1,7 @@
 package api
 
 import (
+	"fmt"
 	builder "github.com/NoF0rte/cmd-builder"
 	"os"
 	"os/exec"
@@ -10,12 +11,12 @@ import (
 )
 
 type VBoxVM struct {
-	Name    string
-	ID      string
-	State   string
-	GuestOS string
-
-	vmInfo map[string]string
+	Name               string
+	ID                 string
+	State              string
+	GuestOS            string
+	PrivateIPAddresses []string
+	vmInfo             map[string]string
 }
 
 var appPath string
@@ -75,9 +76,21 @@ func (v *VBoxVM) loadInfo() error {
 			v.vmInfo[strings.ToLower(strings.Trim(parts[0], "\""))] = strings.Trim(parts[1], "\"")
 		}
 	}
+
+	log.Debug("vbox vm info", "vmInfo", v.vmInfo)
+
 	v.GuestOS = v.vmInfo["ostype"]
 	v.Name = v.vmInfo["name"]
 	v.State = v.vmInfo["vmstate"]
+	v.PrivateIPAddresses = []string{}
+
+	for i := 1; i < 8; i++ {
+		if n, ok := v.vmInfo[fmt.Sprintf("nic%d", i)]; ok {
+			if n == "nat" {
+				v.PrivateIPAddresses = append(v.PrivateIPAddresses, "10.0.2.15")
+			}
+		}
+	}
 
 	return nil
 }
