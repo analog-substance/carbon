@@ -1,26 +1,31 @@
 ---
-title: Vm Restart
-description: Restart VM(s)
+title: Vm Rdp
+description: RDP to a VM
 ---
 
 ## Synopsis
 
-Restart VM(s).
+RDP to a VM.
+This will:
+
+- RDP to the VM :D
+
 
 ```
-carbon vm restart [flags]
+carbon vm rdp [flags]
 ```
 
 ## Examples
 
 ```bash
-carbon vm restart -n vm-name
+carbon vnc rdp -n vm-name
 ```
 
 ## Options
 
 ```
-  -h, --help   help for restart
+  -h, --help         help for rdp
+  -p, --private-ip   Use private IP address
 ```
 
 ## Options inherited from parent commands

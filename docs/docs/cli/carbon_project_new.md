@@ -1,26 +1,29 @@
 ---
-title: Project Apply
-description: Run terraform apply
+title: Project New
+description: Create a new project.
 ---
 
 ## Synopsis
 
-Apply terraform. No need to change dirs.
+Create a new project.
 
 ```
-carbon project apply [flags]
+carbon project new [flags]
 ```
 
 ## Examples
 
 ```bash
-carbon project apply -p project-name
+carbon project new -n project-name
 ```
 
 ## Options
 
 ```
-  -h, --help   help for apply
+  -f, --force            Force over writing files.
+  -h, --help             help for new
+  -n, --name string      Name of the new project.
+  -S, --service string   Service provider (aws, virtualbox, qemu, multipass)
 ```
 
 ## Options inherited from parent commands
