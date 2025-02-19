@@ -29,6 +29,7 @@ func (e *Environment) VMs() []types.VM {
 			CurrentState:       stateFromVboxInfo(vboxVM.State),
 			InstanceID:         vboxVM.ID,
 			Env:                e,
+			CurrentUpTime:      vboxVM.UpTime,
 			PrivateIPAddresses: vboxVM.PrivateIPAddresses,
 		})
 	}

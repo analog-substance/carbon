@@ -1,4 +1,4 @@
-source "qemu" "carbon-ubuntu-desktop" {
+source "qemu" "carbon-ubuntu-base" {
 
   iso_url      = var.iso_url
   iso_checksum = var.iso_checksum
@@ -23,7 +23,7 @@ source "qemu" "carbon-ubuntu-desktop" {
 }
 
 build {
-  sources = ["source.qemu.carbon-ubuntu-desktop"]
+  sources = ["source.qemu.carbon-ubuntu-base"]
 
   provisioner "shell" {
     inline = [
