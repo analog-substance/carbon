@@ -117,6 +117,14 @@ func (m *Machine) ExecSSH(user string, privateIP bool, cmdArgs ...string) error 
 	return syscall.Exec(sshPath, args, os.Environ())
 }
 
+// StartVNC will create a VNC session on the virtual machine
+// It accomplishes this by:
+//   - SSH to the VM.
+//   - Start VNC if it is not already running.
+//   - Forward a port through the SSH session.
+//   - VNC to the forwarded port.
+//
+// Requires TigerVNC to be installed.
 func (m *Machine) StartVNC(user string, privateIP bool, killVNC bool) error {
 	sshSession, err := m.NewSSHSession(user, privateIP)
 	if err != nil {

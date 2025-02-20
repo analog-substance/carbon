@@ -45,7 +45,7 @@ Or use `go install`.
 ```sh
 go install github.com/analog-substance/carbon@latest
 ```
-
+Be sure to check out the [providers](pkg/providers) section for additional information on configuring your provider.
 ## Requirements
 
 Carbon expects the following to be installed and accessible in your `$PATH`.
@@ -53,7 +53,7 @@ Carbon expects the following to be installed and accessible in your `$PATH`.
 - Packer
 - Terraform
 - SSH Client
-- vncviewer (TigerVNC) 
+- vncviewer (TigerVNC)
 
 ## Usage
 ***
