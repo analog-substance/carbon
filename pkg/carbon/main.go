@@ -1,3 +1,4 @@
+// Package carbon provides core application functionality and constants
 package carbon
 
 import (

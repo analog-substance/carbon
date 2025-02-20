@@ -1,3 +1,4 @@
+// Carbon main package
 package main
 
 import (
@@ -19,6 +20,5 @@ func main() {
 	completion.AddToRootCmd(cmd.CarbonCmd)
 	cmd.CarbonCmd.AddCommand(docs.CobraDocsCmd)
 	glamour_help.AddToRootCmd(cmd.CarbonCmd)
-
 	cmd.Execute()
 }

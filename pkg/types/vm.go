@@ -18,10 +18,18 @@ var StateTerminating = MachineState{"Terminating"}
 var StateTerminated = MachineState{"Terminated"}
 var StateUnknown = MachineState{"Unknown"}
 
+// VM interface provides access to useful information and actions related to Virtual Machines
 type VM interface {
+	// Name returns the name of a virtual machine
 	Name() string
+
+	// ID returns the ID of the virtual machine
 	ID() string
+
+	// IPAddress returns the public IP address of the virtual machine
 	IPAddress() string
+
+	// PrivateIPAddress of the virtual machine
 	PrivateIPAddress() string
 	UpTime() time.Duration
 	State() string
