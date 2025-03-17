@@ -1,6 +1,7 @@
 module github.com/analog-substance/carbon
 
 go 1.23.1
+
 toolchain go1.24.1
 
 require (
@@ -11,7 +12,7 @@ require (
 	github.com/aws/aws-sdk-go-v2/service/ec2 v1.210.0
 	github.com/aws/aws-sdk-go-v2/service/sts v1.33.17
 	github.com/charmbracelet/huh v0.6.0
-	github.com/charmbracelet/lipgloss v1.0.0
+	github.com/charmbracelet/lipgloss v1.1.0
 	github.com/digitalocean/go-libvirt v0.0.0-20250207191401-950a7b2d7eaf
 	github.com/hashicorp/hcl/v2 v2.23.0
 	github.com/mitchellh/go-homedir v1.1.0
@@ -45,8 +46,10 @@ require (
 	github.com/catppuccin/go v0.3.0 // indirect
 	github.com/charmbracelet/bubbles v0.20.0 // indirect
 	github.com/charmbracelet/bubbletea v1.3.3 // indirect
+	github.com/charmbracelet/colorprofile v0.2.3-0.20250311203215-f60798e515dc // indirect
 	github.com/charmbracelet/glamour v0.8.0 // indirect
 	github.com/charmbracelet/x/ansi v0.8.0 // indirect
+	github.com/charmbracelet/x/cellbuf v0.0.13-0.20250311204145-2c3ea96c31dd // indirect
 	github.com/charmbracelet/x/exp/strings v0.0.0-20250218211454-aedd0cd23ed7 // indirect
 	github.com/charmbracelet/x/term v0.2.1 // indirect
 	github.com/dlclark/regexp2 v1.11.5 // indirect
@@ -77,6 +80,7 @@ require (
 	github.com/spf13/cast v1.7.1 // indirect
 	github.com/spf13/pflag v1.0.6 // indirect
 	github.com/subosito/gotenv v1.6.0 // indirect
+	github.com/xo/terminfo v0.0.0-20220910002029-abceb7e1c41e // indirect
 	github.com/yuin/goldmark v1.7.8 // indirect
 	github.com/yuin/goldmark-emoji v1.0.5 // indirect
 	github.com/zclconf/go-cty v1.16.2 // indirect
