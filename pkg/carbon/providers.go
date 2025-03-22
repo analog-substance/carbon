@@ -3,6 +3,7 @@ package carbon
 import (
 	"fmt"
 	"github.com/analog-substance/carbon/pkg/providers/aws"
+	"github.com/analog-substance/carbon/pkg/providers/digitalocean"
 	"github.com/analog-substance/carbon/pkg/providers/multipass"
 	"github.com/analog-substance/carbon/pkg/providers/qemu"
 	"github.com/analog-substance/carbon/pkg/providers/virtualbox"
@@ -18,6 +19,7 @@ func AvailableProviders() []types.Provider {
 			qemu.New(),
 			virtualbox.New(),
 			multipass.New(),
+			digitalocean.New(),
 		}
 
 		for _, provider := range allProviders {
