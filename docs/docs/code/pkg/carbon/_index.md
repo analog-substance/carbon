@@ -91,7 +91,7 @@ const PackerFileSuffixVariables = "-variables.pkr.hcl"
 ```
 
 <a name="AvailableProviders"></a>
-## func [AvailableProviders](<https://github.com/analog-substance/carbon/blob/main/pkg/carbon/providers.go#L14>)
+## func [AvailableProviders](<https://github.com/analog-substance/carbon/blob/main/pkg/carbon/providers.go#L15>)
 
 ```go
 func AvailableProviders() []types.Provider
@@ -201,7 +201,7 @@ func (c *Carbon) GetProjects() ([]types.Project, error)
 
 
 <a name="Carbon.GetProvider"></a>
-### func \(\*Carbon\) [GetProvider](<https://github.com/analog-substance/carbon/blob/main/pkg/carbon/providers.go#L39>)
+### func \(\*Carbon\) [GetProvider](<https://github.com/analog-substance/carbon/blob/main/pkg/carbon/providers.go#L41>)
 
 ```go
 func (c *Carbon) GetProvider(providerType string) (types.Provider, error)
@@ -228,7 +228,7 @@ func (c *Carbon) Profiles() []types.Profile
 
 
 <a name="Carbon.Providers"></a>
-### func \(\*Carbon\) [Providers](<https://github.com/analog-substance/carbon/blob/main/pkg/carbon/providers.go#L35>)
+### func \(\*Carbon\) [Providers](<https://github.com/analog-substance/carbon/blob/main/pkg/carbon/providers.go#L37>)
 
 ```go
 func (c *Carbon) Providers() []types.Provider

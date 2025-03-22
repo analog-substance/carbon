@@ -26,7 +26,7 @@ func Start(options Options) error
 
 
 <a name="StartViewer"></a>
-## func [StartViewer](<https://github.com/analog-substance/carbon/blob/main/pkg/vnc_viewer/windows.go#L16>)
+## func [StartViewer](<https://github.com/analog-substance/carbon/blob/main/pkg/vnc_viewer/linux.go#L10>)
 
 ```go
 func StartViewer(options Options) error

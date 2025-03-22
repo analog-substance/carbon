@@ -26,7 +26,7 @@ func Start(options Options) error
 
 
 <a name="StartRDPClient"></a>
-## func [StartRDPClient](<https://github.com/analog-substance/carbon/blob/main/pkg/rdp_client/windows.go#L14>)
+## func [StartRDPClient](<https://github.com/analog-substance/carbon/blob/main/pkg/rdp_client/linux.go#L11>)
 
 ```go
 func StartRDPClient(options Options) error
