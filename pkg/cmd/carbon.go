@@ -31,7 +31,6 @@ var CarbonCmd = &cobra.Command{
 - 😢 Have a problem? [Create an Issue](https://github.com/analog-substance/carbon/issues/new?title=Something%20is%20broken)
 - ❤️ Enjoying Carbon? [Star the Repo](https://github.com/analog-substance/carbon)
 
-
 ## Purpose
 
 Carbon's primary purpose is to provide a consistent execution environment to

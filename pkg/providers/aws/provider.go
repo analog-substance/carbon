@@ -1,5 +1,7 @@
+// Package aws handles communications with AWS APIs
 package aws
 
+// Other docs here are cool as well
 import (
 	"github.com/analog-substance/carbon/pkg/common"
 	"github.com/analog-substance/carbon/pkg/providers/base"
@@ -16,6 +18,8 @@ type Provider struct {
 	profiles []string
 }
 
+// New creates new instance of an AWS Provider and returns it.
+// Defaults to no profiles, this forces a query of the AWS config at runtime.
 func New() types.Provider {
 	return &Provider{
 		base.NewWithName(providerName),
