@@ -23,14 +23,15 @@ It uses:
 It is aimed at supporting various services to ensure it can scale with you as
 your operations become more complex.
 
-| Feature                       | AWS ✅ | QEMU ✅ | VirtualBox ✅ | vSphere ❌ | Multipass ✅ | Azure ❌ | GCP ❌ |
-|-------------------------------|-------|--------|--------------|-----------|-------------|---------|-------|
-| Image build templates         | ✅     | ✅      | ✅            | ✅         | ❌ N/A       | ❌       | ❌     |
-| Build images                  | ✅     | ✅      | ✅            | ✅         | ❌ N/A       | ❌       | ❌     |
-| Launch one off VM from images | ❌     | ✅      | ❌            | ❌         | ❌           | ❌       | ❌     |
-| Destroy VMs                   | ✅     | ✅      | ✅            | ✅         | ❌ N/A       | ❌       | ❌     |
-| VM Start/Stop/SSH/VNC         | ✅     | ✅      | ✅            | ❌         | ✅           | ❌       | ❌     |
-| Infrastructure Creation       | ❌     | ❌      | ❌            | ❌         | ❌ N/A       | ❌       | ❌     |
+| Feature                       | AWS ✅ | QEMU ✅ | VirtualBox ✅ | DigitalOcean ✅ | vSphere ❌ | Multipass ✅ | Azure ❌ | GCP ❌ |
+|-------------------------------|-------|--------|--------------|----------------|-----------|-------------|---------|-------|
+| List VMs                      | ✅     | ✅      | ✅            | ✅              | ❌         | ✅           | ❌       | ❌     |
+| VM Actions Start/Stop/SSH/VNC | ✅     | ✅      | ✅            | ✅              | ❌         | ✅           | ❌       | ❌     |
+| Image build templates         | ✅     | ✅      | ✅            | ❌              | ✅         | ❌ N/A       | ❌       | ❌     |
+| Build images                  | ✅     | ✅      | ✅            | ❌              | ✅         | ❌ N/A       | ❌       | ❌     |
+| Launch one off VM from images | ❌     | ✅      | ❌            | ❌              | ❌         | ❌           | ❌       | ❌     |
+| Destroy VMs                   | ✅     | ✅      | ✅            | ❌              | ✅         | ❌ N/A       | ❌       | ❌     |
+| Infrastructure Creation       | ❌     | ❌      | ❌            | ❌              | ❌         | ❌ N/A       | ❌       | ❌     |
 
 ❌ = Not Right Now, but planned  
 ✅ = Supported
