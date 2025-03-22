@@ -8,7 +8,6 @@ import (
 	"github.com/analog-substance/carbon/pkg/providers/base"
 	"github.com/analog-substance/carbon/pkg/types"
 	"github.com/digitalocean/godo"
-	"net"
 )
 
 type Environment struct {
@@ -23,17 +22,6 @@ func (e *Environment) Name() string {
 
 func (e *Environment) Profile() types.Profile {
 	return e.profile
-}
-
-func getIPsFromSlice(ipStrings []string) []net.IP {
-	ips := []net.IP{}
-	for _, ip := range ipStrings {
-		ip := net.ParseIP(ip)
-		if ip == nil {
-			ips = append(ips, ip)
-		}
-	}
-	return ips
 }
 
 func (e *Environment) VMs() []types.VM {

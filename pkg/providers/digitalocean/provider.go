@@ -12,8 +12,6 @@ import (
 )
 
 const providerName = "DigitalOcean"
-const profileName = "default"
-const environmentName = "local"
 
 type Provider struct {
 	types.Provider
