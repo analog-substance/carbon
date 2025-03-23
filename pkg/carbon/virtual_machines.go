@@ -5,17 +5,23 @@ import (
 	"github.com/analog-substance/carbon/pkg/providers/base"
 	"github.com/analog-substance/carbon/pkg/types"
 	"strings"
+	"sync"
 )
 
 func (c *Carbon) GetVMs() []types.VM {
 	if len(c.machines) == 0 {
 		c.machines = []types.VM{}
+		mu := sync.Mutex{}
 		for _, profile := range c.Profiles() {
 			for _, env := range profile.Environments() {
-				c.machines = append(c.machines, env.VMs()...)
+				go func() {
+					machines := env.VMs()
+					mu.Lock()
+					c.machines = append(c.machines, machines...)
+					mu.Unlock()
+				}()
 			}
 		}
-
 	}
 	return c.machines
 }
