@@ -15,23 +15,24 @@ const providerName = "AWS"
 
 type Provider struct {
 	types.Provider
-	profiles []string
+	awsProfileNames []string
+	profiles        []types.Profile
 }
 
 // New creates new instance of an AWS Provider and returns it.
-// Defaults to no profiles, this forces a query of the AWS config at runtime.
+// Defaults to no awsProfileNames, this forces a query of the AWS config at runtime.
 func New() types.Provider {
 	return &Provider{
-		base.NewWithName(providerName),
-		[]string{},
+		Provider:        base.NewWithName(providerName),
+		awsProfileNames: []string{},
 	}
 }
 
 func (p *Provider) AWSProfiles() []string {
-	if len(p.profiles) > 0 {
-		return p.profiles
+	if len(p.awsProfileNames) > 0 {
+		return p.awsProfileNames
 	}
-	p.profiles = []string{}
+	p.awsProfileNames = []string{}
 	sections, err := ini.Load(config.DefaultSharedConfigFilename())
 	if err != nil {
 		return nil
@@ -50,12 +51,12 @@ func (p *Provider) AWSProfiles() []string {
 
 			if len(sec.Keys()) > 1 {
 				name, _ := strings.CutPrefix(s, "profile ")
-				p.profiles = append(p.profiles, name)
+				p.awsProfileNames = append(p.awsProfileNames, name)
 			}
 		}
 	}
 
-	return p.profiles
+	return p.awsProfileNames
 }
 
 func (p *Provider) IsAvailable() bool {
@@ -63,21 +64,22 @@ func (p *Provider) IsAvailable() bool {
 }
 
 func (p *Provider) Profiles() []types.Profile {
-	var profiles []types.Profile
-	for _, profileName := range p.AWSProfiles() {
-		profileConfig, ok := p.Provider.GetConfig().Profiles[profileName]
-		enabled := p.Provider.GetConfig().AutoDiscover
-		if !ok {
-			profileConfig = common.ProfileConfig{
-				Enabled: enabled,
+	if p.profiles == nil || len(p.profiles) == 0 {
+		for _, profileName := range p.AWSProfiles() {
+			profileConfig, ok := p.Provider.GetConfig().Profiles[profileName]
+			enabled := p.Provider.GetConfig().AutoDiscover
+			if !ok {
+				profileConfig = common.ProfileConfig{
+					Enabled: enabled,
+				}
+			}
+
+			log.Debug("aws profile", "profile", profileName, "enabled", profileConfig.Enabled, "ok", ok, "auto_discover", p.Provider.GetConfig().AutoDiscover)
+			if profileConfig.Enabled {
+				p.profiles = append(p.profiles, NewProfile(profileName, p, profileConfig))
 			}
 		}
 
-		log.Debug("aws profile", "profile", profileName, "enabled", profileConfig.Enabled, "ok", ok, "auto_discover", p.Provider.GetConfig().AutoDiscover)
-		if profileConfig.Enabled {
-			profiles = append(profiles, NewProfile(profileName, p, profileConfig))
-		}
 	}
-
-	return profiles
+	return p.profiles
 }

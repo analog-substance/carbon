@@ -24,7 +24,6 @@ func New() types.Provider {
 }
 
 func (p *Provider) IsAvailable() bool {
-
 	return true
 }
 

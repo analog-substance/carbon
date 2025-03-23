@@ -22,11 +22,26 @@ func AvailableProviders() []types.Provider {
 			digitalocean.New(),
 		}
 
+		type providerAvailability struct {
+			provider  types.Provider
+			available bool
+		}
+		c := make(chan providerAvailability)
 		for _, provider := range allProviders {
-			isAvailable := provider.IsAvailable()
-			log.Debug("assessing provider availability", "provider", provider.Type(), "isAvailable", isAvailable)
-			if isAvailable {
-				availableProviders = append(availableProviders, provider)
+			go func() {
+				c <- providerAvailability{
+					provider:  provider,
+					available: provider.IsAvailable(),
+				}
+			}()
+		}
+
+		result := make([]providerAvailability, len(allProviders))
+		for i, _ := range result {
+			result[i] = <-c
+			log.Debug("assessing provider availability", "provider", result[i].provider.Type(), "isAvailable", result[i].available)
+			if result[i].available {
+				availableProviders = append(availableProviders, result[i].provider)
 			}
 		}
 	}

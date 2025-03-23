@@ -1,11 +1,13 @@
 package common
 
 type ProfileConfig struct {
-	Enabled      bool            `yaml:"enabled"`
-	Username     string          `yaml:"username"`
-	Password     string          `yaml:"password"`
-	URL          string          `yaml:"url"`
-	Environments map[string]bool `yaml:"environments"`
+	Enabled         bool            `yaml:"enabled"`
+	Username        string          `yaml:"username"`
+	Password        string          `yaml:"password"`
+	PasswordCommand string          `yaml:"password_command"`
+	UseOnePassCLI   bool            `yaml:"use_one_pass_cli"`
+	URL             string          `yaml:"url"`
+	Environments    map[string]bool `yaml:"environments"`
 }
 
 type ProviderConfig struct {
