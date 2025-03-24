@@ -6,6 +6,7 @@ import (
 	"github.com/spf13/cobra"
 	"gopkg.in/yaml.v3"
 	"os"
+	"strings"
 )
 
 const defaultConfigFile = "carbon.yaml"
@@ -20,19 +21,18 @@ Carbon loads configuration files from your home directory, then merges it with
 a configuration file in the current directory (if it exists). This should allow
 you the flexibility you need.
 `,
-	Example: `# Configure vSphere credentials
-carbon config carbon.credentials.vsphere_server.provider vsphere
-carbon config carbon.credentials.vsphere_server.username vsphere_user@vsphere.example
-carbon config carbon.credentials.vsphere_server.password_command 'op read op://Private/vSphere Creds/password'
+	Example: `# Configure digitalocean credentials
+carbon config carbon.providers.digitalocean.profiles.default.use_1pass_cli true
+carbon config carbon.providers.digitalocean.profiles.default.password "op://Private/some path/api_key"
 
 
 # Set a default project directory
-carbon config carbon.default.dir ~/my/path/haxors
+carbon config carbon.dir.instance ~/my/path/haxors
 `,
-	//ValidArgsFunction: func(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
-	//	keys := getConfigKeys()
-	//	return keys, cobra.ShellCompDirectiveNoFileComp
-	//},
+	ValidArgsFunction: func(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
+		keys := common.Keys()
+		return keys, cobra.ShellCompDirectiveNoFileComp
+	},
 	Args: cobra.RangeArgs(0, 3),
 	Run: func(cmd *cobra.Command, args []string) {
 		count := len(args)
@@ -85,7 +85,6 @@ func init() {
 	configCmd.Flags().BoolP("remove-reset", "r", false, "remove key from the config or reset to default")
 }
 
-//
-//func updateConfigHelp() {
-//	configCmd.Long += fmt.Sprintf("## Configuration keys\n- %s", strings.Join(getConfigKeys(), "\n - "))
-//}
+func updateConfigHelp() {
+	configCmd.Long += fmt.Sprintf("## Configuration keys\n- %s", strings.Join(common.Keys(), "\n - "))
+}

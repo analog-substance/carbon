@@ -81,6 +81,7 @@ There are plans to bring support to the following:
         }
 
         carbonObj = carbon.New(carbonConfigFile.Carbon)
+        updateConfigHelp()
 
         return nil
     },

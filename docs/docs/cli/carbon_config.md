@@ -10,7 +10,63 @@ View and manage configuration values.
 Carbon loads configuration files from your home directory, then merges it with
 a configuration file in the current directory (if it exists). This should allow
 you the flexibility you need.
-
+## Configuration keys
+- carbon.dir.instance
+ - carbon.dir.deployments
+ - carbon.dir.packer
+ - carbon.dir.images
+ - carbon.dir.terraform
+ - carbon.dir.projects
+ - carbon.providers.aws.enabled
+ - carbon.providers.aws.auto_discover
+ - carbon.providers.aws.profiles.default.enabled
+ - carbon.providers.aws.profiles.default.username
+ - carbon.providers.aws.profiles.default.password
+ - carbon.providers.aws.profiles.default.password_command
+ - carbon.providers.aws.profiles.default.use_1pass_cli
+ - carbon.providers.aws.profiles.default.url
+ - carbon.providers.aws.profiles.default.environments
+ - carbon.providers.aws
+ - carbon.providers.digitalocean.enabled
+ - carbon.providers.digitalocean.auto_discover
+ - carbon.providers.digitalocean.profiles.default.enabled
+ - carbon.providers.digitalocean.profiles.default.username
+ - carbon.providers.digitalocean.profiles.default.password
+ - carbon.providers.digitalocean.profiles.default.password_command
+ - carbon.providers.digitalocean.profiles.default.use_1pass_cli
+ - carbon.providers.digitalocean.profiles.default.url
+ - carbon.providers.digitalocean.profiles.default.environments
+ - carbon.providers.digitalocean
+ - carbon.providers.multipass.enabled
+ - carbon.providers.multipass.auto_discover
+ - carbon.providers.multipass.profiles.default.enabled
+ - carbon.providers.multipass.profiles.default.username
+ - carbon.providers.multipass.profiles.default.password
+ - carbon.providers.multipass.profiles.default.password_command
+ - carbon.providers.multipass.profiles.default.use_1pass_cli
+ - carbon.providers.multipass.profiles.default.url
+ - carbon.providers.multipass.profiles.default.environments
+ - carbon.providers.multipass
+ - carbon.providers.qemu.enabled
+ - carbon.providers.qemu.auto_discover
+ - carbon.providers.qemu.profiles.default.enabled
+ - carbon.providers.qemu.profiles.default.username
+ - carbon.providers.qemu.profiles.default.password
+ - carbon.providers.qemu.profiles.default.password_command
+ - carbon.providers.qemu.profiles.default.use_1pass_cli
+ - carbon.providers.qemu.profiles.default.url
+ - carbon.providers.qemu.profiles.default.environments
+ - carbon.providers.qemu
+ - carbon.providers.virtualbox.enabled
+ - carbon.providers.virtualbox.auto_discover
+ - carbon.providers.virtualbox.profiles.default.enabled
+ - carbon.providers.virtualbox.profiles.default.username
+ - carbon.providers.virtualbox.profiles.default.password
+ - carbon.providers.virtualbox.profiles.default.password_command
+ - carbon.providers.virtualbox.profiles.default.use_1pass_cli
+ - carbon.providers.virtualbox.profiles.default.url
+ - carbon.providers.virtualbox.profiles.default.environments
+ - carbon.providers.virtualbox
 
 ```
 carbon config [flags]
@@ -19,15 +75,14 @@ carbon config [flags]
 ## Examples
 
 ```bash
-# Configure vSphere credentials
-carbon config carbon.credentials.vsphere_server.provider vsphere
-carbon config carbon.credentials.vsphere_server.username vsphere_user@vsphere.example
-carbon config carbon.credentials.vsphere_server.password_command 'op read op://Private/vSphere Creds/password'
+# Configure digitalocean credentials
+carbon config carbon.providers.digitalocean.profiles.default.use_1pass_cli true
+carbon config carbon.providers.digitalocean.profiles.default.password "op://Private/some path/api_key"
 ```
 
 ```bash
 # Set a default project directory
-carbon config carbon.default.dir ~/my/path/haxors
+carbon config carbon.dir.instance ~/my/path/haxors
 
 ```
 

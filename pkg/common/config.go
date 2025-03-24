@@ -21,6 +21,20 @@ type ProfileConfig struct {
 	Environments    map[string]bool `yaml:"environments"`
 }
 
+func (pc *ProfileConfig) Keys(prefix string) []string {
+	myKeys := []string{}
+
+	myKeys = append(myKeys, strings.Join([]string{prefix, "enabled"}, "."))
+	myKeys = append(myKeys, strings.Join([]string{prefix, "username"}, "."))
+	myKeys = append(myKeys, strings.Join([]string{prefix, "password"}, "."))
+	myKeys = append(myKeys, strings.Join([]string{prefix, "password_command"}, "."))
+	myKeys = append(myKeys, strings.Join([]string{prefix, "use_1pass_cli"}, "."))
+	myKeys = append(myKeys, strings.Join([]string{prefix, "url"}, "."))
+	myKeys = append(myKeys, strings.Join([]string{prefix, "environments"}, "."))
+
+	return myKeys
+}
+
 func (pc *ProfileConfig) Get(search []string) any {
 
 	if len(search) == 0 {
@@ -32,7 +46,7 @@ func (pc *ProfileConfig) Get(search []string) any {
 	switch first {
 	case "enabled":
 		return pc.Enabled
-	case "ussername":
+	case "username":
 		return pc.Username
 	case "password":
 		return pc.Password
@@ -49,30 +63,26 @@ func (pc *ProfileConfig) Get(search []string) any {
 }
 
 func (pc *ProfileConfig) Set(search []string, val any) *ProfileConfig {
-
 	first := search[0]
 	search = search[1:]
 
 	if len(search) == 0 {
-
+		strVal := val.(string)
 		switch first {
 		case "enabled":
-			pc.Enabled = val.(bool)
+			pc.Enabled = strVal == "true" || strVal == "1"
 		case "username":
-			pc.Username = val.(string)
-			log.Debug("asd", "pc", pc)
+			pc.Username = strVal
 		case "password":
-			pc.Password = val.(string)
+			pc.Password = strVal
 		case "password_command":
-			pc.PasswordCommand = val.(string)
+			pc.PasswordCommand = strVal
 		case "use_1pass_cli":
-			pc.Use1PassCLI = val.(bool)
+			pc.Use1PassCLI = strVal == "true" || strVal == "1"
 		case "URL":
-			pc.URL = val.(string)
+			pc.URL = strVal
 		}
 	}
-	//fmt.Println(pc)
-	//fmt.Println(pc)
 	return nil
 }
 
@@ -121,6 +131,20 @@ func (pc *ProviderConfig) UnmarshalYAML(unmarshal func(interface{}) error) error
 	return nil
 }
 
+func (pc *ProviderConfig) Keys(prefix string) []string {
+	myKeys := []string{}
+
+	myKeys = append(myKeys, strings.Join([]string{prefix, "enabled"}, "."))
+	myKeys = append(myKeys, strings.Join([]string{prefix, "auto_discover"}, "."))
+
+	for key, prof := range pc.Profiles {
+		myKeys = append(myKeys, prof.Keys(strings.Join([]string{prefix, "profiles", key}, "."))...)
+	}
+	myKeys = append(myKeys, prefix)
+
+	return myKeys
+}
+
 func (pc *ProviderConfig) Get(search []string) any {
 
 	if len(search) == 0 {
@@ -152,17 +176,14 @@ func (pc *ProviderConfig) Set(search []string, val any) *ProviderConfig {
 	first := search[0]
 	search = search[1:]
 
-	switch first {
-	case "auto_discover":
-		if len(search) == 0 {
-			pc.AutoDiscover = val.(bool)
-		}
-	case "enabled":
-		if len(search) == 0 {
-			pc.Enabled = val.(bool)
-		}
-	case "profiles":
-		if len(search) > 0 {
+	if len(search) == 0 {
+		strVal := val.(string)
+		switch first {
+		case "auto_discover":
+			pc.AutoDiscover = strVal == "true" || strVal == "1"
+		case "enabled":
+			pc.Enabled = strVal == "true" || strVal == "1"
+		case "profiles":
 			profileName := search[0]
 			if pp, ok := pc.Profiles[profileName]; ok {
 				search = search[1:]
@@ -177,6 +198,20 @@ func (pc *ProviderConfig) Set(search []string, val any) *ProviderConfig {
 type CarbonConfig struct {
 	Dir       map[string]string         `yaml:"dir"`
 	Providers map[string]ProviderConfig `yaml:"providers"`
+}
+
+func (cc *CarbonConfig) Keys(prefix string) []string {
+	myKeys := []string{}
+
+	for key := range cc.Dir {
+		myKeys = append(myKeys, strings.Join([]string{prefix, "dir", key}, "."))
+	}
+
+	for key, prov := range cc.Providers {
+		myKeys = append(myKeys, prov.Keys(strings.Join([]string{prefix, "providers", key}, "."))...)
+	}
+
+	return myKeys
 }
 
 func (cc *CarbonConfig) Get(search []string) any {
@@ -204,7 +239,7 @@ func (cc *CarbonConfig) Get(search []string) any {
 			search = search[1:]
 			return p.Get(search)
 		} else {
-			log.Error("no provider", search[0])
+			log.Error("no provider", "next", search[0])
 		}
 	}
 
@@ -215,21 +250,20 @@ func (cc *CarbonConfig) Set(search []string, val any) *CarbonConfig {
 	first := search[0]
 	search = search[1:]
 
+	strVal := val.(string)
 	switch first {
 	case "dir":
 		if len(search) == 1 {
-			cc.Dir[search[0]] = val.(string)
+			cc.Dir[search[0]] = strVal
 		}
 	case "providers":
-		if len(search) > 0 {
-			providerName := search[0]
-			if p, ok := cc.Providers[providerName]; ok {
-				search = search[1:]
-				p.Set(search, val)
-				cc.Providers[providerName] = p
-			} else {
-				log.Error("no provider", search[0])
-			}
+		providerName := search[0]
+		if p, ok := cc.Providers[providerName]; ok {
+			search = search[1:]
+			p.Set(search, val)
+			cc.Providers[providerName] = p
+		} else {
+			log.Error("no provider", "next", search[0])
 		}
 	}
 
@@ -237,7 +271,7 @@ func (cc *CarbonConfig) Set(search []string, val any) *CarbonConfig {
 }
 
 type CarbonConfigFile struct {
-	Carbon CarbonConfig `yaml:"carbon" mapstructure:"carbon"`
+	Carbon CarbonConfig `yaml:"carbon"`
 }
 
 func (cf *CarbonConfigFile) MergeInConfigFile(cfgFile string) error {
@@ -252,6 +286,11 @@ func (cf *CarbonConfigFile) MergeInConfigFile(cfgFile string) error {
 		return yaml.Unmarshal(homeCfgBytes, &cf)
 	}
 	return err
+}
+
+func (cf *CarbonConfigFile) Keys() []string {
+
+	return cf.Carbon.Keys("carbon")
 }
 
 func (cf *CarbonConfigFile) Get(search []string) any {
@@ -327,11 +366,15 @@ func GetConfig() *CarbonConfigFile {
 	return instanceCfg
 }
 
+func Keys() []string {
+	return GetConfig().Keys()
+}
+
 func Get(s string) any {
-	return instanceCfg.Get(strings.Split(s, "."))
+	return GetConfig().Get(strings.Split(s, "."))
 }
 
 func Set(s string, v any) any {
-	instanceCfg = instanceCfg.Set(strings.Split(s, "."), v)
+	instanceCfg = GetConfig().Set(strings.Split(s, "."), v)
 	return instanceCfg
 }
