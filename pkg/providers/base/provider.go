@@ -8,7 +8,6 @@ import (
 	"github.com/analog-substance/carbon/pkg/common"
 	"github.com/analog-substance/carbon/pkg/models"
 	"github.com/analog-substance/carbon/pkg/types"
-	"github.com/spf13/viper"
 	"html/template"
 	"os"
 	"path"
@@ -175,7 +174,7 @@ func (p *Provider) NewImageBuild(name, tplDir string) (types.ImageBuild, error) 
 
 func (p *Provider) NewProject(name string, force bool) (types.Project, error) {
 	baseName := filepath.Base(name)
-	projectDir := filepath.Join(viper.GetString(common.ViperTerraformProjectDir), baseName)
+	projectDir := filepath.Join(common.GetConfig().Carbon.Dir[common.TerraformProjectConfigKey], baseName)
 	log.Debug("new project", "dir", projectDir, "service", p.Type())
 
 	_, err := os.Stat(projectDir)

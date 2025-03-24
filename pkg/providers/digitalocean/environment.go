@@ -11,9 +11,10 @@ import (
 )
 
 type Environment struct {
-	name     string
-	profile  types.Profile
-	doClient *godo.Client
+	name      string
+	profile   types.Profile
+	doClient  *godo.Client
+	doProject *godo.Project
 }
 
 func (e *Environment) Name() string {
@@ -27,6 +28,7 @@ func (e *Environment) Profile() types.Profile {
 func (e *Environment) VMs() []types.VM {
 	var vms []types.VM
 
+	log.Debug("getting VMs", "env", e.Name())
 	ctx := context.Background()
 	opt := &godo.ListOptions{}
 	for {
@@ -35,6 +37,7 @@ func (e *Environment) VMs() []types.VM {
 			log.Debug("Error listing Droplets", "error", err)
 			break
 		}
+		log.Debug("listing Droplets", "droplets", droplets)
 
 		for _, d := range droplets {
 			var publicIPs []string

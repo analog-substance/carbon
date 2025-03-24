@@ -1,43 +1,54 @@
 package digitalocean
 
 import (
-	"context"
 	"github.com/analog-substance/carbon/pkg/common"
 	"github.com/analog-substance/carbon/pkg/providers/base"
 	"github.com/analog-substance/carbon/pkg/types"
-	"github.com/digitalocean/godo"
 	"github.com/mitchellh/go-homedir"
 	"gopkg.in/yaml.v3"
 	"os"
 )
 
+const apiKeyEnvVar = "DIGITALOCEAN_TOKEN"
+const defaultProfileName = "default"
 const providerName = "DigitalOcean"
 
 type Provider struct {
 	types.Provider
-	apiToken string
-
-	profiles []string
+	profilesLoaded bool
+	profiles       []types.Profile
 }
 
 func New() types.Provider {
 	return &Provider{
 		Provider: base.NewWithName(providerName),
-		profiles: []string{},
 	}
 }
 
-func (p *Provider) APIToken() string {
-	if p.apiToken == "" {
+func (p *Provider) IsAvailable() bool {
+	return true
+}
 
-		type doYamlConfig struct {
-			AccessToken string `yaml:"access-token"`
-		}
+func (p *Provider) Profiles() []types.Profile {
+	if p.profilesLoaded {
+		return p.profiles
+	}
+	p.profilesLoaded = true
 
-		doAPIKey := os.Getenv("DIGITALOCEAN_ACCESS_TOKEN")
-		if doAPIKey != "" {
-			p.apiToken = doAPIKey
+	if len(p.Provider.GetConfig().Profiles) == 0 {
+		apiKey := os.Getenv(apiKeyEnvVar)
+		if apiKey != "" {
+			defaultConfig := common.ProfileConfig{
+				Enabled:  true,
+				Password: apiKey,
+			}
+			p.profiles = append(p.profiles, NewProfile(defaultProfileName, p, defaultConfig))
 		} else {
+
+			type doYamlConfig struct {
+				AccessToken string `yaml:"access-token"`
+			}
+
 			// check config file
 			configFiles := []string{}
 
@@ -53,64 +64,29 @@ func (p *Provider) APIToken() string {
 						var cfs doYamlConfig
 						err = yaml.Unmarshal(cfBytes, &cfs)
 						if err == nil {
-							p.apiToken = cfs.AccessToken
-							break
+							if cfs.AccessToken != "" {
+
+								defaultConfig := common.ProfileConfig{
+									Enabled:  true,
+									Password: cfs.AccessToken,
+								}
+								p.profiles = append(p.profiles, NewProfile(defaultProfileName, p, defaultConfig))
+								break
+							}
 						}
 					}
 				}
 			}
 		}
 	}
+	log.Debug("provider config", "config", p.Provider.GetConfig())
 
-	return p.apiToken
-}
-
-func (p *Provider) IsAvailable() bool {
-	return p.APIToken() != ""
-}
-
-func (p *Provider) Profiles() []types.Profile {
-	var profiles []types.Profile
-	if p.IsAvailable() {
-		doClient := godo.NewFromToken(p.APIToken())
-
-		ctx := context.Background()
-		opt := &godo.ListOptions{}
-		for {
-			projects, resp, err := doClient.Projects.List(ctx, opt)
-			if err != nil {
-				log.Debug("Error listing projects", "error", err)
-			}
-
-			for _, project := range projects {
-
-				config, ok := p.Provider.GetConfig().Profiles[project.Name]
-
-				if !ok {
-					config = common.ProfileConfig{
-						Enabled: true,
-					}
-				}
-				if config.Enabled {
-					profiles = append(profiles, NewProfile(project.Name, p, config, &project))
-				}
-			}
-
-			// if we are at the last page, break out the for loop
-			if resp.Links == nil || resp.Links.IsLastPage() {
-				break
-			}
-
-			page, err := resp.Links.CurrentPage()
-			if err != nil {
-				log.Error("Error getting page from Godo API", "error", err)
-				break
-			}
-
-			// set the page we want for the next request
-			opt.Page = page + 1
+	for profileName, profileConfig := range p.Provider.GetConfig().Profiles {
+		log.Debug("profile config", "profile", profileName, "config", profileConfig)
+		if profileConfig.Enabled {
+			p.profiles = append(p.profiles, NewProfile(defaultProfileName, p, profileConfig))
 		}
-
 	}
-	return profiles
+
+	return p.profiles
 }

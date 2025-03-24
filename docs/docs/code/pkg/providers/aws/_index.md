@@ -36,13 +36,13 @@ Package aws handles communications with AWS APIs
 
 
 <a name="New"></a>
-## func [New](<https://github.com/analog-substance/carbon/blob/main/pkg/providers/aws/provider.go#L23>)
+## func [New](<https://github.com/analog-substance/carbon/blob/main/pkg/providers/aws/provider.go#L24>)
 
 ```go
 func New() types.Provider
 ```
 
-New creates new instance of an AWS Provider and returns it. Defaults to no profiles, this forces a query of the AWS config at runtime.
+New creates new instance of an AWS Provider and returns it. Defaults to no awsProfileNames, this forces a query of the AWS config at runtime.
 
 <a name="Environment"></a>
 ## type [Environment](<https://github.com/analog-substance/carbon/blob/main/pkg/providers/aws/environment.go#L14-L20>)
@@ -184,7 +184,7 @@ func (p *Profile) Environments() []types.Environment
 
 
 <a name="Provider"></a>
-## type [Provider](<https://github.com/analog-substance/carbon/blob/main/pkg/providers/aws/provider.go#L16-L19>)
+## type [Provider](<https://github.com/analog-substance/carbon/blob/main/pkg/providers/aws/provider.go#L16-L20>)
 
 
 
@@ -196,7 +196,7 @@ type Provider struct {
 ```
 
 <a name="Provider.AWSProfiles"></a>
-### func \(\*Provider\) [AWSProfiles](<https://github.com/analog-substance/carbon/blob/main/pkg/providers/aws/provider.go#L30>)
+### func \(\*Provider\) [AWSProfiles](<https://github.com/analog-substance/carbon/blob/main/pkg/providers/aws/provider.go#L31>)
 
 ```go
 func (p *Provider) AWSProfiles() []string
@@ -205,7 +205,7 @@ func (p *Provider) AWSProfiles() []string
 
 
 <a name="Provider.IsAvailable"></a>
-### func \(\*Provider\) [IsAvailable](<https://github.com/analog-substance/carbon/blob/main/pkg/providers/aws/provider.go#L61>)
+### func \(\*Provider\) [IsAvailable](<https://github.com/analog-substance/carbon/blob/main/pkg/providers/aws/provider.go#L62>)
 
 ```go
 func (p *Provider) IsAvailable() bool
@@ -214,7 +214,7 @@ func (p *Provider) IsAvailable() bool
 
 
 <a name="Provider.Profiles"></a>
-### func \(\*Provider\) [Profiles](<https://github.com/analog-substance/carbon/blob/main/pkg/providers/aws/provider.go#L65>)
+### func \(\*Provider\) [Profiles](<https://github.com/analog-substance/carbon/blob/main/pkg/providers/aws/provider.go#L66>)
 
 ```go
 func (p *Provider) Profiles() []types.Profile

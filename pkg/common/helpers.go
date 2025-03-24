@@ -1,7 +1,6 @@
 package common
 
 import (
-	"github.com/spf13/viper"
 	"os/user"
 	"path/filepath"
 	"strings"
@@ -11,7 +10,7 @@ var instancePath string
 
 func getInstancePath() string {
 	if instancePath == "" {
-		instancePath = viper.GetString(ViperDefaultInstanceDir)
+		instancePath = GetConfig().Carbon.Dir[DefaultInstanceConfigKey]
 		usr, _ := user.Current()
 		dir := usr.HomeDir
 		if instancePath == "~" {
@@ -25,13 +24,13 @@ func getInstancePath() string {
 }
 
 func PackerDir() string {
-	return filepath.Join(getInstancePath(), viper.GetString(ViperPackerDir))
+	return filepath.Join(getInstancePath(), GetConfig().Carbon.Dir[PackerConfigKey])
 }
 
 func ImagesDir() string {
-	return filepath.Join(getInstancePath(), viper.GetString(ViperImagesDir))
+	return filepath.Join(getInstancePath(), GetConfig().Carbon.Dir[ImagesConfigKey])
 }
 
 func ProjectsDir() string {
-	return filepath.Join(getInstancePath(), viper.GetString(ViperTerraformProjectDir))
+	return filepath.Join(getInstancePath(), GetConfig().Carbon.Dir[TerraformProjectConfigKey])
 }

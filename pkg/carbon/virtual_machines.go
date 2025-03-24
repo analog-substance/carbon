@@ -12,16 +12,20 @@ func (c *Carbon) GetVMs() []types.VM {
 	if len(c.machines) == 0 {
 		c.machines = []types.VM{}
 		mu := sync.Mutex{}
+		wait := sync.WaitGroup{}
 		for _, profile := range c.Profiles() {
 			for _, env := range profile.Environments() {
+				wait.Add(1)
 				go func() {
 					machines := env.VMs()
 					mu.Lock()
 					c.machines = append(c.machines, machines...)
 					mu.Unlock()
+					wait.Done()
 				}()
 			}
 		}
+		wait.Wait()
 	}
 	return c.machines
 }

@@ -123,7 +123,7 @@ func GetImagesForFileBasedProvider(providerType string, e types.Environment) ([]
 
 
 <a name="New"></a>
-## func [New](<https://github.com/analog-substance/carbon/blob/main/pkg/providers/base/provider.go#L37>)
+## func [New](<https://github.com/analog-substance/carbon/blob/main/pkg/providers/base/provider.go#L36>)
 
 ```go
 func New() types.Provider
@@ -141,7 +141,7 @@ func NewProfile(name string, providerInstance types.Provider, config common.Prof
 
 
 <a name="NewWithName"></a>
-## func [NewWithName](<https://github.com/analog-substance/carbon/blob/main/pkg/providers/base/provider.go#L43>)
+## func [NewWithName](<https://github.com/analog-substance/carbon/blob/main/pkg/providers/base/provider.go#L42>)
 
 ```go
 func NewWithName(name string) types.Provider
@@ -260,7 +260,7 @@ func (e *Environment) VMs() []types.VM
 
 
 <a name="ImageBuildDate"></a>
-## type [ImageBuildDate](<https://github.com/analog-substance/carbon/blob/main/pkg/providers/base/provider.go#L263-L265>)
+## type [ImageBuildDate](<https://github.com/analog-substance/carbon/blob/main/pkg/providers/base/provider.go#L262-L264>)
 
 
 
@@ -336,7 +336,7 @@ func (p *Profile) ShouldIncludeEnvironment(envName string) bool
 
 
 <a name="Provider"></a>
-## type [Provider](<https://github.com/analog-substance/carbon/blob/main/pkg/providers/base/provider.go#L31-L35>)
+## type [Provider](<https://github.com/analog-substance/carbon/blob/main/pkg/providers/base/provider.go#L30-L34>)
 
 
 
@@ -347,7 +347,7 @@ type Provider struct {
 ```
 
 <a name="Provider.GetConfig"></a>
-### func \(\*Provider\) [GetConfig](<https://github.com/analog-substance/carbon/blob/main/pkg/providers/base/provider.go#L74>)
+### func \(\*Provider\) [GetConfig](<https://github.com/analog-substance/carbon/blob/main/pkg/providers/base/provider.go#L73>)
 
 ```go
 func (p *Provider) GetConfig() common.ProviderConfig
@@ -356,7 +356,7 @@ func (p *Provider) GetConfig() common.ProviderConfig
 
 
 <a name="Provider.IsAvailable"></a>
-### func \(\*Provider\) [IsAvailable](<https://github.com/analog-substance/carbon/blob/main/pkg/providers/base/provider.go#L49>)
+### func \(\*Provider\) [IsAvailable](<https://github.com/analog-substance/carbon/blob/main/pkg/providers/base/provider.go#L48>)
 
 ```go
 func (p *Provider) IsAvailable() bool
@@ -365,7 +365,7 @@ func (p *Provider) IsAvailable() bool
 
 
 <a name="Provider.Name"></a>
-### func \(\*Provider\) [Name](<https://github.com/analog-substance/carbon/blob/main/pkg/providers/base/provider.go#L53>)
+### func \(\*Provider\) [Name](<https://github.com/analog-substance/carbon/blob/main/pkg/providers/base/provider.go#L52>)
 
 ```go
 func (p *Provider) Name() string
@@ -374,7 +374,7 @@ func (p *Provider) Name() string
 
 
 <a name="Provider.NewImageBuild"></a>
-### func \(\*Provider\) [NewImageBuild](<https://github.com/analog-substance/carbon/blob/main/pkg/providers/base/provider.go#L78>)
+### func \(\*Provider\) [NewImageBuild](<https://github.com/analog-substance/carbon/blob/main/pkg/providers/base/provider.go#L77>)
 
 ```go
 func (p *Provider) NewImageBuild(name, tplDir string) (types.ImageBuild, error)
@@ -383,7 +383,7 @@ func (p *Provider) NewImageBuild(name, tplDir string) (types.ImageBuild, error)
 
 
 <a name="Provider.NewProject"></a>
-### func \(\*Provider\) [NewProject](<https://github.com/analog-substance/carbon/blob/main/pkg/providers/base/provider.go#L176>)
+### func \(\*Provider\) [NewProject](<https://github.com/analog-substance/carbon/blob/main/pkg/providers/base/provider.go#L175>)
 
 ```go
 func (p *Provider) NewProject(name string, force bool) (types.Project, error)
@@ -392,7 +392,7 @@ func (p *Provider) NewProject(name string, force bool) (types.Project, error)
 
 
 <a name="Provider.Profiles"></a>
-### func \(\*Provider\) [Profiles](<https://github.com/analog-substance/carbon/blob/main/pkg/providers/base/provider.go#L61>)
+### func \(\*Provider\) [Profiles](<https://github.com/analog-substance/carbon/blob/main/pkg/providers/base/provider.go#L60>)
 
 ```go
 func (p *Provider) Profiles() []types.Profile
@@ -401,7 +401,7 @@ func (p *Provider) Profiles() []types.Profile
 
 
 <a name="Provider.SetConfig"></a>
-### func \(\*Provider\) [SetConfig](<https://github.com/analog-substance/carbon/blob/main/pkg/providers/base/provider.go#L70>)
+### func \(\*Provider\) [SetConfig](<https://github.com/analog-substance/carbon/blob/main/pkg/providers/base/provider.go#L69>)
 
 ```go
 func (p *Provider) SetConfig(config common.ProviderConfig)
@@ -410,7 +410,7 @@ func (p *Provider) SetConfig(config common.ProviderConfig)
 
 
 <a name="Provider.Type"></a>
-### func \(\*Provider\) [Type](<https://github.com/analog-substance/carbon/blob/main/pkg/providers/base/provider.go#L57>)
+### func \(\*Provider\) [Type](<https://github.com/analog-substance/carbon/blob/main/pkg/providers/base/provider.go#L56>)
 
 ```go
 func (p *Provider) Type() string
