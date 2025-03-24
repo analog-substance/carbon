@@ -41,7 +41,7 @@ func (pc *ProfileConfig) Get(search []string) any {
 		return pc
 	}
 	first := search[0]
-	search = search[1:]
+	//search = search[1:]
 
 	switch first {
 	case "enabled":

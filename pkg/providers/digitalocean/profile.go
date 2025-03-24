@@ -10,7 +10,6 @@ import (
 
 type Profile struct {
 	types.Profile
-	apiToken string
 	doClient *godo.Client
 }
 
