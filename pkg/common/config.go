@@ -176,20 +176,22 @@ func (pc *ProviderConfig) Set(search []string, val any) *ProviderConfig {
 	first := search[0]
 	search = search[1:]
 
-	if len(search) == 0 {
-		strVal := val.(string)
-		switch first {
-		case "auto_discover":
+	strVal := val.(string)
+	switch first {
+	case "auto_discover":
+		if len(search) == 0 {
 			pc.AutoDiscover = strVal == "true" || strVal == "1"
-		case "enabled":
+		}
+	case "enabled":
+		if len(search) == 0 {
 			pc.Enabled = strVal == "true" || strVal == "1"
-		case "profiles":
-			profileName := search[0]
-			if pp, ok := pc.Profiles[profileName]; ok {
-				search = search[1:]
-				pp.Set(search, val)
-				pc.Profiles[profileName] = pp
-			}
+		}
+	case "profiles":
+		profileName := search[0]
+		if pp, ok := pc.Profiles[profileName]; ok {
+			search = search[1:]
+			pp.Set(search, val)
+			pc.Profiles[profileName] = pp
 		}
 	}
 	return nil
