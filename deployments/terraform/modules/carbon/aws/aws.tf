@@ -27,7 +27,7 @@ variable "operations_subnet_cidr" {
 
 resource "aws_instance" "carbon_vm" {
   for_each                             = {
-    for machine in var.machines :machine.name => machineif machine.provider == "aws"
+    for machine in var.machines :machine.name => machine if machine.provider == "aws"
   }
   ami                                  = local.amis[each.value.image]
   instance_type                        = each.value.type
