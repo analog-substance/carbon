@@ -63,10 +63,21 @@ There are plans to bring support to the following:
         }
         log.Debug("debug mode", "debug", debug)
 
-        carbonConfigFile := &common.CarbonConfigFile{}
-        err := viper.Unmarshal(carbonConfigFile)
+        carbonConfigFile := common.GetConfig()
+        home, err := homedir.Dir()
         if err != nil {
-            log.Debug("failed to unmarshal viper config to carbon config struct")
+            log.Debug("error getting home directory", "error", err)
+        } else {
+            err := carbonConfigFile.MergeInConfigFile(filepath.Join(home, cfgFileName))
+
+            if err != nil {
+                log.Debug("error loading carbon config from home", "error", err)
+            }
+        }
+
+        err = carbonConfigFile.MergeInConfigFile(cfgFileName)
+        if err != nil {
+            log.Debug("error loading carbon config from home", "error", err)
         }
 
         carbonObj = carbon.New(carbonConfigFile.Carbon)
@@ -87,7 +98,7 @@ func AskIfSure(msg string) bool
 
 
 <a name="Execute"></a>
-## func [Execute](<https://github.com/analog-substance/carbon/blob/main/pkg/cmd/carbon.go#L82>)
+## func [Execute](<https://github.com/analog-substance/carbon/blob/main/pkg/cmd/carbon.go#L94>)
 
 ```go
 func Execute()

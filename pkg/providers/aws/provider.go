@@ -79,7 +79,6 @@ func (p *Provider) Profiles() []types.Profile {
 				p.profiles = append(p.profiles, NewProfile(profileName, p, profileConfig))
 			}
 		}
-
 	}
 	return p.profiles
 }

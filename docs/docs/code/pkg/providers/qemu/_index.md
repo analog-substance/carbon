@@ -202,7 +202,7 @@ func (p *Provider) IsAvailable() bool
 
 
 <a name="Provider.Profiles"></a>
-### func \(\*Provider\) [Profiles](<https://github.com/analog-substance/carbon/blob/main/pkg/providers/qemu/provider.go#L31>)
+### func \(\*Provider\) [Profiles](<https://github.com/analog-substance/carbon/blob/main/pkg/providers/qemu/provider.go#L30>)
 
 ```go
 func (p *Provider) Profiles() []types.Profile

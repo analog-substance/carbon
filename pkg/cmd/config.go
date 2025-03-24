@@ -1,16 +1,12 @@
 package cmd
 
 import (
-	"bytes"
 	"fmt"
-	"gopkg.in/yaml.v3"
-	"reflect"
-	"sort"
-	"strconv"
-	"strings"
-
+	"github.com/analog-substance/carbon/pkg/common"
 	"github.com/spf13/cobra"
-	"github.com/spf13/viper"
+	"gopkg.in/yaml.v3"
+	"os"
+	"strings"
 )
 
 const defaultConfigFile = "carbon.yaml"
@@ -25,17 +21,16 @@ Carbon loads configuration files from your home directory, then merges it with
 a configuration file in the current directory (if it exists). This should allow
 you the flexibility you need.
 `,
-	Example: `# Configure vSphere credentials
-carbon config carbon.credentials.vsphere_server.provider vsphere
-carbon config carbon.credentials.vsphere_server.username vsphere_user@vsphere.example
-carbon config carbon.credentials.vsphere_server.password_command 'op read op://Private/vSphere Creds/password'
+	Example: `# Configure digitalocean credentials
+carbon config carbon.providers.digitalocean.profiles.default.use_1pass_cli true
+carbon config carbon.providers.digitalocean.profiles.default.password "op://Private/some path/api_key"
 
 
 # Set a default project directory
-carbon config carbon.default.dir ~/my/path/haxors
+carbon config carbon.dir.instance ~/my/path/haxors
 `,
 	ValidArgsFunction: func(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
-		keys := getConfigKeys()
+		keys := common.Keys()
 		return keys, cobra.ShellCompDirectiveNoFileComp
 	},
 	Args: cobra.RangeArgs(0, 3),
@@ -43,183 +38,44 @@ carbon config carbon.default.dir ~/my/path/haxors
 		count := len(args)
 		switch count {
 		case 0:
-			saveNew, _ := cmd.Flags().GetBool("save")
-			if saveNew {
-				saveConfig(true)
-				return
+			c := common.GetConfig()
+			cb, err := yaml.Marshal(c)
+			if err != nil {
+				log.Error(err.Error())
 			}
-			subKeysOnly, _ := cmd.Flags().GetBool("sub-keys")
-			if subKeysOnly {
-				printKeys(viper.AllSettings())
-				return
-			}
-			printConfig()
-		case 1, 2: // 1 arg = get/remove/reset config value, 2 args = set config value
+			fmt.Println(string(cb))
+
+		case 1: // 1 arg = get/remove/reset config value, 2 args = set config value
 			key := args[0]
 
-			currentValue := viper.Get(key)
-			if count == 1 { // If only one argument, display current value/keys or remove/reset key
-				if !viper.IsSet(key) {
-					fmt.Println("Key not found in config")
-					return
-				}
+			c := common.Get(key)
 
-				subKeysOnly, _ := cmd.Flags().GetBool("sub-keys")
-				if subKeysOnly {
-					printKeys(currentValue)
-					return
-				}
-
-				removeOrReset, _ := cmd.Flags().GetBool("remove-reset")
-				if removeOrReset {
-					parentKey, childKey := splitIntoParentChild(key)
-					parentValue := viper.GetStringMap(parentKey)
-					if parentKey == "" {
-						parentValue = viper.AllSettings()
-					}
-
-					delete(parentValue, childKey)
-					viper.Set(parentKey, parentValue)
-					if parentKey == "" {
-						overwriteInMemConfig(parentValue)
-					} else {
-						overwriteInMemConfig(viper.AllSettings())
-					}
-					saveConfig(false)
-					return
-				}
-
-				if arrayValue, ok := currentValue.([]string); ok {
-					for _, value := range arrayValue {
-						fmt.Println(value)
-					}
-					return
-				}
-
-				t, err := yaml.Marshal(currentValue)
-				if err != nil {
-					fmt.Println(err)
-					return
-				}
-
-				str := strings.TrimSpace(string(t))
-				if str == `""` {
-					str = ""
-				}
-
-				fmt.Println(str)
-				return
-			}
-
-			newValue, err := matchConfigType(currentValue, args[1])
+			cb, err := yaml.Marshal(c)
 			if err != nil {
-				fmt.Println(err)
-				return
+				log.Error(err.Error())
 			}
+			fmt.Println(string(cb))
+		case 2:
+			key := args[0]
+			value := args[1]
 
-			// If parentKey is empty, we are setting a root key
-			// If parentValue is nil, we are setting a nested key which has not been set
-			parentKey, _ := splitIntoParentChild(key)
-			parentValue := viper.Get(parentKey)
-			if _, ok := parentValue.(map[string]interface{}); !ok &&
-				parentKey != "" && parentValue != nil {
-				fmt.Printf("Key '%s' is not a key/value object", parentKey)
-				return
+			c := common.Set(key, value)
+			cb, err := yaml.Marshal(c)
+			if err != nil {
+				log.Error(err.Error())
 			}
+			fileH, err := os.OpenFile(defaultConfigFile, os.O_CREATE|os.O_TRUNC|os.O_WRONLY, os.FileMode(0o644))
+			if err != nil {
+				log.Error(err.Error())
+			}
+			defer fileH.Close()
 
-			viper.Set(key, newValue)
-			saveConfig(false)
+			_, err = fileH.Write(cb)
+			if err != nil {
+				log.Debug(err.Error())
+			}
 		}
 	},
-}
-
-func saveConfig(saveNew bool) {
-	fmt.Println("Writing Config")
-
-	fileName := viper.ConfigFileUsed()
-	if saveNew || fileName == "" {
-		fileName = defaultConfigFile
-	}
-
-	viper.WriteConfigAs(fileName)
-}
-
-func overwriteInMemConfig(configMap map[string]interface{}) error {
-	encodedConfig, _ := yaml.Marshal(configMap)
-	return viper.ReadConfig(bytes.NewReader(encodedConfig))
-}
-
-// Based on the current value of the config, attempts to return the user's value as the right type
-func matchConfigType(currentValue interface{}, userValue string) (interface{}, error) {
-	// Currently our config values are either bool, int, string, or []string
-	if _, ok := currentValue.(bool); ok {
-		value, err := strconv.ParseBool(userValue)
-		if err != nil {
-			return nil, fmt.Errorf("error converting %s to a bool\n%v", userValue, err)
-		}
-		return value, nil
-	} else if _, ok := currentValue.(int); ok {
-		value, err := strconv.Atoi(userValue)
-		if err != nil {
-			return nil, fmt.Errorf("error converting %s to an integer\n%v", userValue, err)
-		}
-		return value, nil
-	} else if _, ok := currentValue.(string); ok {
-		return userValue, nil
-	} else if slice, ok := currentValue.([]interface{}); ok {
-		// If the slice is a string slice or is empty, we can append to it
-		if (len(slice) > 0 && reflect.TypeOf(slice[0]).String() == "string") ||
-			len(slice) == 0 {
-			userValues := strings.Split(userValue, ",")
-			for _, value := range userValues {
-				slice = append(slice, value)
-			}
-			return slice, nil
-		}
-	} else if currentValue == nil { // If currentValue is nil, we are setting a new key, and we must guess the value type
-		intValue, err := strconv.Atoi(userValue)
-		if err == nil {
-			return intValue, nil
-		}
-
-		boolValue, err := strconv.ParseBool(userValue)
-		if err == nil {
-			return boolValue, nil
-		}
-
-		return userValue, nil
-	}
-	return nil, fmt.Errorf("cannot set keys that are not of type int, string, []string or bool")
-}
-
-func printConfig() {
-	t, err := yaml.Marshal(viper.AllSettings())
-	if err != nil {
-		fmt.Println(err)
-		return
-	}
-
-	fmt.Println(string(t))
-}
-
-func printKeys(value interface{}) {
-	if valueMap, ok := value.(map[string]interface{}); ok {
-		for key := range valueMap {
-			fmt.Println(key)
-		}
-	} else {
-		fmt.Println("No sub-keys")
-	}
-}
-
-func splitIntoParentChild(key string) (string, string) {
-	split := strings.Split(key, ".")
-	keyCount := len(split)
-	if keyCount == 1 {
-		return "", key
-	}
-
-	return strings.Join(split[:keyCount-1], "."), split[keyCount-1]
 }
 
 func init() {
@@ -229,28 +85,6 @@ func init() {
 	configCmd.Flags().BoolP("remove-reset", "r", false, "remove key from the config or reset to default")
 }
 
-func getKeys(config map[string]any, prefix string) []string {
-	var keys []string
-	for k, val := range config {
-		if mapVal, ok := val.(map[string]interface{}); ok {
-			keys = append(keys, getKeys(mapVal, fmt.Sprintf("%s%s.", prefix, k))...)
-		} else {
-			keys = append(keys, fmt.Sprintf("%s%s", prefix, k))
-		}
-	}
-	return keys
-}
-
-var configKeys []string
-
-func getConfigKeys() []string {
-	if len(configKeys) == 0 {
-		configKeys = getKeys(viper.AllSettings(), "")
-		sort.Strings(configKeys)
-	}
-	return configKeys
-}
-
 func updateConfigHelp() {
-	configCmd.Long += fmt.Sprintf("## Configuration keys\n- %s", strings.Join(getConfigKeys(), "\n - "))
+	configCmd.Long += fmt.Sprintf("## Configuration keys\n- %s", strings.Join(common.Keys(), "\n - "))
 }

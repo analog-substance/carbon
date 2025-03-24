@@ -19,6 +19,7 @@ Package carbon provides core application functionality and constants
   - [func New\(config common.CarbonConfig\) \*Carbon](<#New>)
   - [func \(c \*Carbon\) FindVMByID\(id string\) \[\]types.VM](<#Carbon.FindVMByID>)
   - [func \(c \*Carbon\) FindVMByName\(name string\) \[\]types.VM](<#Carbon.FindVMByName>)
+  - [func \(c \*Carbon\) GetConfig\(\) common.CarbonConfig](<#Carbon.GetConfig>)
   - [func \(c \*Carbon\) GetImage\(imageID string\) \(types.Image, error\)](<#Carbon.GetImage>)
   - [func \(c \*Carbon\) GetImageBuild\(name, provider, provisioner string\) \(types.ImageBuild, error\)](<#Carbon.GetImageBuild>)
   - [func \(c \*Carbon\) GetImageBuildTemplates\(\) \[\]string](<#Carbon.GetImageBuildTemplates>)
@@ -120,7 +121,7 @@ func New(config common.CarbonConfig) *Carbon
 
 
 <a name="Carbon.FindVMByID"></a>
-### func \(\*Carbon\) [FindVMByID](<https://github.com/analog-substance/carbon/blob/main/pkg/carbon/virtual_machines.go#L23>)
+### func \(\*Carbon\) [FindVMByID](<https://github.com/analog-substance/carbon/blob/main/pkg/carbon/virtual_machines.go#L33>)
 
 ```go
 func (c *Carbon) FindVMByID(id string) []types.VM
@@ -129,10 +130,19 @@ func (c *Carbon) FindVMByID(id string) []types.VM
 
 
 <a name="Carbon.FindVMByName"></a>
-### func \(\*Carbon\) [FindVMByName](<https://github.com/analog-substance/carbon/blob/main/pkg/carbon/virtual_machines.go#L32>)
+### func \(\*Carbon\) [FindVMByName](<https://github.com/analog-substance/carbon/blob/main/pkg/carbon/virtual_machines.go#L42>)
 
 ```go
 func (c *Carbon) FindVMByName(name string) []types.VM
+```
+
+
+
+<a name="Carbon.GetConfig"></a>
+### func \(\*Carbon\) [GetConfig](<https://github.com/analog-substance/carbon/blob/main/pkg/carbon/main.go#L58>)
+
+```go
+func (c *Carbon) GetConfig() common.CarbonConfig
 ```
 
 
@@ -201,7 +211,7 @@ func (c *Carbon) GetProjects() ([]types.Project, error)
 
 
 <a name="Carbon.GetProvider"></a>
-### func \(\*Carbon\) [GetProvider](<https://github.com/analog-substance/carbon/blob/main/pkg/carbon/providers.go#L41>)
+### func \(\*Carbon\) [GetProvider](<https://github.com/analog-substance/carbon/blob/main/pkg/carbon/providers.go#L56>)
 
 ```go
 func (c *Carbon) GetProvider(providerType string) (types.Provider, error)
@@ -210,7 +220,7 @@ func (c *Carbon) GetProvider(providerType string) (types.Provider, error)
 
 
 <a name="Carbon.GetVMs"></a>
-### func \(\*Carbon\) [GetVMs](<https://github.com/analog-substance/carbon/blob/main/pkg/carbon/virtual_machines.go#L10>)
+### func \(\*Carbon\) [GetVMs](<https://github.com/analog-substance/carbon/blob/main/pkg/carbon/virtual_machines.go#L11>)
 
 ```go
 func (c *Carbon) GetVMs() []types.VM
@@ -228,7 +238,7 @@ func (c *Carbon) Profiles() []types.Profile
 
 
 <a name="Carbon.Providers"></a>
-### func \(\*Carbon\) [Providers](<https://github.com/analog-substance/carbon/blob/main/pkg/carbon/providers.go#L37>)
+### func \(\*Carbon\) [Providers](<https://github.com/analog-substance/carbon/blob/main/pkg/carbon/providers.go#L52>)
 
 ```go
 func (c *Carbon) Providers() []types.Provider
@@ -237,7 +247,7 @@ func (c *Carbon) Providers() []types.Provider
 
 
 <a name="Carbon.VMsFromHosts"></a>
-### func \(\*Carbon\) [VMsFromHosts](<https://github.com/analog-substance/carbon/blob/main/pkg/carbon/virtual_machines.go#L46>)
+### func \(\*Carbon\) [VMsFromHosts](<https://github.com/analog-substance/carbon/blob/main/pkg/carbon/virtual_machines.go#L56>)
 
 ```go
 func (c *Carbon) VMsFromHosts(hostnames []string) []types.VM

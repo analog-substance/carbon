@@ -6,11 +6,12 @@ import (
 	"github.com/analog-substance/carbon/pkg/common"
 	"github.com/mitchellh/go-homedir"
 	"github.com/spf13/cobra"
-	"github.com/spf13/viper"
 	"log/slog"
 	"os"
 	"path/filepath"
 )
+
+const cfgFileName = "carbon.yaml"
 
 var cfgFile string
 
@@ -64,10 +65,21 @@ There are plans to bring support to the following:
 		}
 		log.Debug("debug mode", "debug", debug)
 
-		carbonConfigFile := &common.CarbonConfigFile{}
-		err := viper.Unmarshal(carbonConfigFile)
+		carbonConfigFile := common.GetConfig()
+		home, err := homedir.Dir()
 		if err != nil {
-			log.Debug("failed to unmarshal viper config to carbon config struct")
+			log.Debug("error getting home directory", "error", err)
+		} else {
+			err := carbonConfigFile.MergeInConfigFile(filepath.Join(home, cfgFileName))
+
+			if err != nil {
+				log.Debug("error loading carbon config from home", "error", err)
+			}
+		}
+
+		err = carbonConfigFile.MergeInConfigFile(cfgFileName)
+		if err != nil {
+			log.Debug("error loading carbon config from home", "error", err)
 		}
 
 		carbonObj = carbon.New(carbonConfigFile.Carbon)
@@ -89,7 +101,6 @@ func Execute() {
 func init() {
 	log = common.WithGroup("cmd")
 
-	cobra.OnInitialize(initConfig)
 	CarbonCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is $HOME/carbon.yaml)")
 	// need to rethink how I want this to work
 	//CarbonCmd.PersistentFlags().StringSliceP("provider", "P", []string{}, "Provider to use vbox, aws")
@@ -97,50 +108,6 @@ func init() {
 	//CarbonCmd.PersistentFlags().StringSliceVarP(&environments, "environment", "e", []string{}, "Environment to use. Some providers/profiles support many environments.")
 	CarbonCmd.PersistentFlags().BoolVarP(&jsonOutput, "json", "j", false, "Output in JSON")
 	CarbonCmd.PersistentFlags().BoolVar(&debug, "debug", false, "Debug mode")
-}
-
-// initConfig reads in config file and ENV variables if set.
-func initConfig() {
-	viper.AutomaticEnv() // read in environment variables that match
-
-	viper.SetDefault(common.ViperDefaultInstanceDir, common.DefaultInstanceDir)
-	viper.SetDefault(common.ViperDeploymentsDir, common.DefaultDeploymentsDirName)
-	viper.SetDefault(common.ViperPackerDir, filepath.Join(common.DefaultDeploymentsDirName, common.DefaultPackerDirName))
-	viper.SetDefault(common.ViperImagesDir, filepath.Join(common.DefaultDeploymentsDirName, common.DefaultImagesDirName))
-	viper.SetDefault(common.ViperTerraformDir, filepath.Join(common.DefaultDeploymentsDirName, common.DefaultTerraformDirName))
-	viper.SetDefault(common.ViperTerraformProjectDir, filepath.Join(common.DefaultDeploymentsDirName, common.DefaultProjectsDirName))
-
-	viper.SetDefault("carbon.providers.aws.auto_discover", true)
-	viper.SetDefault("carbon.providers.aws.enabled", true)
-	viper.SetDefault("carbon.providers.aws.profiles.default.enabled", true)
-
-	viper.SetDefault("carbon.providers.virtualbox.enabled", true)
-	viper.SetDefault("carbon.providers.virtualbox.auto_discover", true)
-	viper.SetDefault("carbon.providers.virtualbox.profiles.default.enabled", true)
-
-	viper.SetDefault("carbon.providers.qemu.enabled", true)
-	viper.SetDefault("carbon.providers.qemu.auto_discover", true)
-	viper.SetDefault("carbon.providers.qemu.profiles.default.enabled", true)
-
-	viper.SetDefault("carbon.providers.multipass.enabled", true)
-	viper.SetDefault("carbon.providers.multipass.auto_discover", true)
-	viper.SetDefault("carbon.providers.multipass.profiles.default.enabled", true)
-
-	if cfgFile != "" {
-		viper.SetConfigFile(cfgFile)
-	} else {
-		viper.AddConfigPath(".")
-
-		home, err := homedir.Dir()
-		cobra.CheckErr(err)
-
-		viper.AddConfigPath(home)
-		viper.SetConfigName("carbon")
-	}
-
-	// do not need to handle err here. since an error will occur if the config file doesn't exist
-	_ = viper.MergeInConfig()
-	log.Debug("carbon config loaded", "config_file", viper.ConfigFileUsed())
 }
 
 func addServiceProviderFlag(c *cobra.Command) {

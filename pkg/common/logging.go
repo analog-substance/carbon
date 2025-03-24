@@ -7,9 +7,11 @@ import (
 
 var logLevel = new(slog.LevelVar)
 var logger *slog.Logger
+var log *slog.Logger
 
 func init() {
 	logger = slog.New(slog.NewTextHandler(os.Stderr, &slog.HandlerOptions{Level: logLevel}))
+	log = WithGroup("common")
 }
 
 func Logger() *slog.Logger {

@@ -11,6 +11,18 @@ jobs:
       - uses: actions/setup-go@0aaccfd150d50ccaeb58ebd88d36e91967a5f35b # v5.4.0
         with:
           go-version: '1.23'
+
+      - name: TruffleHog OSS
+        uses: trufflesecurity/trufflehog@ded5f45b92c00939718787ce586b520bbe795f3b # v3.88.18
+        with:
+          extra_args: --results=verified,unknown
+
+      - name: Build
+        run: go build -v ./...
+
+      - name: Test
+        run: go test -v ./...
+
       - uses: reviewdog/action-staticcheck@73cfd0daa6fdbba9a858dcb0f62844012fa8317d # v1.27.0
         with:
           fail_on_error: true
