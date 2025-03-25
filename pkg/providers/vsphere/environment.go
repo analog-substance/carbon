@@ -1,16 +1,23 @@
 package vsphere
 
 import (
+	"context"
 	"errors"
 	"fmt"
 	"github.com/analog-substance/carbon/pkg/models"
 	"github.com/analog-substance/carbon/pkg/providers/base"
 	"github.com/analog-substance/carbon/pkg/types"
+	"github.com/vmware/govmomi/view"
+	"github.com/vmware/govmomi/vim25"
+	"github.com/vmware/govmomi/vim25/mo"
+	vsphereTypes "github.com/vmware/govmomi/vim25/types"
+	"time"
 )
 
 type Environment struct {
-	name    string
-	profile types.Profile
+	name      string
+	profile   types.Profile
+	apiClient *vim25.Client
 }
 
 func (e *Environment) Name() string {
@@ -24,22 +31,49 @@ func (e *Environment) Profile() types.Profile {
 func (e *Environment) VMs() []types.VM {
 	var vms []types.VM
 
-	log.Debug("getting VMs", "env", e.Name())
+	// Create view of VirtualMachine objects
+	m := view.NewManager(e.apiClient)
+	ctx := context.Background()
 
-	var publicIPs = []string{"1.1.1.1"}
-	var privateIPs = []string{"10.0.0.1"}
+	v, err := m.CreateContainerView(ctx, e.apiClient.ServiceContent.RootFolder, []string{"VirtualMachine"}, true)
+	if err != nil {
+		log.Debug("failed to create VM view", "error", err)
+	}
 
-	vms = append(vms, &models.Machine{
-		InstanceName: "test name",
-		CurrentState: stateFromStatus("d.Status"),
-		InstanceID:   fmt.Sprintf("%d", 420),
-		Env:          e,
-		//CurrentUpTime:      d,
-		InstanceType:       "large",
-		PrivateIPAddresses: privateIPs,
-		PublicIPAddresses:  publicIPs,
-	})
+	defer v.Destroy(ctx)
 
+	// Retrieve summary property for all machines
+	// Reference: http://pubs.vmware.com/vsphere-60/topic/com.vmware.wssdk.apiref.doc/vim.VirtualMachine.html
+	var vsvms []mo.VirtualMachine
+	err = v.Retrieve(ctx, []string{"VirtualMachine"}, []string{"summary", "runtime", "network", "guest"}, &vsvms)
+	if err != nil {
+		log.Debug("failed to retrieve VM summary", "error", err)
+	}
+
+	// Print summary per vm (see also: govc/vm/info.go)
+
+	for _, vm := range vsvms {
+		//fmt.Printf("%s: %s\n", , vm.Summary.Config.GuestFullName)
+
+		var publicIPs = []string{}
+		var privateIPs = []string{vm.Guest.IpAddress}
+
+		uptime := time.Duration(0)
+		if vm.Runtime.BootTime != nil {
+			uptime = time.Now().Sub(*vm.Runtime.BootTime)
+		}
+
+		vms = append(vms, &models.Machine{
+			InstanceName:       vm.Summary.Config.Name,
+			CurrentState:       stateFromStatus(vm.Runtime.PowerState),
+			InstanceID:         fmt.Sprintf("%d", 420),
+			Env:                e,
+			CurrentUpTime:      uptime,
+			InstanceType:       "large",
+			PrivateIPAddresses: privateIPs,
+			PublicIPAddresses:  publicIPs,
+		})
+	}
 	return vms
 }
 
@@ -75,19 +109,16 @@ func (e *Environment) Images() ([]types.Image, error) {
 	return base.GetImagesForFileBasedProvider(e.Profile().Provider().Type(), e)
 }
 
-func stateFromStatus(state string) types.MachineState {
-	//if state == "poweroff" {
-	//	return types.StateStopped
-	//}
-	//if state == "poweron" {
-	//	return types.StateRunning
-	//}
-	//if state == "aborted" {
-	//	return types.StateStopped
-	//}
-	//if state == "active" {
-	//	return types.StateRunning
-	//}
+func stateFromStatus(state vsphereTypes.VirtualMachinePowerState) types.MachineState {
+	if state == vsphereTypes.VirtualMachinePowerStatePoweredOff {
+		return types.StateStopped
+	}
+	if state == vsphereTypes.VirtualMachinePowerStatePoweredOn {
+		return types.StateRunning
+	}
+	if state == vsphereTypes.VirtualMachinePowerStateSuspended {
+		return types.StateStopped
+	}
 
 	log.Debug("unknown state for VM", "state", state)
 	return types.StateUnknown
