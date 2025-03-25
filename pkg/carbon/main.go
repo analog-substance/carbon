@@ -28,6 +28,12 @@ var log *slog.Logger
 
 func init() {
 	log = common.WithGroup("carbon")
+	providerTypes := []string{}
+
+	for _, provider := range AllProviders {
+		providerTypes = append(providerTypes, provider.Type())
+	}
+	common.SetProvidersTypes(providerTypes)
 }
 
 func New(config common.CarbonConfig) *Carbon {

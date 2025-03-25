@@ -344,6 +344,7 @@ func DefaultProviderConfig() ProviderConfig {
 
 func GetConfig() *CarbonConfigFile {
 	if instanceCfg == nil {
+
 		instanceCfg = &CarbonConfigFile{
 			Carbon: CarbonConfig{
 				Dir: map[string]string{
@@ -354,13 +355,7 @@ func GetConfig() *CarbonConfigFile {
 					TerraformConfigKey:        filepath.Join(DefaultDeploymentsDirName, DefaultTerraformDirName),
 					TerraformProjectConfigKey: filepath.Join(DefaultDeploymentsDirName, DefaultProjectsDirName),
 				},
-				Providers: map[string]ProviderConfig{
-					"aws":          DefaultProviderConfig(),
-					"digitalocean": DefaultProviderConfig(),
-					"multipass":    DefaultProviderConfig(),
-					"qemu":         DefaultProviderConfig(),
-					"virtualbox":   DefaultProviderConfig(),
-				},
+				Providers: defaultProviders(),
 			},
 		}
 	}
@@ -379,4 +374,19 @@ func Get(s string) any {
 func Set(s string, v any) any {
 	instanceCfg = GetConfig().Set(strings.Split(s, "."), v)
 	return instanceCfg
+}
+
+var allProviders = []string{}
+
+func SetProvidersTypes(p []string) {
+	allProviders = p
+}
+
+func defaultProviders() map[string]ProviderConfig {
+	ret := map[string]ProviderConfig{}
+	for _, provider := range allProviders {
+		ret[provider] = DefaultProviderConfig()
+	}
+
+	return ret
 }
