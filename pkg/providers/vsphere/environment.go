@@ -3,6 +3,7 @@ package vsphere
 import (
 	"context"
 	"errors"
+	"fmt"
 	"github.com/analog-substance/carbon/pkg/models"
 	"github.com/analog-substance/carbon/pkg/providers/base"
 	"github.com/analog-substance/carbon/pkg/types"
@@ -14,9 +15,10 @@ import (
 )
 
 type Environment struct {
-	name      string
-	profile   types.Profile
-	apiClient *vim25.Client
+	name       string
+	profile    types.Profile
+	apiClient  *vim25.Client
+	hostSystem *mo.HostSystem
 }
 
 func (e *Environment) Name() string {
@@ -49,10 +51,11 @@ func (e *Environment) VMs() []types.VM {
 		log.Debug("failed to retrieve VM summary", "error", err)
 	}
 
-	// Print summary per vm (see also: govc/vm/info.go)
-
 	for _, vm := range vsvms {
-		//fmt.Printf("%s: %s\n", , vm.Summary.Config.GuestFullName)
+		if vm.Runtime.Host.Value != e.hostSystem.Summary.Host.Value {
+			// this is terrible. it seems event the vsphere sdk does something similar. not cool
+			continue
+		}
 
 		var publicIPs = []string{}
 		var privateIPs = []string{vm.Guest.IpAddress}
@@ -62,13 +65,14 @@ func (e *Environment) VMs() []types.VM {
 			uptime = time.Now().Sub(*vm.Runtime.BootTime)
 		}
 
+		info := fmt.Sprintf("vx-%dvcpu-%dgb", vm.Summary.Config.NumCpu, vm.Summary.Config.MemorySizeMB/1024)
 		vms = append(vms, &models.Machine{
 			InstanceName:       vm.Summary.Config.Name,
 			CurrentState:       stateFromStatus(vm.Runtime.PowerState),
 			InstanceID:         vm.Summary.Vm.Value,
 			Env:                e,
 			CurrentUpTime:      uptime,
-			InstanceType:       "large",
+			InstanceType:       info,
 			PrivateIPAddresses: privateIPs,
 			PublicIPAddresses:  publicIPs,
 		})

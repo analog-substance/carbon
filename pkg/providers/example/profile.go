@@ -11,8 +11,6 @@ type Profile struct {
 }
 
 func NewProfile(name string, providerInstance *Provider, config common.ProfileConfig) *Profile {
-
-	log.Debug("password", "password", config.GetPassword())
 	return &Profile{
 		Profile: base.NewProfile(name, providerInstance, config),
 	}

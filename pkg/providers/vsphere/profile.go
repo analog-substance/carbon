@@ -32,6 +32,9 @@ func NewProfile(name string, providerInstance *Provider, config common.ProfileCo
 
 func (p *Profile) Environments() []types.Environment {
 	var environments []types.Environment
+	if p.apiClient == nil {
+		return environments
+	}
 
 	// Create a view of HostSystem objects
 	m := view.NewManager(p.apiClient)
@@ -44,7 +47,7 @@ func (p *Profile) Environments() []types.Environment {
 	defer v.Destroy(ctx)
 
 	var hss []mo.HostSystem
-	err = v.Retrieve(ctx, []string{"HostSystem"}, []string{"summary"}, &hss)
+	err = v.Retrieve(ctx, []string{"HostSystem"}, []string{"summary", "name"}, &hss)
 	if err != nil {
 		panic(err)
 
@@ -52,9 +55,10 @@ func (p *Profile) Environments() []types.Environment {
 
 	for _, hs := range hss {
 		environments = append(environments, &Environment{
-			name:      hs.Summary.Config.Name,
-			profile:   p,
-			apiClient: p.apiClient,
+			name:       hs.Name,
+			profile:    p,
+			apiClient:  p.apiClient,
+			hostSystem: &hs,
 		})
 	}
 

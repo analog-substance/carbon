@@ -7,6 +7,7 @@ import (
 	"os/exec"
 	"path/filepath"
 	"strings"
+	"time"
 )
 
 var instanceCfg *CarbonConfigFile
@@ -97,12 +98,15 @@ func (pc *ProfileConfig) UnmarshalYAML(unmarshal func(interface{}) error) error 
 }
 
 func (pc *ProfileConfig) GetPassword() string {
+	started := time.Now()
+	defer func() {
+		log.Debug("ProfileConfig.GetPassword()", "took", time.Since(started), "command", pc.PasswordCommand)
+	}()
 	if pc.Use1PassCLI {
 		pc.PasswordCommand = fmt.Sprintf("op read \"%s\"", pc.Password)
 	}
 
 	if pc.PasswordCommand != "" {
-		log.Debug("password command", "command", pc.PasswordCommand)
 		p, err := exec.Command("sh", "-c", pc.PasswordCommand).Output()
 		if err != nil {
 			log.Debug("failed to execute password command", "cmd", pc.PasswordCommand, "err", err)
