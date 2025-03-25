@@ -3,7 +3,6 @@ package vsphere
 import (
 	"context"
 	"errors"
-	"fmt"
 	"github.com/analog-substance/carbon/pkg/models"
 	"github.com/analog-substance/carbon/pkg/providers/base"
 	"github.com/analog-substance/carbon/pkg/types"
@@ -66,7 +65,7 @@ func (e *Environment) VMs() []types.VM {
 		vms = append(vms, &models.Machine{
 			InstanceName:       vm.Summary.Config.Name,
 			CurrentState:       stateFromStatus(vm.Runtime.PowerState),
-			InstanceID:         fmt.Sprintf("%d", 420),
+			InstanceID:         vm.Summary.Vm.Value,
 			Env:                e,
 			CurrentUpTime:      uptime,
 			InstanceType:       "large",
