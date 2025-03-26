@@ -2,6 +2,7 @@ package carbon
 
 import (
 	"fmt"
+	"github.com/analog-substance/carbon/pkg/common"
 	"github.com/analog-substance/carbon/pkg/providers/aws"
 	"github.com/analog-substance/carbon/pkg/providers/digitalocean"
 	"github.com/analog-substance/carbon/pkg/providers/multipass"
@@ -14,6 +15,8 @@ import (
 var availableProviders []types.Provider
 
 func AvailableProviders() []types.Provider {
+	defer (common.Time("available providers"))()
+
 	if len(availableProviders) == 0 {
 
 		type providerAvailability struct {
@@ -23,6 +26,7 @@ func AvailableProviders() []types.Provider {
 		c := make(chan providerAvailability)
 		for _, provider := range AllProviders {
 			go func() {
+				//defer (common.Time(fmt.Sprintf("(%s)provider.isAvailable", provider.Name())))()
 				c <- providerAvailability{
 					provider:  provider,
 					available: provider.IsAvailable(),
