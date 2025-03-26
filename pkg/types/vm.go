@@ -42,6 +42,7 @@ type VM interface {
 	Destroy() error
 	Start() error
 	Stop() error
+	Suspend() error
 	Restart() error
 
 	ExecSSH(string, bool, ...string) error

@@ -112,6 +112,20 @@ func (e *Environment) StopVM(id string) error {
 	return errors.New("no vm found")
 }
 
+func (e *Environment) SuspendVM(id string) error {
+	vsv := e.getVMByID(id)
+	if vsv != nil {
+		req := vsphereTypes.SuspendVM_Task{
+			This: vsv.Reference(),
+		}
+
+		_, err := methods.SuspendVM_Task(context.Background(), e.apiClient.RoundTripper, &req)
+		return err
+	}
+
+	return errors.New("no vm found")
+}
+
 func (e *Environment) RestartVM(id string) error {
 	vsv := e.getVMByID(id)
 	if vsv != nil {

@@ -5,6 +5,7 @@ import (
 	"github.com/analog-substance/carbon/pkg/common"
 	"github.com/analog-substance/carbon/pkg/providers/aws"
 	"github.com/analog-substance/carbon/pkg/providers/digitalocean"
+	"github.com/analog-substance/carbon/pkg/providers/gcloud"
 	"github.com/analog-substance/carbon/pkg/providers/multipass"
 	"github.com/analog-substance/carbon/pkg/providers/qemu"
 	"github.com/analog-substance/carbon/pkg/providers/virtualbox"
@@ -63,9 +64,10 @@ func (c *Carbon) GetProvider(providerType string) (types.Provider, error) {
 
 var AllProviders = []types.Provider{
 	aws.New(),
+	digitalocean.New(),
+	gcloud.New(),
+	multipass.New(),
 	qemu.New(),
 	virtualbox.New(),
-	multipass.New(),
-	digitalocean.New(),
 	vsphere.New(),
 }

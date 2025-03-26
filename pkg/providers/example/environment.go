@@ -51,6 +51,10 @@ func (e *Environment) StopVM(id string) error {
 	return errors.New("not yet implemented")
 }
 
+func (e *Environment) SuspendVM(id string) error {
+	return errors.New("not implemented")
+}
+
 func (e *Environment) RestartVM(id string) error {
 	return errors.New("not yet implemented")
 }

@@ -102,6 +102,10 @@ func (e *Environment) StopVM(id string) error {
 	return err
 }
 
+func (e *Environment) SuspendVM(id string) error {
+	return errors.New("not implemented")
+}
+
 func (e *Environment) RestartVM(id string) error {
 	intId, err := strconv.Atoi(id)
 	if err != nil {

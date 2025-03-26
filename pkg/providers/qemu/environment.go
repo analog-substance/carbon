@@ -54,6 +54,11 @@ func (e *Environment) StartVM(id string) error {
 }
 
 func (e *Environment) StopVM(id string) error {
+	// just suspend, since there is no stop in the library
+	return e.SuspendVM(id)
+}
+
+func (e *Environment) SuspendVM(id string) error {
 
 	domain, err := e.qemu.GetDomain(id)
 	if err != nil {

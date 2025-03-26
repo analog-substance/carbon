@@ -89,6 +89,10 @@ func (m *Machine) Stop() error {
 	return m.Env.StopVM(m.InstanceID)
 }
 
+func (m *Machine) Suspend() error {
+	return m.Env.SuspendVM(m.InstanceID)
+}
+
 func (m *Machine) Restart() error {
 	return m.Env.RestartVM(m.InstanceID)
 }

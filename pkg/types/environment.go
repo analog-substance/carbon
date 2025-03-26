@@ -12,6 +12,7 @@ type Environment interface {
 	Profile() Profile
 	StartVM(string) error
 	StopVM(string) error
+	SuspendVM(string) error
 	RestartVM(string) error
 	ImageBuilds() ([]ImageBuild, error)
 	Images() ([]Image, error)

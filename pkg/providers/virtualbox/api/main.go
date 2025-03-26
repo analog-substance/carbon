@@ -138,6 +138,13 @@ func StartVM(id string) error {
 	return err
 }
 
+func StopVM(id string) error {
+	_, err := builder.
+		Cmd(AppPath(), "controlvm", id, "poweroff").
+		Output()
+	return err
+}
+
 func RestartVM(id string) error {
 	_, err := builder.
 		Cmd(AppPath(), "controlvm", id, "reboot").
@@ -145,7 +152,7 @@ func RestartVM(id string) error {
 	return err
 }
 
-func SleepVM(id string) error {
+func SuspendVM(id string) error {
 	_, err := builder.
 		Cmd(AppPath(), "controlvm", id, "savestate").
 		Output()
