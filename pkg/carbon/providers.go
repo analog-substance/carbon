@@ -1,8 +1,12 @@
 package carbon
 
 import (
+	"bytes"
+	"embed"
 	"fmt"
+	"github.com/analog-substance/carbon/deployments"
 	"github.com/analog-substance/carbon/pkg/common"
+	"github.com/analog-substance/carbon/pkg/models"
 	"github.com/analog-substance/carbon/pkg/providers/aws"
 	"github.com/analog-substance/carbon/pkg/providers/digitalocean"
 	"github.com/analog-substance/carbon/pkg/providers/gcloud"
@@ -11,6 +15,10 @@ import (
 	"github.com/analog-substance/carbon/pkg/providers/virtualbox"
 	"github.com/analog-substance/carbon/pkg/providers/vsphere"
 	"github.com/analog-substance/carbon/pkg/types"
+	"os"
+	"path"
+	"path/filepath"
+	"text/template"
 )
 
 var availableProviders []types.Provider
@@ -62,6 +70,76 @@ func (c *Carbon) GetProvider(providerType string) (types.Provider, error) {
 	return nil, fmt.Errorf("provider '%s' not found", providerType)
 }
 
+func (c *Carbon) NewProject(name string, providerType string, force bool) (types.Project, error) {
+	baseName := filepath.Base(name)
+	projectDir := filepath.Join(common.GetConfig().Carbon.Dir[common.TerraformProjectConfigKey], baseName)
+	terraformDir := common.GetConfig().Carbon.Dir[common.DefaultTerraformDirName]
+	log.Debug("new project", "dir", projectDir)
+
+	_, err := os.Stat(projectDir)
+	if err == nil && !force {
+		return nil, fmt.Errorf("project %s already exists", name)
+	}
+
+	err = os.MkdirAll(projectDir, 0755)
+	if err != nil {
+		log.Debug("failed to create project dir", "dir", projectDir, "err", err)
+		return nil, err
+	}
+
+	err = os.MkdirAll(terraformDir, 0755)
+	if err != nil {
+		log.Debug("failed to create terraformDir dir", "dir", terraformDir, "err", err)
+		return nil, err
+	}
+
+	embeddedDir := path.Join(common.DefaultProjectsDirName, "example")
+	dirListing, err := deployments.Files.ReadDir(embeddedDir)
+	if err != nil {
+		log.Debug("failed to read embedded project dir", "dir", common.DefaultProjectsDirName, "err", err)
+		return nil, err
+	}
+	for _, d := range dirListing {
+		if !d.IsDir() {
+			err = copyTemplateFromEmbeddedFS(
+				path.Join(embeddedDir, d.Name()),
+				filepath.Join(projectDir, d.Name()),
+				deployments.Files,
+				ImageBuildDate{name},
+			)
+			if err != nil {
+				log.Debug("failed to copy embedded project file", "file", d.Name(), "err", err)
+				return nil, err
+			}
+
+		}
+	}
+
+	embeddedDir = path.Join(common.DefaultTerraformDirName, "modules", "carbon")
+	dirListing, err = deployments.Files.ReadDir(embeddedDir)
+	if err != nil {
+		log.Debug("failed to read embedded project dir", "dir", common.DefaultProjectsDirName, "err", err)
+		return nil, err
+	}
+	for _, d := range dirListing {
+		if !d.IsDir() {
+			err = copyTemplateFromEmbeddedFS(
+				path.Join(embeddedDir, d.Name()),
+				filepath.Join(terraformDir, d.Name()),
+				deployments.Files,
+				ImageBuildDate{name},
+			)
+			if err != nil {
+				log.Debug("failed to copy embedded project file", "file", d.Name(), "err", err)
+				return nil, err
+			}
+
+		}
+	}
+
+	return models.NewProject(projectDir), nil
+}
+
 var AllProviders = []types.Provider{
 	aws.New(),
 	digitalocean.New(),
@@ -70,4 +148,54 @@ var AllProviders = []types.Provider{
 	qemu.New(),
 	virtualbox.New(),
 	vsphere.New(),
+}
+
+func fileContainsString(path string, needle string, embeddedFS embed.FS) (bool, error) {
+	fileBytes, err := embeddedFS.ReadFile(path)
+	if err != nil {
+		return false, err
+	}
+
+	return bytes.Contains(fileBytes, []byte(needle)), nil
+}
+
+func copyFileFromEmbeddedFS(src, dest string, embeddedFS embed.FS) error {
+	fileBytes, err := embeddedFS.ReadFile(src)
+	if err != nil {
+		return err
+	}
+
+	err = os.WriteFile(dest, fileBytes, 0644)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func copyTemplateFromEmbeddedFS(src, dest string, embeddedFS embed.FS, data any) error {
+	fileBytes, err := embeddedFS.ReadFile(src)
+	if err != nil {
+		return err
+	}
+
+	tmpl, err := template.New(src).Parse(string(fileBytes))
+	if err != nil {
+		return err
+	}
+
+	var templateBytes bytes.Buffer
+	err = tmpl.Execute(&templateBytes, data)
+	if err != nil {
+		return err
+	}
+
+	err = os.WriteFile(dest, templateBytes.Bytes(), 0644)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+type ImageBuildDate struct {
+	Name string
 }

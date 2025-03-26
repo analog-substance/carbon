@@ -7,6 +7,7 @@ variable "machines" {
     purpose = optional(string, "util")
     volume_size = optional(number, 80)
     provider = optional(string, "aws")
+    region = optional(string, "")
   }))
   default = []
 }
