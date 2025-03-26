@@ -46,10 +46,11 @@ facilitate offensive security assessments.
 ## Supported Providers
 
 - AWS
+- DigitalOcean
+- Multipass (Local)
 - QEMU (Local)
 - VirtualBox (Local)
 - vSphere (in progress)
-- Multipass (Local)
 
 There are plans to bring support to the following:
 

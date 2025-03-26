@@ -23,15 +23,15 @@ It uses:
 It is aimed at supporting various services to ensure it can scale with you as
 your operations become more complex.
 
-| Feature                       | AWS ✅ | QEMU ✅ | VirtualBox ✅ | DigitalOcean ✅ | vSphere ❌ | Multipass ✅ | Azure ❌ | GCP ❌ |
-|-------------------------------|-------|--------|--------------|----------------|-----------|-------------|---------|-------|
-| List VMs                      | ✅     | ✅      | ✅            | ✅              | ❌         | ✅           | ❌       | ❌     |
-| VM Actions Start/Stop/SSH/VNC | ✅     | ✅      | ✅            | ✅              | ❌         | ✅           | ❌       | ❌     |
-| Image build templates         | ✅     | ✅      | ✅            | ❌              | ✅         | ❌ N/A       | ❌       | ❌     |
-| Build images                  | ✅     | ✅      | ✅            | ❌              | ✅         | ❌ N/A       | ❌       | ❌     |
-| Launch one off VM from images | ❌     | ✅      | ❌            | ❌              | ❌         | ❌           | ❌       | ❌     |
-| Destroy VMs                   | ✅     | ✅      | ✅            | ❌              | ✅         | ❌ N/A       | ❌       | ❌     |
-| Infrastructure Creation       | ❌     | ❌      | ❌            | ❌              | ❌         | ❌ N/A       | ❌       | ❌     |
+| Feature                   | AWS | QEMU | VirtualBox | DigitalOcean | vSphere | Multipass | Azure | GCP |
+|---------------------------|-----|------|------------|--------------|---------|-----------|-------|-----|
+| VM: List                  | ✅   | ✅    | ✅          | ✅            | ✅       | ✅         | ❌     | ❌   |
+| VM: Start / Stop / Reboot | ✅   | ✅    | ✅          | ✅            | ✅       | ✅         | ❌     | ❌   |
+| VM: SSH / RDP / VNC       | ✅   | ✅    | ✅          | ✅            | ✅       | ✅         | ❌     | ❌   |
+| VM: Create / Destroy      | ✅   | ✅    | ✅          | ✅            | ✅       | ✅         | ❌     | ❌   |
+| Image Builds              | ✅   | ✅    | ✅          | ❌            | ✅       | ❌ N/A     | ❌     | ❌   |
+| Images (Build, Destroy)   | ✅   | ✅    | ✅          | ❌            | ✅       | ❌ N/A     | ❌     | ❌   |
+| Infrastructure Creation   | ❌   | ❌    | ❌          | ❌            | ❌       | ❌ N/A     | ❌     | ❌   |
 
 ❌ = Not Right Now, but planned  
 ✅ = Supported
@@ -61,28 +61,29 @@ Carbon expects the following to be installed and accessible in your `$PATH`.
 ```
 Manage and use infrastructure with a consistent interface, regardless of where it lives.
 
-Usage:
-  carbon [command]
-
-Available Commands:
-  completion  Generate the autocompletion script for the specified shell
-  config      Display config information
-  dev         Unstable sub-commands for testing random ideas
+## Usage
+                                                                                                                                                                                                                                                                                                          
+carbon [command]
+                                                                                                                                                                                                                                                                                                                  
+## Available Commands:
+                                                                                                                                                                                                                                                                                                                  
+  completion  Generate completion script
+  config      View and manage configuration values.
   help        Help about any command
-  image       manage images and image builds
-  vm          Manage and interact with VMs
-
-Flags:
-      --config string         config file (default is $HOME/.carbon.yaml)
-  -e, --environment strings   Environment to use. Some providers/profiles support many environments.
-  -h, --help                  help for carbon
-  -j, --json                  Output in JSON
-  -p, --profile strings       Profile to use. Like an instance of a provider. Used to specify aws profiles
-  -P, --provider strings      Provider to use vbox, aws
-  -v, --version               version for carbon
-
+  image       View or manage images and image builds.
+  project     Manage and interact with projects
+  update      Update carbon to latest version
+  vm          Manage and interact with VMs.
+                                                                                                                                                                                                                                                                       
+## Flags
+                                                                                                                                                                                                                                                                                                          
+      --config string   config file (default is $HOME/carbon.yaml)
+      --debug           Debug mode
+  -h, --help            help for carbon
+  -j, --json            Output in JSON
+  -v, --version         version for carbon
+  
 Use "carbon [command] --help" for more information about a command.
-
 ```
 
 ### Images
@@ -144,7 +145,6 @@ carbon vm ssh -i i-afde123ae43
 - provision aws env (create files, call terraform)
 - Self Test to ensure dependencies are met
 - Cloud init from templates (Base, Operator, Operator Desktop, Implant VM)
-- vSphere provider
 - DNS management
     - point a domain
     - list domains

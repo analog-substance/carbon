@@ -1,12 +1,12 @@
 ---
-title: digitalocean
+title: example
 description: 
 weight: 200
 ---
 
 
 ```go
-import "github.com/analog-substance/carbon/pkg/providers/digitalocean"
+import "github.com/analog-substance/carbon/pkg/providers/example"
 ```
 
 ## Index
@@ -33,7 +33,7 @@ import "github.com/analog-substance/carbon/pkg/providers/digitalocean"
 
 
 <a name="New"></a>
-## func [New](<https://github.com/analog-substance/carbon/blob/main/pkg/providers/digitalocean/provider.go#L22>)
+## func [New](<https://github.com/analog-substance/carbon/blob/main/pkg/providers/example/provider.go#L18>)
 
 ```go
 func New() types.Provider
@@ -42,7 +42,7 @@ func New() types.Provider
 
 
 <a name="Environment"></a>
-## type [Environment](<https://github.com/analog-substance/carbon/blob/main/pkg/providers/digitalocean/environment.go#L14-L19>)
+## type [Environment](<https://github.com/analog-substance/carbon/blob/main/pkg/providers/example/environment.go#L11-L14>)
 
 
 
@@ -53,7 +53,7 @@ type Environment struct {
 ```
 
 <a name="Environment.CreateVM"></a>
-### func \(\*Environment\) [CreateVM](<https://github.com/analog-substance/carbon/blob/main/pkg/providers/digitalocean/environment.go#L124>)
+### func \(\*Environment\) [CreateVM](<https://github.com/analog-substance/carbon/blob/main/pkg/providers/example/environment.go#L66>)
 
 ```go
 func (e *Environment) CreateVM(options types.MachineLaunchOptions) error
@@ -62,7 +62,7 @@ func (e *Environment) CreateVM(options types.MachineLaunchOptions) error
 
 
 <a name="Environment.DestroyImage"></a>
-### func \(\*Environment\) [DestroyImage](<https://github.com/analog-substance/carbon/blob/main/pkg/providers/digitalocean/environment.go#L119>)
+### func \(\*Environment\) [DestroyImage](<https://github.com/analog-substance/carbon/blob/main/pkg/providers/example/environment.go#L62>)
 
 ```go
 func (e *Environment) DestroyImage(imageID string) error
@@ -71,7 +71,7 @@ func (e *Environment) DestroyImage(imageID string) error
 
 
 <a name="Environment.DestroyVM"></a>
-### func \(\*Environment\) [DestroyVM](<https://github.com/analog-substance/carbon/blob/main/pkg/providers/digitalocean/environment.go#L115>)
+### func \(\*Environment\) [DestroyVM](<https://github.com/analog-substance/carbon/blob/main/pkg/providers/example/environment.go#L58>)
 
 ```go
 func (e *Environment) DestroyVM(id string) error
@@ -80,7 +80,7 @@ func (e *Environment) DestroyVM(id string) error
 
 
 <a name="Environment.ImageBuilds"></a>
-### func \(\*Environment\) [ImageBuilds](<https://github.com/analog-substance/carbon/blob/main/pkg/providers/digitalocean/environment.go#L129>)
+### func \(\*Environment\) [ImageBuilds](<https://github.com/analog-substance/carbon/blob/main/pkg/providers/example/environment.go#L70>)
 
 ```go
 func (e *Environment) ImageBuilds() ([]types.ImageBuild, error)
@@ -89,7 +89,7 @@ func (e *Environment) ImageBuilds() ([]types.ImageBuild, error)
 
 
 <a name="Environment.Images"></a>
-### func \(\*Environment\) [Images](<https://github.com/analog-substance/carbon/blob/main/pkg/providers/digitalocean/environment.go#L133>)
+### func \(\*Environment\) [Images](<https://github.com/analog-substance/carbon/blob/main/pkg/providers/example/environment.go#L74>)
 
 ```go
 func (e *Environment) Images() ([]types.Image, error)
@@ -98,7 +98,7 @@ func (e *Environment) Images() ([]types.Image, error)
 
 
 <a name="Environment.Name"></a>
-### func \(\*Environment\) [Name](<https://github.com/analog-substance/carbon/blob/main/pkg/providers/digitalocean/environment.go#L21>)
+### func \(\*Environment\) [Name](<https://github.com/analog-substance/carbon/blob/main/pkg/providers/example/environment.go#L16>)
 
 ```go
 func (e *Environment) Name() string
@@ -107,7 +107,7 @@ func (e *Environment) Name() string
 
 
 <a name="Environment.Profile"></a>
-### func \(\*Environment\) [Profile](<https://github.com/analog-substance/carbon/blob/main/pkg/providers/digitalocean/environment.go#L25>)
+### func \(\*Environment\) [Profile](<https://github.com/analog-substance/carbon/blob/main/pkg/providers/example/environment.go#L20>)
 
 ```go
 func (e *Environment) Profile() types.Profile
@@ -116,7 +116,7 @@ func (e *Environment) Profile() types.Profile
 
 
 <a name="Environment.RestartVM"></a>
-### func \(\*Environment\) [RestartVM](<https://github.com/analog-substance/carbon/blob/main/pkg/providers/digitalocean/environment.go#L105>)
+### func \(\*Environment\) [RestartVM](<https://github.com/analog-substance/carbon/blob/main/pkg/providers/example/environment.go#L54>)
 
 ```go
 func (e *Environment) RestartVM(id string) error
@@ -125,7 +125,7 @@ func (e *Environment) RestartVM(id string) error
 
 
 <a name="Environment.StartVM"></a>
-### func \(\*Environment\) [StartVM](<https://github.com/analog-substance/carbon/blob/main/pkg/providers/digitalocean/environment.go#L85>)
+### func \(\*Environment\) [StartVM](<https://github.com/analog-substance/carbon/blob/main/pkg/providers/example/environment.go#L46>)
 
 ```go
 func (e *Environment) StartVM(id string) error
@@ -134,7 +134,7 @@ func (e *Environment) StartVM(id string) error
 
 
 <a name="Environment.StopVM"></a>
-### func \(\*Environment\) [StopVM](<https://github.com/analog-substance/carbon/blob/main/pkg/providers/digitalocean/environment.go#L95>)
+### func \(\*Environment\) [StopVM](<https://github.com/analog-substance/carbon/blob/main/pkg/providers/example/environment.go#L50>)
 
 ```go
 func (e *Environment) StopVM(id string) error
@@ -143,7 +143,7 @@ func (e *Environment) StopVM(id string) error
 
 
 <a name="Environment.VMs"></a>
-### func \(\*Environment\) [VMs](<https://github.com/analog-substance/carbon/blob/main/pkg/providers/digitalocean/environment.go#L29>)
+### func \(\*Environment\) [VMs](<https://github.com/analog-substance/carbon/blob/main/pkg/providers/example/environment.go#L24>)
 
 ```go
 func (e *Environment) VMs() []types.VM
@@ -152,19 +152,18 @@ func (e *Environment) VMs() []types.VM
 
 
 <a name="Profile"></a>
-## type [Profile](<https://github.com/analog-substance/carbon/blob/main/pkg/providers/digitalocean/profile.go#L11-L14>)
+## type [Profile](<https://github.com/analog-substance/carbon/blob/main/pkg/providers/example/profile.go#L9-L11>)
 
 
 
 ```go
 type Profile struct {
     types.Profile
-    // contains filtered or unexported fields
 }
 ```
 
 <a name="NewProfile"></a>
-### func [NewProfile](<https://github.com/analog-substance/carbon/blob/main/pkg/providers/digitalocean/profile.go#L16>)
+### func [NewProfile](<https://github.com/analog-substance/carbon/blob/main/pkg/providers/example/profile.go#L13>)
 
 ```go
 func NewProfile(name string, providerInstance *Provider, config common.ProfileConfig) *Profile
@@ -173,7 +172,7 @@ func NewProfile(name string, providerInstance *Provider, config common.ProfileCo
 
 
 <a name="Profile.Environments"></a>
-### func \(\*Profile\) [Environments](<https://github.com/analog-substance/carbon/blob/main/pkg/providers/digitalocean/profile.go#L25>)
+### func \(\*Profile\) [Environments](<https://github.com/analog-substance/carbon/blob/main/pkg/providers/example/profile.go#L19>)
 
 ```go
 func (p *Profile) Environments() []types.Environment
@@ -182,7 +181,7 @@ func (p *Profile) Environments() []types.Environment
 
 
 <a name="Provider"></a>
-## type [Provider](<https://github.com/analog-substance/carbon/blob/main/pkg/providers/digitalocean/provider.go#L16-L20>)
+## type [Provider](<https://github.com/analog-substance/carbon/blob/main/pkg/providers/example/provider.go#L12-L16>)
 
 
 
@@ -194,7 +193,7 @@ type Provider struct {
 ```
 
 <a name="Provider.IsAvailable"></a>
-### func \(\*Provider\) [IsAvailable](<https://github.com/analog-substance/carbon/blob/main/pkg/providers/digitalocean/provider.go#L28>)
+### func \(\*Provider\) [IsAvailable](<https://github.com/analog-substance/carbon/blob/main/pkg/providers/example/provider.go#L24>)
 
 ```go
 func (p *Provider) IsAvailable() bool
@@ -203,7 +202,7 @@ func (p *Provider) IsAvailable() bool
 
 
 <a name="Provider.Profiles"></a>
-### func \(\*Provider\) [Profiles](<https://github.com/analog-substance/carbon/blob/main/pkg/providers/digitalocean/provider.go#L32>)
+### func \(\*Provider\) [Profiles](<https://github.com/analog-substance/carbon/blob/main/pkg/providers/example/provider.go#L28>)
 
 ```go
 func (p *Provider) Profiles() []types.Profile

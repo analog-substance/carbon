@@ -20,6 +20,8 @@ import "github.com/analog-substance/carbon/pkg/common"
 - [func PackerDir\(\) string](<#PackerDir>)
 - [func ProjectsDir\(\) string](<#ProjectsDir>)
 - [func Set\(s string, v any\) any](<#Set>)
+- [func SetProvidersTypes\(p \[\]string\)](<#SetProvidersTypes>)
+- [func Time\(what string\) func\(\)](<#Time>)
 - [func WithGroup\(groupName string\) \*slog.Logger](<#WithGroup>)
 - [type CarbonConfig](<#CarbonConfig>)
   - [func \(cc \*CarbonConfig\) Get\(search \[\]string\) any](<#CarbonConfig.Get>)
@@ -121,7 +123,7 @@ const TerraformProjectConfigKey = "projects"
 ```
 
 <a name="Get"></a>
-## func [Get](<https://github.com/analog-substance/carbon/blob/main/pkg/common/config.go#L373>)
+## func [Get](<https://github.com/analog-substance/carbon/blob/main/pkg/common/config.go#L374>)
 
 ```go
 func Get(s string) any
@@ -139,7 +141,7 @@ func ImagesDir() string
 
 
 <a name="Keys"></a>
-## func [Keys](<https://github.com/analog-substance/carbon/blob/main/pkg/common/config.go#L369>)
+## func [Keys](<https://github.com/analog-substance/carbon/blob/main/pkg/common/config.go#L370>)
 
 ```go
 func Keys() []string
@@ -148,7 +150,7 @@ func Keys() []string
 
 
 <a name="LogLevel"></a>
-## func [LogLevel](<https://github.com/analog-substance/carbon/blob/main/pkg/common/logging.go#L25>)
+## func [LogLevel](<https://github.com/analog-substance/carbon/blob/main/pkg/common/logging.go#L27>)
 
 ```go
 func LogLevel(level slog.Level)
@@ -157,7 +159,7 @@ func LogLevel(level slog.Level)
 
 
 <a name="Logger"></a>
-## func [Logger](<https://github.com/analog-substance/carbon/blob/main/pkg/common/logging.go#L17>)
+## func [Logger](<https://github.com/analog-substance/carbon/blob/main/pkg/common/logging.go#L19>)
 
 ```go
 func Logger() *slog.Logger
@@ -184,7 +186,7 @@ func ProjectsDir() string
 
 
 <a name="Set"></a>
-## func [Set](<https://github.com/analog-substance/carbon/blob/main/pkg/common/config.go#L377>)
+## func [Set](<https://github.com/analog-substance/carbon/blob/main/pkg/common/config.go#L378>)
 
 ```go
 func Set(s string, v any) any
@@ -192,8 +194,26 @@ func Set(s string, v any) any
 
 
 
+<a name="SetProvidersTypes"></a>
+## func [SetProvidersTypes](<https://github.com/analog-substance/carbon/blob/main/pkg/common/config.go#L385>)
+
+```go
+func SetProvidersTypes(p []string)
+```
+
+
+
+<a name="Time"></a>
+## func [Time](<https://github.com/analog-substance/carbon/blob/main/pkg/common/logging.go#L31>)
+
+```go
+func Time(what string) func()
+```
+
+
+
 <a name="WithGroup"></a>
-## func [WithGroup](<https://github.com/analog-substance/carbon/blob/main/pkg/common/logging.go#L21>)
+## func [WithGroup](<https://github.com/analog-substance/carbon/blob/main/pkg/common/logging.go#L23>)
 
 ```go
 func WithGroup(groupName string) *slog.Logger
@@ -202,7 +222,7 @@ func WithGroup(groupName string) *slog.Logger
 
 
 <a name="CarbonConfig"></a>
-## type [CarbonConfig](<https://github.com/analog-substance/carbon/blob/main/pkg/common/config.go#L198-L201>)
+## type [CarbonConfig](<https://github.com/analog-substance/carbon/blob/main/pkg/common/config.go#L204-L207>)
 
 
 
@@ -214,7 +234,7 @@ type CarbonConfig struct {
 ```
 
 <a name="CarbonConfig.Get"></a>
-### func \(\*CarbonConfig\) [Get](<https://github.com/analog-substance/carbon/blob/main/pkg/common/config.go#L217>)
+### func \(\*CarbonConfig\) [Get](<https://github.com/analog-substance/carbon/blob/main/pkg/common/config.go#L223>)
 
 ```go
 func (cc *CarbonConfig) Get(search []string) any
@@ -223,7 +243,7 @@ func (cc *CarbonConfig) Get(search []string) any
 
 
 <a name="CarbonConfig.Keys"></a>
-### func \(\*CarbonConfig\) [Keys](<https://github.com/analog-substance/carbon/blob/main/pkg/common/config.go#L203>)
+### func \(\*CarbonConfig\) [Keys](<https://github.com/analog-substance/carbon/blob/main/pkg/common/config.go#L209>)
 
 ```go
 func (cc *CarbonConfig) Keys(prefix string) []string
@@ -232,7 +252,7 @@ func (cc *CarbonConfig) Keys(prefix string) []string
 
 
 <a name="CarbonConfig.Set"></a>
-### func \(\*CarbonConfig\) [Set](<https://github.com/analog-substance/carbon/blob/main/pkg/common/config.go#L249>)
+### func \(\*CarbonConfig\) [Set](<https://github.com/analog-substance/carbon/blob/main/pkg/common/config.go#L255>)
 
 ```go
 func (cc *CarbonConfig) Set(search []string, val any) *CarbonConfig
@@ -241,7 +261,7 @@ func (cc *CarbonConfig) Set(search []string, val any) *CarbonConfig
 
 
 <a name="CarbonConfigFile"></a>
-## type [CarbonConfigFile](<https://github.com/analog-substance/carbon/blob/main/pkg/common/config.go#L273-L275>)
+## type [CarbonConfigFile](<https://github.com/analog-substance/carbon/blob/main/pkg/common/config.go#L279-L281>)
 
 
 
@@ -252,7 +272,7 @@ type CarbonConfigFile struct {
 ```
 
 <a name="GetConfig"></a>
-### func [GetConfig](<https://github.com/analog-substance/carbon/blob/main/pkg/common/config.go#L343>)
+### func [GetConfig](<https://github.com/analog-substance/carbon/blob/main/pkg/common/config.go#L349>)
 
 ```go
 func GetConfig() *CarbonConfigFile
@@ -261,7 +281,7 @@ func GetConfig() *CarbonConfigFile
 
 
 <a name="CarbonConfigFile.Get"></a>
-### func \(\*CarbonConfigFile\) [Get](<https://github.com/analog-substance/carbon/blob/main/pkg/common/config.go#L296>)
+### func \(\*CarbonConfigFile\) [Get](<https://github.com/analog-substance/carbon/blob/main/pkg/common/config.go#L302>)
 
 ```go
 func (cf *CarbonConfigFile) Get(search []string) any
@@ -270,7 +290,7 @@ func (cf *CarbonConfigFile) Get(search []string) any
 
 
 <a name="CarbonConfigFile.Keys"></a>
-### func \(\*CarbonConfigFile\) [Keys](<https://github.com/analog-substance/carbon/blob/main/pkg/common/config.go#L291>)
+### func \(\*CarbonConfigFile\) [Keys](<https://github.com/analog-substance/carbon/blob/main/pkg/common/config.go#L297>)
 
 ```go
 func (cf *CarbonConfigFile) Keys() []string
@@ -279,7 +299,7 @@ func (cf *CarbonConfigFile) Keys() []string
 
 
 <a name="CarbonConfigFile.MergeInConfigFile"></a>
-### func \(\*CarbonConfigFile\) [MergeInConfigFile](<https://github.com/analog-substance/carbon/blob/main/pkg/common/config.go#L277>)
+### func \(\*CarbonConfigFile\) [MergeInConfigFile](<https://github.com/analog-substance/carbon/blob/main/pkg/common/config.go#L283>)
 
 ```go
 func (cf *CarbonConfigFile) MergeInConfigFile(cfgFile string) error
@@ -288,7 +308,7 @@ func (cf *CarbonConfigFile) MergeInConfigFile(cfgFile string) error
 
 
 <a name="CarbonConfigFile.Set"></a>
-### func \(\*CarbonConfigFile\) [Set](<https://github.com/analog-substance/carbon/blob/main/pkg/common/config.go#L309>)
+### func \(\*CarbonConfigFile\) [Set](<https://github.com/analog-substance/carbon/blob/main/pkg/common/config.go#L315>)
 
 ```go
 func (cf *CarbonConfigFile) Set(search []string, val any) *CarbonConfigFile
@@ -297,7 +317,7 @@ func (cf *CarbonConfigFile) Set(search []string, val any) *CarbonConfigFile
 
 
 <a name="ProfileConfig"></a>
-## type [ProfileConfig](<https://github.com/analog-substance/carbon/blob/main/pkg/common/config.go#L14-L22>)
+## type [ProfileConfig](<https://github.com/analog-substance/carbon/blob/main/pkg/common/config.go#L15-L23>)
 
 
 
@@ -314,7 +334,7 @@ type ProfileConfig struct {
 ```
 
 <a name="DefaultProfileConfig"></a>
-### func [DefaultProfileConfig](<https://github.com/analog-substance/carbon/blob/main/pkg/common/config.go#L323>)
+### func [DefaultProfileConfig](<https://github.com/analog-substance/carbon/blob/main/pkg/common/config.go#L329>)
 
 ```go
 func DefaultProfileConfig() ProfileConfig
@@ -323,7 +343,7 @@ func DefaultProfileConfig() ProfileConfig
 
 
 <a name="ProfileConfig.Get"></a>
-### func \(\*ProfileConfig\) [Get](<https://github.com/analog-substance/carbon/blob/main/pkg/common/config.go#L38>)
+### func \(\*ProfileConfig\) [Get](<https://github.com/analog-substance/carbon/blob/main/pkg/common/config.go#L39>)
 
 ```go
 func (pc *ProfileConfig) Get(search []string) any
@@ -332,7 +352,7 @@ func (pc *ProfileConfig) Get(search []string) any
 
 
 <a name="ProfileConfig.GetPassword"></a>
-### func \(\*ProfileConfig\) [GetPassword](<https://github.com/analog-substance/carbon/blob/main/pkg/common/config.go#L99>)
+### func \(\*ProfileConfig\) [GetPassword](<https://github.com/analog-substance/carbon/blob/main/pkg/common/config.go#L100>)
 
 ```go
 func (pc *ProfileConfig) GetPassword() string
@@ -341,7 +361,7 @@ func (pc *ProfileConfig) GetPassword() string
 
 
 <a name="ProfileConfig.Keys"></a>
-### func \(\*ProfileConfig\) [Keys](<https://github.com/analog-substance/carbon/blob/main/pkg/common/config.go#L24>)
+### func \(\*ProfileConfig\) [Keys](<https://github.com/analog-substance/carbon/blob/main/pkg/common/config.go#L25>)
 
 ```go
 func (pc *ProfileConfig) Keys(prefix string) []string
@@ -350,7 +370,7 @@ func (pc *ProfileConfig) Keys(prefix string) []string
 
 
 <a name="ProfileConfig.Set"></a>
-### func \(\*ProfileConfig\) [Set](<https://github.com/analog-substance/carbon/blob/main/pkg/common/config.go#L65>)
+### func \(\*ProfileConfig\) [Set](<https://github.com/analog-substance/carbon/blob/main/pkg/common/config.go#L66>)
 
 ```go
 func (pc *ProfileConfig) Set(search []string, val any) *ProfileConfig
@@ -359,7 +379,7 @@ func (pc *ProfileConfig) Set(search []string, val any) *ProfileConfig
 
 
 <a name="ProfileConfig.UnmarshalYAML"></a>
-### func \(\*ProfileConfig\) [UnmarshalYAML](<https://github.com/analog-substance/carbon/blob/main/pkg/common/config.go#L89>)
+### func \(\*ProfileConfig\) [UnmarshalYAML](<https://github.com/analog-substance/carbon/blob/main/pkg/common/config.go#L90>)
 
 ```go
 func (pc *ProfileConfig) UnmarshalYAML(unmarshal func(interface{}) error) error
@@ -368,7 +388,7 @@ func (pc *ProfileConfig) UnmarshalYAML(unmarshal func(interface{}) error) error
 
 
 <a name="ProviderConfig"></a>
-## type [ProviderConfig](<https://github.com/analog-substance/carbon/blob/main/pkg/common/config.go#L116-L120>)
+## type [ProviderConfig](<https://github.com/analog-substance/carbon/blob/main/pkg/common/config.go#L120-L124>)
 
 
 
@@ -381,7 +401,7 @@ type ProviderConfig struct {
 ```
 
 <a name="DefaultProviderConfig"></a>
-### func [DefaultProviderConfig](<https://github.com/analog-substance/carbon/blob/main/pkg/common/config.go#L333>)
+### func [DefaultProviderConfig](<https://github.com/analog-substance/carbon/blob/main/pkg/common/config.go#L339>)
 
 ```go
 func DefaultProviderConfig() ProviderConfig
@@ -390,7 +410,7 @@ func DefaultProviderConfig() ProviderConfig
 
 
 <a name="ProviderConfig.Get"></a>
-### func \(\*ProviderConfig\) [Get](<https://github.com/analog-substance/carbon/blob/main/pkg/common/config.go#L148>)
+### func \(\*ProviderConfig\) [Get](<https://github.com/analog-substance/carbon/blob/main/pkg/common/config.go#L152>)
 
 ```go
 func (pc *ProviderConfig) Get(search []string) any
@@ -399,7 +419,7 @@ func (pc *ProviderConfig) Get(search []string) any
 
 
 <a name="ProviderConfig.Keys"></a>
-### func \(\*ProviderConfig\) [Keys](<https://github.com/analog-substance/carbon/blob/main/pkg/common/config.go#L134>)
+### func \(\*ProviderConfig\) [Keys](<https://github.com/analog-substance/carbon/blob/main/pkg/common/config.go#L138>)
 
 ```go
 func (pc *ProviderConfig) Keys(prefix string) []string
@@ -408,7 +428,7 @@ func (pc *ProviderConfig) Keys(prefix string) []string
 
 
 <a name="ProviderConfig.Set"></a>
-### func \(\*ProviderConfig\) [Set](<https://github.com/analog-substance/carbon/blob/main/pkg/common/config.go#L175>)
+### func \(\*ProviderConfig\) [Set](<https://github.com/analog-substance/carbon/blob/main/pkg/common/config.go#L179>)
 
 ```go
 func (pc *ProviderConfig) Set(search []string, val any) *ProviderConfig
@@ -417,7 +437,7 @@ func (pc *ProviderConfig) Set(search []string, val any) *ProviderConfig
 
 
 <a name="ProviderConfig.UnmarshalYAML"></a>
-### func \(\*ProviderConfig\) [UnmarshalYAML](<https://github.com/analog-substance/carbon/blob/main/pkg/common/config.go#L122>)
+### func \(\*ProviderConfig\) [UnmarshalYAML](<https://github.com/analog-substance/carbon/blob/main/pkg/common/config.go#L126>)
 
 ```go
 func (pc *ProviderConfig) UnmarshalYAML(unmarshal func(interface{}) error) error
