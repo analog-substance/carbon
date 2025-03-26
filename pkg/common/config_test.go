@@ -10,6 +10,9 @@ func TestCarbonConfigFile_Keys(t *testing.T) {
 	type fields struct {
 		Carbon CarbonConfig
 	}
+
+	SetProvidersTypes([]string{"aws", "digitalocean", "multipass", "qemu", "virtualbox"})
+
 	tests := []struct {
 		name   string
 		fields fields

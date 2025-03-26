@@ -6,24 +6,37 @@ import (
 	"github.com/analog-substance/carbon/pkg/types"
 	"strings"
 	"sync"
+	"time"
 )
 
 func (c *Carbon) GetVMs() []types.VM {
 	if len(c.machines) == 0 {
+		started := time.Now()
+		defer func() {
+			log.Debug("GetVMs timing", "took", time.Since(started))
+		}()
 		c.machines = []types.VM{}
 		mu := sync.Mutex{}
 		wait := sync.WaitGroup{}
 		for _, profile := range c.Profiles() {
-			for _, env := range profile.Environments() {
-				wait.Add(1)
-				go func() {
-					machines := env.VMs()
-					mu.Lock()
-					c.machines = append(c.machines, machines...)
-					mu.Unlock()
-					wait.Done()
-				}()
-			}
+			wait.Add(1)
+			go func() {
+				for _, env := range profile.Environments() {
+					wait.Add(1)
+					go func() {
+						vmStart := time.Now()
+						defer func() {
+							log.Debug("env.VMs() timing", "took", time.Since(vmStart), "env", env.Name(), "profile", profile.Name(), "provider", profile.Provider().Name())
+						}()
+						machines := env.VMs()
+						mu.Lock()
+						c.machines = append(c.machines, machines...)
+						mu.Unlock()
+						wait.Done()
+					}()
+				}
+				wait.Done()
+			}()
 		}
 		wait.Wait()
 	}

@@ -8,6 +8,7 @@ import (
 	"github.com/analog-substance/carbon/pkg/providers/base"
 	"github.com/analog-substance/carbon/pkg/types"
 	"github.com/digitalocean/godo"
+	"strconv"
 )
 
 type Environment struct {
@@ -27,8 +28,6 @@ func (e *Environment) Profile() types.Profile {
 
 func (e *Environment) VMs() []types.VM {
 	var vms []types.VM
-
-	log.Debug("getting VMs", "env", e.Name())
 	ctx := context.Background()
 	opt := &godo.ListOptions{}
 	for {
@@ -37,7 +36,6 @@ func (e *Environment) VMs() []types.VM {
 			log.Debug("Error listing Droplets", "error", err)
 			break
 		}
-		log.Debug("listing Droplets", "droplets", droplets)
 
 		for _, d := range droplets {
 			var publicIPs []string
@@ -85,15 +83,33 @@ func (e *Environment) VMs() []types.VM {
 }
 
 func (e *Environment) StartVM(id string) error {
-	return errors.New("not yet implemented")
+	intId, err := strconv.Atoi(id)
+	if err != nil {
+		return err
+	}
+
+	_, _, err = e.doClient.DropletActions.PowerOn(context.Background(), intId)
+	return err
 }
 
 func (e *Environment) StopVM(id string) error {
-	return errors.New("not yet implemented")
+	intId, err := strconv.Atoi(id)
+	if err != nil {
+		return err
+	}
+
+	_, _, err = e.doClient.DropletActions.Shutdown(context.Background(), intId)
+	return err
 }
 
 func (e *Environment) RestartVM(id string) error {
-	return errors.New("not yet implemented")
+	intId, err := strconv.Atoi(id)
+	if err != nil {
+		return err
+	}
+
+	_, _, err = e.doClient.DropletActions.Reboot(context.Background(), intId)
+	return err
 }
 
 func (e *Environment) DestroyVM(id string) error {

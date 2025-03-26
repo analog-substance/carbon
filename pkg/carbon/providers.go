@@ -2,33 +2,31 @@ package carbon
 
 import (
 	"fmt"
+	"github.com/analog-substance/carbon/pkg/common"
 	"github.com/analog-substance/carbon/pkg/providers/aws"
 	"github.com/analog-substance/carbon/pkg/providers/digitalocean"
 	"github.com/analog-substance/carbon/pkg/providers/multipass"
 	"github.com/analog-substance/carbon/pkg/providers/qemu"
 	"github.com/analog-substance/carbon/pkg/providers/virtualbox"
+	"github.com/analog-substance/carbon/pkg/providers/vsphere"
 	"github.com/analog-substance/carbon/pkg/types"
 )
 
 var availableProviders []types.Provider
 
 func AvailableProviders() []types.Provider {
+	defer (common.Time("available providers"))()
+
 	if len(availableProviders) == 0 {
-		allProviders := []types.Provider{
-			aws.New(),
-			qemu.New(),
-			virtualbox.New(),
-			multipass.New(),
-			digitalocean.New(),
-		}
 
 		type providerAvailability struct {
 			provider  types.Provider
 			available bool
 		}
 		c := make(chan providerAvailability)
-		for _, provider := range allProviders {
+		for _, provider := range AllProviders {
 			go func() {
+				//defer (common.Time(fmt.Sprintf("(%s)provider.isAvailable", provider.Name())))()
 				c <- providerAvailability{
 					provider:  provider,
 					available: provider.IsAvailable(),
@@ -36,7 +34,7 @@ func AvailableProviders() []types.Provider {
 			}()
 		}
 
-		result := make([]providerAvailability, len(allProviders))
+		result := make([]providerAvailability, len(AllProviders))
 		for i, _ := range result {
 			result[i] = <-c
 			log.Debug("assessing provider availability", "provider", result[i].provider.Type(), "isAvailable", result[i].available)
@@ -61,4 +59,13 @@ func (c *Carbon) GetProvider(providerType string) (types.Provider, error) {
 	}
 
 	return nil, fmt.Errorf("provider '%s' not found", providerType)
+}
+
+var AllProviders = []types.Provider{
+	aws.New(),
+	qemu.New(),
+	virtualbox.New(),
+	multipass.New(),
+	digitalocean.New(),
+	vsphere.New(),
 }

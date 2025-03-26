@@ -7,6 +7,7 @@ import (
 	"os/exec"
 	"path/filepath"
 	"strings"
+	"time"
 )
 
 var instanceCfg *CarbonConfigFile
@@ -97,12 +98,15 @@ func (pc *ProfileConfig) UnmarshalYAML(unmarshal func(interface{}) error) error 
 }
 
 func (pc *ProfileConfig) GetPassword() string {
+	started := time.Now()
+	defer func() {
+		log.Debug("ProfileConfig.GetPassword()", "took", time.Since(started), "command", pc.PasswordCommand)
+	}()
 	if pc.Use1PassCLI {
 		pc.PasswordCommand = fmt.Sprintf("op read \"%s\"", pc.Password)
 	}
 
 	if pc.PasswordCommand != "" {
-		log.Debug("password command", "command", pc.PasswordCommand)
 		p, err := exec.Command("sh", "-c", pc.PasswordCommand).Output()
 		if err != nil {
 			log.Debug("failed to execute password command", "cmd", pc.PasswordCommand, "err", err)
@@ -344,6 +348,7 @@ func DefaultProviderConfig() ProviderConfig {
 
 func GetConfig() *CarbonConfigFile {
 	if instanceCfg == nil {
+
 		instanceCfg = &CarbonConfigFile{
 			Carbon: CarbonConfig{
 				Dir: map[string]string{
@@ -354,13 +359,7 @@ func GetConfig() *CarbonConfigFile {
 					TerraformConfigKey:        filepath.Join(DefaultDeploymentsDirName, DefaultTerraformDirName),
 					TerraformProjectConfigKey: filepath.Join(DefaultDeploymentsDirName, DefaultProjectsDirName),
 				},
-				Providers: map[string]ProviderConfig{
-					"aws":          DefaultProviderConfig(),
-					"digitalocean": DefaultProviderConfig(),
-					"multipass":    DefaultProviderConfig(),
-					"qemu":         DefaultProviderConfig(),
-					"virtualbox":   DefaultProviderConfig(),
-				},
+				Providers: defaultProviders(),
 			},
 		}
 	}
@@ -379,4 +378,19 @@ func Get(s string) any {
 func Set(s string, v any) any {
 	instanceCfg = GetConfig().Set(strings.Split(s, "."), v)
 	return instanceCfg
+}
+
+var allProviders = []string{}
+
+func SetProvidersTypes(p []string) {
+	allProviders = p
+}
+
+func defaultProviders() map[string]ProviderConfig {
+	ret := map[string]ProviderConfig{}
+	for _, provider := range allProviders {
+		ret[provider] = DefaultProviderConfig()
+	}
+
+	return ret
 }
