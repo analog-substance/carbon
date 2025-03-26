@@ -67,6 +67,9 @@ func (p *Profile) Environments() []types.Environment {
 
 func newClient(hostUrl, user, pass string) (*vim25.Client, error) {
 	endpoint, err := url.Parse(hostUrl)
+	if err != nil {
+		return nil, err
+	}
 	endpoint.User = url.UserPassword(user, pass)
 
 	s := &cache.Session{
