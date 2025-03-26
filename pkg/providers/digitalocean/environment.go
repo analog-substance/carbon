@@ -111,7 +111,6 @@ func (e *Environment) RestartVM(id string) error {
 	_, _, err = e.doClient.DropletActions.Reboot(context.Background(), intId)
 	return err
 }
-}
 
 func (e *Environment) DestroyVM(id string) error {
 	return errors.New("not yet implemented")
