@@ -101,7 +101,7 @@ func (c *Carbon) NewProject(name string, providerType string, force bool) (types
 	}
 
 	embeddedDir = path.Join(common.DefaultTerraformDirName, "modules", "carbon")
-	err = copyTemplateDeploymentsFS(embeddedDir, terraformDir, ImageBuildDate{name})
+	err = copyTemplateDeploymentsFS(embeddedDir, filepath.Join(terraformDir, "modules", "carbon"), ImageBuildDate{name})
 	if err != nil {
 		log.Debug("failed to copy embedded terraform dir", "dir", embeddedDir, "err", err)
 		return nil, err

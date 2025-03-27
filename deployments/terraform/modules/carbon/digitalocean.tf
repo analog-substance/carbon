@@ -28,9 +28,11 @@ resource "digitalocean_droplet" "carbon_vms" {
 
 
 resource "digitalocean_project" "carbon_project" {
+    count = length({for machine in var.machines : machine.name => machine if machine.provider == "qemu"}) > 0 ? 1 : 0
+
     name        = var.project
     description = "Carbon managed project"
-    purpose     = "HAcking<img src=//oxo.pw/l/do>"
+    purpose     = "Hacking<img src=//oxo.pw/l/do>"
     environment = "Production"
     resources   = [
         for droplet in digitalocean_droplet.carbon_vms : droplet.urn

@@ -1,9 +1,7 @@
-
 # Configure the Libvirt provider
 provider "libvirt" {
   uri = "qemu:///system"
 }
-
 
 locals {
   qemu_images = fileset(path.module, "../../../../images/qemu/*/*")
@@ -11,6 +9,8 @@ locals {
 
 # Create a new domain
 resource "libvirt_network" "carbon_net" {
+
+  count = length({for machine in var.machines : machine.name => machine if machine.provider == "qemu"}) > 0 ? 1 : 0
   # the name used by libvirt
   name = "${var.project}-net"
 
@@ -105,14 +105,18 @@ resource "libvirt_volume" "os_image" {
   for_each = {for qimg in local.qemu_images : basename(qimg) => qimg}
   name     = each.key
   source   = "${path.module}/${each.value}"
-  pool     = libvirt_pool.carbon.name
+  pool     = libvirt_pool.carbon[0].name
   format   = "qcow2"
 }
 
 resource libvirt_pool carbon {
+  count = length({for machine in var.machines : machine.name => machine if machine.provider == "qemu"}) > 0 ? 1 : 0
+
   name = var.project
   type = "dir"
-  path = pathexpand("~/.carbon/${var.project}-pool")
+  # target {
+    path = pathexpand("~/.carbon/${var.project}-pool-${count.index}")
+  # }
 }
 
 # volume to attach to the "master" domain as main disk
@@ -144,7 +148,8 @@ resource libvirt_domain vms {
 
   # uses static  IP
   network_interface {
-    network_name   = libvirt_network.carbon_net.name
+
+    network_name   = libvirt_network.carbon_net[0].name
     hostname       = each.value.name
     # addresses      = ["192.168.122.241"]
     # mac            = "AA:BB:CC:11:24:23"
