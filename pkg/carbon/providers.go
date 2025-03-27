@@ -94,47 +94,17 @@ func (c *Carbon) NewProject(name string, providerType string, force bool) (types
 	}
 
 	embeddedDir := path.Join(common.DefaultProjectsDirName, "example")
-	dirListing, err := deployments.Files.ReadDir(embeddedDir)
+	err = copyTemplateDeploymentsFS(embeddedDir, projectDir, ImageBuildDate{name})
 	if err != nil {
-		log.Debug("failed to read embedded project dir", "dir", common.DefaultProjectsDirName, "err", err)
+		log.Debug("failed to copy embedded terraform dir", "dir", embeddedDir, "err", err)
 		return nil, err
-	}
-	for _, d := range dirListing {
-		if !d.IsDir() {
-			err = copyTemplateFromEmbeddedFS(
-				path.Join(embeddedDir, d.Name()),
-				filepath.Join(projectDir, d.Name()),
-				deployments.Files,
-				ImageBuildDate{name},
-			)
-			if err != nil {
-				log.Debug("failed to copy embedded project file", "file", d.Name(), "err", err)
-				return nil, err
-			}
-
-		}
 	}
 
 	embeddedDir = path.Join(common.DefaultTerraformDirName, "modules", "carbon")
-	dirListing, err = deployments.Files.ReadDir(embeddedDir)
+	err = copyTemplateDeploymentsFS(embeddedDir, terraformDir, ImageBuildDate{name})
 	if err != nil {
-		log.Debug("failed to read embedded project dir", "dir", common.DefaultProjectsDirName, "err", err)
+		log.Debug("failed to copy embedded terraform dir", "dir", embeddedDir, "err", err)
 		return nil, err
-	}
-	for _, d := range dirListing {
-		if !d.IsDir() {
-			err = copyTemplateFromEmbeddedFS(
-				path.Join(embeddedDir, d.Name()),
-				filepath.Join(terraformDir, d.Name()),
-				deployments.Files,
-				ImageBuildDate{name},
-			)
-			if err != nil {
-				log.Debug("failed to copy embedded project file", "file", d.Name(), "err", err)
-				return nil, err
-			}
-
-		}
 	}
 
 	return models.NewProject(projectDir), nil
@@ -150,24 +120,26 @@ var AllProviders = []types.Provider{
 	vsphere.New(),
 }
 
-func fileContainsString(path string, needle string, embeddedFS embed.FS) (bool, error) {
-	fileBytes, err := embeddedFS.ReadFile(path)
+func copyTemplateDeploymentsFS(embeddedDir string, dest string, templateData any) error {
+	dirListing, err := deployments.Files.ReadDir(embeddedDir)
 	if err != nil {
-		return false, err
-	}
-
-	return bytes.Contains(fileBytes, []byte(needle)), nil
-}
-
-func copyFileFromEmbeddedFS(src, dest string, embeddedFS embed.FS) error {
-	fileBytes, err := embeddedFS.ReadFile(src)
-	if err != nil {
+		log.Debug("failed to read embedded project dir", "dir", common.DefaultProjectsDirName, "err", err)
 		return err
 	}
+	for _, d := range dirListing {
+		if !d.IsDir() {
+			err = copyTemplateFromEmbeddedFS(
+				path.Join(embeddedDir, d.Name()),
+				filepath.Join(dest, d.Name()),
+				deployments.Files,
+				templateData,
+			)
+			if err != nil {
+				log.Debug("failed to copy embedded project file", "file", d.Name(), "err", err)
+				return err
+			}
 
-	err = os.WriteFile(dest, fileBytes, 0644)
-	if err != nil {
-		return err
+		}
 	}
 	return nil
 }

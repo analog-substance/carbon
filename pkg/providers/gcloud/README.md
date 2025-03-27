@@ -8,9 +8,21 @@ weight: 20
 
 ### Map
 
-| GCP     | Carbon       | Description |
-|---------|--------------|-------------|
-| Account | Profile      |             |
-| Project | Environment  |             |
-|         |              |             |
+| GCP            | Carbon       | Description |
+|----------------|--------------|-------------|
+| Account        | Profile      |             |
+| Project & Zone | Environment  |             |
+|                |              |             |
 
+### Configuration
+
+use project/zone for the environment name.
+```yaml
+carbon:
+    providers:
+        gcloud:
+            profiles:
+                default:
+                    environments:
+                      gcp-project/us-east3-c
+```

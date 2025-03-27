@@ -30,5 +30,5 @@ var vmSuspend = &cobra.Command{
 }
 
 func init() {
-	vmCmd.AddCommand(vmStart)
+	vmCmd.AddCommand(vmSuspend)
 }
