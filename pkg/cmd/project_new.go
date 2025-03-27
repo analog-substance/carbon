@@ -17,26 +17,33 @@ var projectNewCmd = &cobra.Command{
 		serviceProvider, _ := cmd.Flags().GetString("service")
 		force, _ := cmd.Flags().GetBool("force")
 
-		provider, err := carbonObj.GetProvider(serviceProvider)
-		if err != nil {
-			log.Error("Failed to get provider", "err", err)
-			os.Exit(1)
-		}
-
-		project, err := carbonObj.GetProject(projectName)
-		if !force && (err == nil || project != nil) {
-			if !AskIfSure("Project already exists. would you like to overwrite the files?") {
-				os.Exit(1)
-			}
-			force = true
-		}
-
-		project, err = provider.NewProject(projectName, force)
+		project, err := carbonObj.NewProject(projectName, serviceProvider, force)
 		if err != nil {
 			fmt.Println(err)
 			os.Exit(1)
 		}
 		fmt.Printf("Project created: %s\n", project.Name())
+		//
+		//provider, err := carbonObj.GetProvider(serviceProvider)
+		//if err != nil {
+		//	log.Error("Failed to get provider", "err", err)
+		//	os.Exit(1)
+		//}
+		//
+		//project, err := carbonObj.GetProject(projectName)
+		//if !force && (err == nil || project != nil) {
+		//	if !AskIfSure("Project already exists. would you like to overwrite the files?") {
+		//		os.Exit(1)
+		//	}
+		//	force = true
+		//}
+		//
+		//project, err = provider.NewProject(projectName, force)
+		//if err != nil {
+		//	fmt.Println(err)
+		//	os.Exit(1)
+		//}
+		//fmt.Printf("Project created: %s\n", project.Name())
 	},
 }
 

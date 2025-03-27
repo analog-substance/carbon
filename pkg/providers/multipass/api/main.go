@@ -57,6 +57,13 @@ func StartVM(id string) error {
 	return err
 }
 
+func StopVM(id string) error {
+	_, err := builder.
+		Cmd(AppPath(), "stop", id).
+		Output()
+	return err
+}
+
 func RestartVM(id string) error {
 	_, err := builder.
 		Cmd(AppPath(), "restart", id).
@@ -64,7 +71,7 @@ func RestartVM(id string) error {
 	return err
 }
 
-func SleepVM(id string) error {
+func Suspend(id string) error {
 	_, err := builder.
 		Cmd(AppPath(), "suspend", id).
 		Output()

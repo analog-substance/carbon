@@ -23,15 +23,15 @@ It uses:
 It is aimed at supporting various services to ensure it can scale with you as
 your operations become more complex.
 
-| Feature                   | AWS | QEMU | VirtualBox | DigitalOcean | vSphere | Multipass | Azure | GCP |
-|---------------------------|-----|------|------------|--------------|---------|-----------|-------|-----|
-| VM: List                  | ✅   | ✅    | ✅          | ✅            | ✅       | ✅         | ❌     | ❌   |
-| VM: Start / Stop / Reboot | ✅   | ✅    | ✅          | ✅            | ✅       | ✅         | ❌     | ❌   |
-| VM: SSH / RDP / VNC       | ✅   | ✅    | ✅          | ✅            | ✅       | ✅         | ❌     | ❌   |
-| VM: Create / Destroy      | ✅   | ✅    | ✅          | ✅            | ✅       | ✅         | ❌     | ❌   |
-| Image Builds              | ✅   | ✅    | ✅          | ❌            | ✅       | ❌ N/A     | ❌     | ❌   |
-| Images (Build, Destroy)   | ✅   | ✅    | ✅          | ❌            | ✅       | ❌ N/A     | ❌     | ❌   |
-| Infrastructure Creation   | ❌   | ❌    | ❌          | ❌            | ❌       | ❌ N/A     | ❌     | ❌   |
+| Feature                   | AWS | QEMU | VirtualBox | DigitalOcean | vSphere | Multipass | GCP | Azure |
+|---------------------------|-----|------|------------|--------------|---------|-----------|-----|-------|
+| VM: List                  | ✅   | ✅    | ✅          | ✅            | ✅       | ✅         | ✅   | ❌     |
+| VM: Start / Stop / Reboot | ✅   | ✅    | ✅          | ✅            | ✅       | ✅         | ✅   | ❌     |
+| VM: SSH / RDP / VNC       | ✅   | ✅    | ✅          | ✅            | ✅       | ✅         | ✅   | ❌     |
+| VM: Create / Destroy      | ✅   | ✅    | ✅          | ✅            | ✅       | ✅         | ❌   | ❌     |
+| Image Builds              | ✅   | ✅    | ✅          | ❌            | ✅       | ❌ N/A     | ❌   | ❌     |
+| Images (Build, Destroy)   | ✅   | ✅    | ✅          | ❌            | ✅       | ❌ N/A     | ❌   | ❌     |
+| Infrastructure Creation   | ❌   | ❌    | ❌          | ❌            | ❌       | ❌ N/A     | ❌   | ❌     |
 
 ❌ = Not Right Now, but planned  
 ✅ = Supported

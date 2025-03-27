@@ -13,7 +13,7 @@ import (
 
 type Environment struct {
 	name      string
-	profile   types.Profile
+	profile   *Profile
 	doClient  *godo.Client
 	doProject *godo.Project
 }
@@ -23,61 +23,38 @@ func (e *Environment) Name() string {
 }
 
 func (e *Environment) Profile() types.Profile {
-	return e.profile
+	return e.profile.ToProfile()
 }
 
 func (e *Environment) VMs() []types.VM {
 	var vms []types.VM
-	ctx := context.Background()
-	opt := &godo.ListOptions{}
-	for {
-		droplets, resp, err := e.doClient.Droplets.List(ctx, opt)
+
+	for _, d := range e.profile.GetProjectVMs(e.doProject.ID) {
+		var publicIPs []string
+		var privateIPs []string
+		pIPs, err := d.PrivateIPv4()
 		if err != nil {
-			log.Debug("Error listing Droplets", "error", err)
-			break
+			log.Debug("Error getting private IPv4", "error", err)
+		} else {
+			privateIPs = append(privateIPs, pIPs)
 		}
-
-		for _, d := range droplets {
-			var publicIPs []string
-			var privateIPs []string
-			pIPs, err := d.PrivateIPv4()
-			if err != nil {
-				log.Debug("Error getting private IPv4", "error", err)
-			} else {
-				privateIPs = append(privateIPs, pIPs)
-			}
-			pIPs, err = d.PublicIPv4()
-			if err != nil {
-				log.Debug("Error getting private IPv4", "error", err)
-			} else {
-				publicIPs = append(publicIPs, pIPs)
-			}
-
-			vms = append(vms, &models.Machine{
-				InstanceName: d.Name,
-				CurrentState: stateFromStatus(d.Status),
-				InstanceID:   fmt.Sprintf("%d", d.ID),
-				Env:          e,
-				//CurrentUpTime:      d,
-				InstanceType:       d.Size.Slug,
-				PrivateIPAddresses: privateIPs,
-				PublicIPAddresses:  publicIPs,
-			})
-		}
-
-		// if we are at the last page, break out the for loop
-		if resp.Links == nil || resp.Links.IsLastPage() {
-			break
-		}
-
-		page, err := resp.Links.CurrentPage()
+		pIPs, err = d.PublicIPv4()
 		if err != nil {
-			log.Debug("Error getting current page", "error", err)
-			break
+			log.Debug("Error getting private IPv4", "error", err)
+		} else {
+			publicIPs = append(publicIPs, pIPs)
 		}
 
-		// set the page we want for the next request
-		opt.Page = page + 1
+		vms = append(vms, &models.Machine{
+			InstanceName: d.Name,
+			CurrentState: stateFromStatus(d.Status),
+			InstanceID:   fmt.Sprintf("%d", d.ID),
+			Env:          e,
+			//CurrentUpTime:      d,
+			InstanceType:       d.Size.Slug,
+			PrivateIPAddresses: privateIPs,
+			PublicIPAddresses:  publicIPs,
+		})
 	}
 	return vms
 }
@@ -100,6 +77,10 @@ func (e *Environment) StopVM(id string) error {
 
 	_, _, err = e.doClient.DropletActions.Shutdown(context.Background(), intId)
 	return err
+}
+
+func (e *Environment) SuspendVM(id string) error {
+	return errors.New("not implemented")
 }
 
 func (e *Environment) RestartVM(id string) error {

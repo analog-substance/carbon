@@ -45,12 +45,17 @@ func (e *Environment) StartVM(id string) error {
 
 func (e *Environment) StopVM(id string) error {
 	// sleep
-	return api.SleepVM(id)
+	return api.StopVM(id)
+}
+
+func (e *Environment) SuspendVM(id string) error {
+	// sleep
+	return api.Suspend(id)
 }
 
 func (e *Environment) RestartVM(id string) error {
 	// sleep
-	return api.SleepVM(id)
+	return api.RestartVM(id)
 }
 
 func (e *Environment) DestroyVM(id string) error {

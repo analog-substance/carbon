@@ -61,6 +61,15 @@ func (e *Environment) StartVM(id string) error {
 }
 
 func (e *Environment) StopVM(id string) error {
+	hibernate := false
+	_, err := e.ec2Client.StopInstances(context.Background(), &ec2.StopInstancesInput{
+		InstanceIds: []string{id},
+		Hibernate:   &hibernate,
+	})
+	return err
+}
+
+func (e *Environment) SuspendVM(id string) error {
 	hibernate := true
 	_, err := e.ec2Client.StopInstances(context.Background(), &ec2.StopInstancesInput{
 		InstanceIds: []string{id},

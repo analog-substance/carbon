@@ -14,6 +14,7 @@ type Options struct {
 }
 
 type Carbon struct {
+	version      string
 	config       common.CarbonConfig
 	providers    []types.Provider
 	profiles     []types.Profile
@@ -36,8 +37,14 @@ func init() {
 	common.SetProvidersTypes(providerTypes)
 }
 
-func New(config common.CarbonConfig) *Carbon {
-	carbon := &Carbon{config: config, providers: []types.Provider{}, profiles: []types.Profile{}, environments: []types.Environment{}}
+func New(version string, config common.CarbonConfig) *Carbon {
+	carbon := &Carbon{
+		version:      version,
+		config:       config,
+		providers:    []types.Provider{},
+		profiles:     []types.Profile{},
+		environments: []types.Environment{},
+	}
 	for _, provider := range AvailableProviders() {
 		providerConfig, ok := config.Providers[provider.Type()]
 		if !ok {
