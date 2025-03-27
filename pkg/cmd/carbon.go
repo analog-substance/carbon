@@ -47,14 +47,14 @@ facilitate offensive security assessments.
 
 - AWS
 - DigitalOcean
+- GCloud
 - Multipass (Local)
 - QEMU (Local)
 - VirtualBox (Local)
-- vSphere (in progress)
+- vSphere
 
 There are plans to bring support to the following:
 
-- GCP
 - Azure
 - VMware (Local)
 - QEMU (Remote)
@@ -83,7 +83,7 @@ There are plans to bring support to the following:
 			log.Debug("error loading carbon config from home", "error", err)
 		}
 
-		carbonObj = carbon.New(carbonConfigFile.Carbon)
+		carbonObj = carbon.New(cmd.Root().Version, carbonConfigFile.Carbon)
 		updateConfigHelp()
 
 		return nil

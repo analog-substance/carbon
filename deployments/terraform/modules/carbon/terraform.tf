@@ -1,3 +1,5 @@
+# Copied from Carbon {{ .Version }}
+
 terraform {
   required_providers {
     libvirt = {

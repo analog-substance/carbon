@@ -71,9 +71,13 @@ func (c *Carbon) GetProvider(providerType string) (types.Provider, error) {
 }
 
 func (c *Carbon) NewProject(name string, providerType string, force bool) (types.Project, error) {
+
+	if err := c.CopyTFModule(); err != nil {
+		return nil, err
+	}
+
 	baseName := filepath.Base(name)
 	projectDir := filepath.Join(common.GetConfig().Carbon.Dir[common.TerraformProjectConfigKey], baseName)
-	terraformDir := common.GetConfig().Carbon.Dir[common.DefaultTerraformDirName]
 	log.Debug("new project", "dir", projectDir)
 
 	_, err := os.Stat(projectDir)
@@ -87,12 +91,6 @@ func (c *Carbon) NewProject(name string, providerType string, force bool) (types
 		return nil, err
 	}
 
-	err = os.MkdirAll(terraformDir, 0755)
-	if err != nil {
-		log.Debug("failed to create terraformDir dir", "dir", terraformDir, "err", err)
-		return nil, err
-	}
-
 	embeddedDir := path.Join(common.DefaultProjectsDirName, "example")
 	err = copyTemplateDeploymentsFS(embeddedDir, projectDir, ImageBuildDate{name})
 	if err != nil {
@@ -100,14 +98,32 @@ func (c *Carbon) NewProject(name string, providerType string, force bool) (types
 		return nil, err
 	}
 
-	embeddedDir = path.Join(common.DefaultTerraformDirName, "modules", "carbon")
-	err = copyTemplateDeploymentsFS(embeddedDir, filepath.Join(terraformDir, "modules", "carbon"), ImageBuildDate{name})
+	return models.NewProject(projectDir), nil
+}
+
+func (c *Carbon) CopyTFModule() error {
+
+	terraformDir := common.GetConfig().Carbon.Dir[common.DefaultTerraformDirName]
+	log.Debug("copy terraform", "dir", terraformDir)
+
+	err := os.MkdirAll(filepath.Join(terraformDir, "modules", "carbon"), 0755)
 	if err != nil {
-		log.Debug("failed to copy embedded terraform dir", "dir", embeddedDir, "err", err)
-		return nil, err
+		log.Debug("failed to create terraformDir dir", "dir", terraformDir, "err", err)
+		return err
 	}
 
-	return models.NewProject(projectDir), nil
+	embeddedDir := path.Join(common.DefaultTerraformDirName, "modules", "carbon")
+	err = copyTemplateDeploymentsFS(embeddedDir, filepath.Join(terraformDir, "modules", "carbon"), struct {
+		Version string
+	}{
+		Version: c.version,
+	})
+	if err != nil {
+		log.Debug("failed to copy embedded terraform dir", "dir", embeddedDir, "err", err)
+		return err
+	}
+
+	return nil
 }
 
 var AllProviders = []types.Provider{

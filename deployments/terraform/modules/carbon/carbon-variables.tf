@@ -1,3 +1,5 @@
+# Copied from Carbon {{ .Version }}
+
 variable "machines" {
   type = list(object({
     name = string

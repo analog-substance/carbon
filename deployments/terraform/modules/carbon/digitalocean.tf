@@ -1,4 +1,4 @@
-
+# Copied from Carbon {{ .Version }}
 
 # data "digitalocean_images" "ubuntu" {
 #   filter {

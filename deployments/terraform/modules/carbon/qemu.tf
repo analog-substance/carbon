@@ -1,4 +1,5 @@
-# Configure the Libvirt provider
+# Copied from Carbon {{ .Version }}
+
 provider "libvirt" {
   uri = "qemu:///system"
 }

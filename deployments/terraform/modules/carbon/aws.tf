@@ -1,3 +1,5 @@
+# Copied from Carbon {{ .Version }}
+
 data "aws_ami" "carbon_desktop" {
   owners = ["self"]
   most_recent = true
