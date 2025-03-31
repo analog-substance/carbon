@@ -92,8 +92,8 @@ github.com/davecgh/go-spew v1.1.1 h1:vj9j/u1bqnvCEfJOwUhtlOARqs3+rkHYY13jYWTU97c
 github.com/davecgh/go-spew v1.1.1/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
 github.com/digitalocean/go-libvirt v0.0.0-20250317183548-13bf9b43b50b h1:LqD7kE8wQRMPjjRAzg9ENwDwJKlapDpuiG1ix5QQcps=
 github.com/digitalocean/go-libvirt v0.0.0-20250317183548-13bf9b43b50b/go.mod h1:s7Tz3AmcoxYalhSQXZ2dzHanRebh35PeetRkYfhda3c=
-github.com/digitalocean/godo v1.141.0 h1:g4vKl9VZvgzE0EEFv8Y3SYiKqdteKS18BrVPatKFSVE=
-github.com/digitalocean/godo v1.141.0/go.mod h1:PU8JB6I1XYkQIdHFop8lLAY9ojp6M0XcU0TWaQSxbrc=
+github.com/digitalocean/godo v1.142.0 h1:OZwDccTSL7yrgkGIiPMcJ4DXD8tCpu3xfbEVHAIB8mw=
+github.com/digitalocean/godo v1.142.0/go.mod h1:tYeiWY5ZXVpU48YaFv0M5irUFHXGorZpDNm7zzdWMzM=
 github.com/dlclark/regexp2 v1.11.5 h1:Q/sSnsKerHeCkc/jSTNq1oCm7KiVgUMZRDUoRu0JQZQ=
 github.com/dlclark/regexp2 v1.11.5/go.mod h1:DHkYz0B9wPfa6wondMfaivmHpzrQ3v9q8cnmRbL6yW8=
 github.com/dustin/go-humanize v1.0.1 h1:GzkhY7T5VNhEkwH0PVJgjz+fX1rhBrR7pRT3mDkpeCY=

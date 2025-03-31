@@ -1,7 +1,6 @@
 module github.com/analog-substance/carbon
 
 go 1.23.1
-
 toolchain go1.24.1
 
 require (
@@ -15,7 +14,7 @@ require (
 	github.com/charmbracelet/huh v0.6.0
 	github.com/charmbracelet/lipgloss v1.1.0
 	github.com/digitalocean/go-libvirt v0.0.0-20250317183548-13bf9b43b50b
-	github.com/digitalocean/godo v1.141.0
+	github.com/digitalocean/godo v1.142.0
 	github.com/hashicorp/hcl/v2 v2.23.0
 	github.com/mitchellh/go-homedir v1.1.0
 	github.com/spf13/cobra v1.9.1
