@@ -1,7 +1,6 @@
 module github.com/analog-substance/carbon
 
 go 1.23.1
-
 toolchain go1.24.1
 
 require (
@@ -25,7 +24,7 @@ require (
 	google.golang.org/api v0.228.0
 	gopkg.in/ini.v1 v1.67.0
 	gopkg.in/yaml.v3 v3.0.1
-	libvirt.org/go/libvirtxml v1.11000.1
+	libvirt.org/go/libvirtxml v1.11001.0
 )
 
 require (
