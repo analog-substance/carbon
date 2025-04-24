@@ -63,5 +63,8 @@ type ProjectMachine struct {
 }
 
 type ProjectConfig struct {
+	IngressIPs []string          `yaml:"ingress_ips"`
+	Bastions   []*ProjectMachine `yaml:"bastions"`
+
 	Machines []*ProjectMachine `yaml:"machines"`
 }
