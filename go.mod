@@ -25,7 +25,7 @@ require (
 	google.golang.org/api v0.230.0
 	gopkg.in/ini.v1 v1.67.0
 	gopkg.in/yaml.v3 v3.0.1
-	libvirt.org/go/libvirtxml v1.11001.0
+	libvirt.org/go/libvirtxml v1.11002.0
 )
 
 require (
