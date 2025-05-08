@@ -4,6 +4,7 @@ import (
 	"github.com/analog-substance/carbon/pkg/models"
 	"github.com/analog-substance/carbon/pkg/providers/base"
 	"github.com/analog-substance/carbon/pkg/types"
+	"sort"
 	"strings"
 	"sync"
 	"time"
@@ -29,6 +30,9 @@ func (c *Carbon) GetVMs() []types.VM {
 							log.Debug("env.VMs() timing", "took", time.Since(vmStart), "env", env.Name(), "profile", profile.Name(), "provider", profile.Provider().Name())
 						}()
 						machines := env.VMs()
+						sort.Slice(machines, func(i, j int) bool {
+							return machines[i].Name() < machines[j].Name()
+						})
 						mu.Lock()
 						c.machines = append(c.machines, machines...)
 						mu.Unlock()
