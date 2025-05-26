@@ -5,7 +5,7 @@ go 1.23.1
 toolchain go1.24.1
 
 require (
-	cloud.google.com/go/compute v1.37.0
+	cloud.google.com/go/compute v1.38.0
 	github.com/NoF0rte/cmd-builder v0.0.0-20220305223538-e35bfeabbbff
 	github.com/analog-substance/util v1.1.6
 	github.com/aws/aws-sdk-go-v2 v1.36.3
