@@ -19,7 +19,7 @@ require (
 	github.com/hashicorp/hcl/v2 v2.23.0
 	github.com/mitchellh/go-homedir v1.1.0
 	github.com/spf13/cobra v1.9.1
-	github.com/vmware/govmomi v0.50.0
+	github.com/vmware/govmomi v0.51.0
 	github.com/xanzy/ssh-agent v0.3.3
 	golang.org/x/crypto v0.38.0
 	google.golang.org/api v0.232.0
@@ -68,6 +68,7 @@ require (
 	github.com/google/go-cmp v0.7.0 // indirect
 	github.com/google/go-querystring v1.1.0 // indirect
 	github.com/google/s2a-go v0.1.9 // indirect
+	github.com/google/uuid v1.6.0 // indirect
 	github.com/googleapis/enterprise-certificate-proxy v0.3.6 // indirect
 	github.com/googleapis/gax-go/v2 v2.14.1 // indirect
 	github.com/gorilla/css v1.0.1 // indirect
