@@ -16,7 +16,7 @@ require (
 	github.com/digitalocean/godo v1.169.0
 	github.com/hashicorp/hcl/v2 v2.24.0
 	github.com/mitchellh/go-homedir v1.1.0
-	github.com/spf13/cobra v1.10.1
+	github.com/spf13/cobra v1.10.2
 	github.com/vmware/govmomi v0.52.0
 	github.com/xanzy/ssh-agent v0.3.3
 	golang.org/x/crypto v0.45.0
