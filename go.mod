@@ -20,7 +20,7 @@ require (
 	github.com/vmware/govmomi v0.52.0
 	github.com/xanzy/ssh-agent v0.3.3
 	golang.org/x/crypto v0.45.0
-	google.golang.org/api v0.256.0
+	google.golang.org/api v0.257.0
 	gopkg.in/ini.v1 v1.67.0
 	gopkg.in/yaml.v3 v3.0.1
 	libvirt.org/go/libvirtxml v1.11009.0
