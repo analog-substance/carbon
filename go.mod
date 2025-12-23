@@ -8,7 +8,7 @@ require (
 	github.com/analog-substance/util v1.1.7
 	github.com/aws/aws-sdk-go-v2 v1.41.0
 	github.com/aws/aws-sdk-go-v2/config v1.32.6
-	github.com/aws/aws-sdk-go-v2/service/ec2 v1.275.0
+	github.com/aws/aws-sdk-go-v2/service/ec2 v1.279.0
 	github.com/aws/aws-sdk-go-v2/service/sts v1.41.5
 	github.com/charmbracelet/huh v0.8.0
 	github.com/charmbracelet/lipgloss v1.1.1-0.20250404203927-76690c660834
