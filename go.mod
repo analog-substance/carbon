@@ -3,7 +3,7 @@ module github.com/analog-substance/carbon
 go 1.24.2
 
 require (
-	cloud.google.com/go/compute v1.49.1
+	cloud.google.com/go/compute v1.52.0
 	github.com/NoF0rte/cmd-builder v0.0.0-20220305223538-e35bfeabbbff
 	github.com/analog-substance/util v1.1.7
 	github.com/aws/aws-sdk-go-v2 v1.41.0
