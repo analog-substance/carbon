@@ -13,7 +13,7 @@ require (
 	github.com/charmbracelet/huh v0.8.0
 	github.com/charmbracelet/lipgloss v1.1.1-0.20250404203927-76690c660834
 	github.com/digitalocean/go-libvirt v0.0.0-20251120220305-e19c2691f7c2
-	github.com/digitalocean/godo v1.169.0
+	github.com/digitalocean/godo v1.171.0
 	github.com/hashicorp/hcl/v2 v2.24.0
 	github.com/mitchellh/go-homedir v1.1.0
 	github.com/spf13/cobra v1.10.2
