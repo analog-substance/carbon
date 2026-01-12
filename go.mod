@@ -6,7 +6,7 @@ require (
 	cloud.google.com/go/compute v1.52.0
 	github.com/NoF0rte/cmd-builder v0.0.0-20220305223538-e35bfeabbbff
 	github.com/analog-substance/util v1.1.7
-	github.com/aws/aws-sdk-go-v2 v1.41.0
+	github.com/aws/aws-sdk-go-v2 v1.41.1
 	github.com/aws/aws-sdk-go-v2/config v1.32.6
 	github.com/aws/aws-sdk-go-v2/service/ec2 v1.279.0
 	github.com/aws/aws-sdk-go-v2/service/sts v1.41.5
