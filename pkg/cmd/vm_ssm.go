@@ -67,19 +67,24 @@ func init() {
 	vmSSMCmd.Flags().String("region", "", "AWS region")
 }
 
+func buildSSMArgs(instanceID, awsProfile, region string) []string {
+	args := []string{"aws", "ssm", "start-session", "--target", instanceID}
+	if awsProfile != "" {
+		args = append(args, "--profile", awsProfile)
+	}
+	if region != "" {
+		args = append(args, "--region", region)
+	}
+	return args
+}
+
 func execSSM(instanceID, awsProfile, region string) error {
 	awsPath, err := exec.LookPath("aws")
 	if err != nil {
 		return fmt.Errorf("aws CLI not found: %w", err)
 	}
 
-	cmdArgs := []string{"aws", "ssm", "start-session", "--target", instanceID}
-	if awsProfile != "" {
-		cmdArgs = append(cmdArgs, "--profile", awsProfile)
-	}
-	if region != "" {
-		cmdArgs = append(cmdArgs, "--region", region)
-	}
+	cmdArgs := buildSSMArgs(instanceID, awsProfile, region)
 
 	if runtime.GOOS == "windows" {
 		c := exec.Command(awsPath, cmdArgs[1:]...)
