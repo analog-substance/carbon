@@ -14,6 +14,23 @@ var vmSSH = &cobra.Command{
 	Long: `SSH to a VM.
 Carbon will call exec on the ssh binary. This means the SSH process takes
 over the carbon process. So SSH agents should just work.
+
+SSM tunneling (--ssm):
+  SSH can be tunnelled over AWS Systems Manager Session Manager instead of a
+  direct network connection. This is useful when the instance has no public IP
+  or inbound SSH is blocked.
+
+  One-time setup required:
+    1. Install the AWS CLI: https://docs.aws.amazon.com/cli/latest/userguide/getting-started-install.html
+    2. Install the Session Manager plugin: https://docs.aws.amazon.com/systems-manager/latest/userguide/session-manager-working-with-install-plugin.html
+    3. Ensure the target instance has:
+         - The SSM Agent running (pre-installed on most AWS-provided AMIs)
+         - An IAM instance profile with the AmazonSSMManagedInstanceCore policy
+    4. Add the following to your ~/.ssh/config to use carbon as the proxy:
+
+         Host i-* mi-*
+           ProxyCommand carbon vm ssh -i %h --ssm -- -W %h:%p
+           User ubuntu
 `,
 	Example: `# SSH to a VM
 carbon vm ssh -n vm-name
@@ -35,8 +52,13 @@ carbon vm ssh -n vm-name -- -A
 carbon vm ssh -n vm-name -- -D 1080
 
 
-# SSH tunneled over AWS SSM (requires AWS-StartSSHSession document enabled on the instance)
+# SSH tunnelled over AWS SSM
 carbon vm ssh -n vm-name --ssm
+
+
+# port forward over SSM
+carbon vm ssh -n vm-name --ssm -- -L 8080:localhost:80
+
 
 # SSH over SSM with a specific AWS profile and region
 carbon vm ssh -n vm-name --ssm --aws-profile my-profile --aws-region us-east-1
