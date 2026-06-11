@@ -46,6 +46,7 @@ type VM interface {
 	Restart() error
 
 	ExecSSH(string, bool, ...string) error
+	ExecSSHOverSSM(user, instanceID, awsProfile, awsRegion string, cmdArgs ...string) error
 	StartVNC(user string, privateIP bool, killVNC bool) error
 	StartRDPClient(user string, privateIP bool) error
 	Cmd(string, bool, ...string) (string, error)
