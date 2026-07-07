@@ -121,6 +121,45 @@ func (m *Machine) ExecSSH(user string, privateIP bool, cmdArgs ...string) error 
 	return syscall.Exec(sshPath, args, os.Environ())
 }
 
+func (m *Machine) ExecSSHOverSSM(user, instanceID, awsProfile, awsRegion string, cmdArgs ...string) error {
+	sshPath, err := exec.LookPath("ssh")
+	if err != nil {
+		return fmt.Errorf("ssh not found: %w", err)
+	}
+
+	proxyCmd := buildSSMProxyCommand(instanceID, awsProfile, awsRegion)
+
+	args := []string{
+		"ssh",
+		"-o", "StrictHostKeyChecking=no",
+		"-o", "UserKnownHostsFile=/dev/null",
+		"-o", fmt.Sprintf("ProxyCommand=%s", proxyCmd),
+		fmt.Sprintf("%s@%s", user, instanceID),
+	}
+	args = append(args, cmdArgs...)
+
+	if //goland:noinspection GoBoolExpressions
+	runtime.GOOS == "windows" {
+		return builder.Cmd(args[0], args[1:]...).Interactive().Run()
+	}
+	return syscall.Exec(sshPath, args, os.Environ())
+}
+
+func buildSSMProxyCommand(instanceID, awsProfile, awsRegion string) string {
+	args := []string{"aws", "ssm", "start-session",
+		"--target", instanceID,
+		"--document-name", "AWS-StartSSHSession",
+		"--parameters", "portNumber=%p",
+	}
+	if awsProfile != "" {
+		args = append(args, "--profile", awsProfile)
+	}
+	if awsRegion != "" {
+		args = append(args, "--region", awsRegion)
+	}
+	return strings.Join(args, " ")
+}
+
 // StartVNC will create a VNC session on the virtual machine
 // It accomplishes this by:
 //   - SSH to the VM.
