@@ -1,8 +1,8 @@
-name: reviewdog
+name: Code Review
 on: [pull_request_target]
 jobs:
-  reviewdog:
-    name: reviewdog
+  code_review:
+    name: code reviewer
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
