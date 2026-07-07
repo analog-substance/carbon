@@ -2,6 +2,7 @@ package models
 
 import (
 	"encoding/base64"
+	"encoding/json"
 	"fmt"
 	"github.com/NoF0rte/cmd-builder"
 	"github.com/analog-substance/carbon/pkg/rdp_client"
@@ -29,6 +30,45 @@ type Machine struct {
 	PrivateIPAddresses []string           `json:"private_ip_addresses"`
 	CurrentState       types.MachineState `json:"current_state"`
 	Env                types.Environment  `json:"-"`
+}
+
+// MarshalJSON implements json.Marshaler so that the environment, profile, and
+// provider names are included in the serialized output. These names are derived
+// from the Env field, which is otherwise excluded from JSON.
+func (m *Machine) MarshalJSON() ([]byte, error) {
+	type machineAlias Machine
+	return json.Marshal(struct {
+		*machineAlias
+		Environment string `json:"environment"`
+		Profile     string `json:"profile"`
+		Provider    string `json:"provider"`
+	}{
+		machineAlias: (*machineAlias)(m),
+		Environment:  m.environmentName(),
+		Profile:      m.profileName(),
+		Provider:     m.providerName(),
+	})
+}
+
+func (m *Machine) environmentName() string {
+	if m.Env == nil {
+		return ""
+	}
+	return m.Env.Name()
+}
+
+func (m *Machine) profileName() string {
+	if m.Env == nil || m.Env.Profile() == nil {
+		return ""
+	}
+	return m.Env.Profile().Name()
+}
+
+func (m *Machine) providerName() string {
+	if m.Env == nil || m.Env.Profile() == nil || m.Env.Profile().Provider() == nil {
+		return ""
+	}
+	return m.Env.Profile().Provider().Name()
 }
 
 func (m *Machine) Environment() types.Environment {
