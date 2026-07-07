@@ -1,19 +1,19 @@
-name: reviewdog
+name: Code Review
 on: [pull_request_target]
 jobs:
-  reviewdog:
-    name: reviewdog
+  code_review:
+    name: code reviewer
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6.0.1
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
         with:
           ref: ${{ github.event.pull_request.head.sha }}
-      - uses: actions/setup-go@4dc6199c7b1a012772edbd06daecab0f50c9053c # v6.1.0
+      - uses: actions/setup-go@924ae3a1cded613372ab5595356fb5720e22ba16 # v6.5.0
         with:
-          go-version: "1.24"
+          go-version-file: 'go.mod'
 
       - name: TruffleHog OSS
-        uses: trufflesecurity/trufflehog@ef6e76c3c4023279497fab4721ffa071a722fd05 # v3.92.4
+        uses: trufflesecurity/trufflehog@00155c9dc586f34d189adc83d3ac2698c2ec551f # v3.95.8
         with:
           extra_args: --results=verified,unknown
 
@@ -23,7 +23,7 @@ jobs:
       - name: Test
         run: go test -v ./...
 
-      - uses: reviewdog/action-staticcheck@50f9bfcf3738839ddc95deac241b904d77469096 # v1.28.0
+      - uses: reviewdog/action-staticcheck@564f18c6297af36f7b10b6c7a72e814341bd813a # v1.29.0
         with:
           fail_on_error: true
       - uses: reviewdog/action-setup@d8a7baabd7f3e8544ee4dbde3ee41d0011c3a93f # v1.5.0
