@@ -23,7 +23,7 @@ jobs:
       - name: Test
         run: go test -v ./...
 
-      - uses: reviewdog/action-staticcheck@53efac7da6eead83fb445fc490fef0b7ea57eeb1 # v1.31.0
+      - uses: reviewdog/action-staticcheck@8a5a935620ac73e5d4db95c8dc952108a885a748 # v1.32.0
         with:
           fail_on_error: true
       - uses: reviewdog/action-setup@d8a7baabd7f3e8544ee4dbde3ee41d0011c3a93f # v1.5.0
